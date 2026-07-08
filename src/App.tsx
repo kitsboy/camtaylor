@@ -1,46 +1,23 @@
-import { useState } from 'react';
-import { BackgroundCanvas } from './components/BackgroundCanvas';
-import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
-import { Manifesto } from './components/Manifesto';
-import { Services } from './components/Services';
-import { Ventures } from './components/Ventures';
-import { Contact } from './components/Contact';
-import { Footer } from './components/Footer';
-import { CommandDeck } from './components/CommandDeck';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HomePage } from './pages/HomePage';
+import { PrivacyPage } from './pages/PrivacyPage';
+import { TermsPage } from './pages/TermsPage';
+import { FieldGuidePage } from './pages/FieldGuidePage';
+import { YearReviewPage } from './pages/YearReviewPage';
 
 function App() {
-  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
-
   return (
-    <div className="app-container">
-      {/* Interactive hardware-accelerated grid/particle canvas background */}
-      <BackgroundCanvas />
-
-      {/* Floating minimal frosted glass Navbar */}
-      <Navbar 
-        onToggleTerminal={() => setIsTerminalOpen(!isTerminalOpen)} 
-        isTerminalOpen={isTerminalOpen} 
-      />
-
-      {/* Main landing segments */}
-      <main className="main-content">
-        <Hero onOpenTerminal={() => setIsTerminalOpen(true)} />
-        <Manifesto />
-        <Services />
-        <Ventures />
-        <Contact />
-      </main>
-
-      {/* Secure command terminal overlay */}
-      <CommandDeck 
-        isOpen={isTerminalOpen} 
-        onClose={() => setIsTerminalOpen(false)} 
-      />
-
-      {/* Footer operations status */}
-      <Footer onToggleTerminal={() => setIsTerminalOpen(true)} />
-    </div>
+    <BrowserRouter>
+      <div className="app-container">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/field-guide" element={<FieldGuidePage />} />
+          <Route path="/2026" element={<YearReviewPage />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 

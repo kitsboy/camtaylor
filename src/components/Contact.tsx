@@ -1,174 +1,244 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { useForm, ValidationError } from '@formspree/react';
+import { Send, CheckCircle2, ShieldAlert, Clock, Zap, Copy, Check, Mail } from 'lucide-react';
+import { FORMSPREE_FORM_ID, SITE } from '../data/site';
+import { DEAL_TIERS } from '../data/dealTiers';
+import { useReferrer } from '../hooks/useReferrer';
+import { trackEvent } from '../utils/analytics';
 
-export const Contact: React.FC = () => {
-  const [form, setForm] = useState({ name: '', org: '', email: '', details: '', dealSize: '$100K - $1M' });
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+function ContactFormBody({ onReset }: { onReset: () => void }) {
+  const [state, handleSubmit] = useForm(FORMSPREE_FORM_ID);
+  const [tierId, setTierId] = useState('multi-day');
+  const [submittedName, setSubmittedName] = useState('');
+  const [referenceId, setReferenceId] = useState('');
+  const [started, setStarted] = useState(false);
+  const referrer = useReferrer();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.name || !form.email || !form.details) return;
+  const activeTier = DEAL_TIERS.find((t) => t.id === tierId) ?? DEAL_TIERS[1];
 
-    setLoading(true);
-
-    // Simulate premium transmission
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-    }, 1500);
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const form = e.currentTarget;
+    const name = (form.elements.namedItem('name') as HTMLInputElement)?.value ?? '';
+    setSubmittedName(name);
+    setReferenceId(`CT-${Date.now().toString(36).toUpperCase()}`);
+    trackEvent('form_submit', { tier: activeTier.label, ref: referrer || 'direct' });
+    handleSubmit(e);
   };
 
-  const dealSizes = ['<$100K', '$100K - $1M', '$1M - $5M', '$5M+'];
+  if (state.succeeded) {
+    trackEvent('form_success');
+    const nostrNote = encodeURIComponent(
+      `Reached base camp at camtaylor.ca — inquiry ref ${referenceId}. @giveabit.io`,
+    );
+    return (
+      <motion.div
+        className="contact-success"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 100 }}
+      >
+        <CheckCircle2 className="success-icon" size={48} />
+        <h3 className="success-title">Message received</h3>
+        <p className="success-message">
+          Thank you, {submittedName || 'there'}. Your inquiry has been sent to {SITE.email}. I&apos;ll
+          review the details and respond if there&apos;s alignment.
+        </p>
+        <div className="success-details">
+          <div className="details-row">
+            <span>Reference:</span>
+            <code>{referenceId}</code>
+          </div>
+          <div className="details-row">
+            <span>Reply to:</span>
+            <span>{SITE.email}</span>
+          </div>
+        </div>
+        <a
+          href={`https://coracle.social/notes?t=${nostrNote}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-secondary nostr-share-btn"
+        >
+          <Zap size={14} />
+          Share on Nostr
+        </a>
+        <button onClick={onReset} className="btn-reset">
+          Send another message
+        </button>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.form
+      onSubmit={onSubmit}
+      className="contact-form"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.4 }}
+      onFocus={() => {
+        if (!started) {
+          setStarted(true);
+          trackEvent('form_start');
+        }
+      }}
+    >
+      <div className="form-grid">
+        <div className="form-group">
+          <label htmlFor="name" className="form-label">Full Name</label>
+          <input id="name" type="text" name="name" required className="form-input" placeholder="Your name" />
+          <ValidationError prefix="Name" field="name" errors={state.errors} className="form-error" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="organization" className="form-label">Organization</label>
+          <input id="organization" type="text" name="organization" className="form-input" placeholder="Company or entity (optional)" />
+        </div>
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="email" className="form-label">Email</label>
+        <input id="email" type="email" name="email" required className="form-input" placeholder="you@company.com" />
+        <ValidationError prefix="Email" field="email" errors={state.errors} className="form-error" />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">Expedition tier</label>
+        <div className="deal-size-selector expedition-tiers" role="group" aria-label="Expedition tier">
+          {DEAL_TIERS.map((tier) => (
+            <button
+              key={tier.id}
+              type="button"
+              className={`deal-size-btn expedition-tier-btn ${tierId === tier.id ? 'active' : ''}`}
+              onClick={() => setTierId(tier.id)}
+              aria-pressed={tierId === tier.id}
+              title={tier.description}
+            >
+              <span className="tier-label">{tier.label}</span>
+              <span className="tier-range">{tier.range}</span>
+            </button>
+          ))}
+        </div>
+        <input type="hidden" name="dealSize" value={`${activeTier.label} (${activeTier.range})`} />
+        <input type="hidden" name="dealTier" value={activeTier.id} />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="message" className="form-label">Brief overview</label>
+        <textarea id="message" name="message" required rows={4} className="form-textarea" placeholder="Structure, assets, timeline, and what you're looking for..." />
+        <ValidationError prefix="Message" field="message" errors={state.errors} className="form-error" />
+      </div>
+
+      <input type="hidden" name="_subject" value={`New inquiry — ${activeTier.label} (${activeTier.range})`} />
+      {referrer && <input type="hidden" name="referrer" value={referrer} />}
+      <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" className="form-honeypot" aria-hidden="true" />
+
+      <ValidationError errors={state.errors} className="form-submit-error" />
+
+      <button type="submit" className="submit-btn" disabled={state.submitting}>
+        {state.submitting ? (
+          <span className="spinner">Sending...</span>
+        ) : (
+          <>
+            <span>Send message</span>
+            <Send size={16} />
+          </>
+        )}
+      </button>
+
+      <p className="form-sla">
+        <Clock size={13} />
+        {SITE.responseTime}
+      </p>
+    </motion.form>
+  );
+}
+
+function CopyEmailButton() {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(SITE.email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* noop */ }
+  };
+  return (
+    <button type="button" className="copy-email-btn" onClick={copy} aria-label="Copy email">
+      {copied ? <Check size={14} /> : <Copy size={14} />}
+      {copied ? 'Copied' : 'Copy email'}
+    </button>
+  );
+}
+
+export const Contact: React.FC = () => {
+  const [formKey, setFormKey] = useState(0);
 
   return (
     <section className="contact-section" id="contact">
+      <div className="section-divider section-divider--topo" aria-hidden="true" />
       <div className="section-header">
-        <h2 className="section-title text-gradient">SECURE PORTAL</h2>
-        <p className="section-subtitle">Establish a secure pipeline for capital allocation, deal advisories, and strategic partnerships.</p>
+        <h2 className="section-title text-gradient">GET IN TOUCH</h2>
+        <p className="section-subtitle">
+          Share your deal, venture, or partnership idea. All inquiries are handled confidentially.
+        </p>
       </div>
 
       <div className="contact-container">
         <AnimatePresence mode="wait">
-          {!submitted ? (
-            <motion.form 
-              key="contact-form"
-              onSubmit={handleSubmit} 
-              className="contact-form glass"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-            >
-              <div className="form-grid">
-                <div className="form-group">
-                  <label htmlFor="name" className="form-label">Full Name</label>
-                  <input
-                    id="name"
-                    type="text"
-                    required
-                    className="form-input"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="Enter your name"
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label htmlFor="org" className="form-label">Organization / Entity</label>
-                  <input
-                    id="org"
-                    type="text"
-                    className="form-input"
-                    value={form.org}
-                    onChange={(e) => setForm({ ...form, org: e.target.value })}
-                    placeholder="Entity name"
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="email" className="form-label">Secure Email Endpoint</label>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  className="form-input"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="name@domain.com"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Scale of Leverage / Deal Size</label>
-                <div className="deal-size-selector">
-                  {dealSizes.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      className={`deal-size-btn ${form.dealSize === size ? 'active' : ''}`}
-                      onClick={() => setForm({ ...form, dealSize: size })}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="details" className="form-label">Brief Deal / Venture Details</label>
-                <textarea
-                  id="details"
-                  required
-                  rows={4}
-                  className="form-textarea"
-                  value={form.details}
-                  onChange={(e) => setForm({ ...form, details: e.target.value })}
-                  placeholder="Outline the structure, core assets, and objective..."
-                />
-              </div>
-
-              <button 
-                type="submit" 
-                className="submit-btn"
-                disabled={loading}
-              >
-                {loading ? (
-                  <span className="spinner">Encrypting...</span>
-                ) : (
-                  <>
-                    <span>Transmit Secure Signal</span>
-                    <Send size={16} />
-                  </>
-                )}
-              </button>
-            </motion.form>
-          ) : (
-            <motion.div 
-              key="success"
-              className="contact-success glass"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: 'spring', stiffness: 100 }}
-            >
-              <CheckCircle2 className="success-icon" size={48} />
-              <h3 className="success-title">TRANSMISSION SECURED</h3>
-              <p className="success-message">
-                Your connection request has been encrypted and routed. The agent will assess the transaction terms and establish contact if alignment exists.
-              </p>
-              <div className="success-details">
-                <div className="details-row">
-                  <span>Routing Code:</span>
-                  <code>CTVA-{Math.floor(Math.random() * 90000) + 10000}</code>
-                </div>
-                <div className="details-row">
-                  <span>Target Node:</span>
-                  <span>camtaylor.ca</span>
-                </div>
-              </div>
-              <button 
-                onClick={() => {
-                  setSubmitted(false);
-                  setForm({ name: '', org: '', email: '', details: '', dealSize: '$100K - $1M' });
-                }} 
-                className="btn-reset"
-              >
-                Open New Pipeline
-              </button>
-            </motion.div>
-          )}
+          <ContactFormBody key={formKey} onReset={() => setFormKey((k) => k + 1)} />
         </AnimatePresence>
 
         <div className="contact-sidebar">
-          <div className="sidebar-card glass">
+          <div className="trust-badges">
+            <span className="trust-badge">🔒 Confidential</span>
+            <span className="trust-badge">⚡ 48h response</span>
+            <span className="trust-badge">🌐 Nostr ready</span>
+          </div>
+
+          <a href={`mailto:${SITE.email}`} className="mobile-email-cta">
+            <Mail size={18} />
+            <span>{SITE.email}</span>
+          </a>
+          <CopyEmailButton />
+
+          <div className="sidebar-card">
             <ShieldAlert className="sidebar-icon" size={24} />
-            <h4 className="sidebar-title">Pipeline Protocols</h4>
+            <h4 className="sidebar-title">How it works</h4>
             <ul className="sidebar-list">
-              <li>All inbound proposals are held under strict confidentiality.</li>
-              <li>Priority routing is given to ventures with active technical or structural leverage.</li>
-              <li>Direct endpoint for verified partners: <a href="mailto:cam@camtaylor.ca" className="secure-mail-link">cam@camtaylor.ca</a></li>
+              <li>All inquiries are treated as confidential.</li>
+              <li>Priority goes to ventures with clear structure and leverage.</li>
+              <li>
+                Prefer email?{' '}
+                <a href={`mailto:${SITE.email}`} className="secure-mail-link">{SITE.email}</a>
+              </li>
+            </ul>
+          </div>
+
+          <div className="sidebar-card nostr-contact-card">
+            <Zap className="sidebar-icon" size={24} />
+            <h4 className="sidebar-title">Prefer Nostr?</h4>
+            <ul className="sidebar-list">
+              <li>
+                <a href="https://iris.to/cam@giveabit.io" target="_blank" rel="noopener noreferrer">
+                  DM via iris.to
+                </a>
+              </li>
+              <li>
+                <a href="https://coracle.social" target="_blank" rel="noopener noreferrer">
+                  coracle.social
+                </a>
+              </li>
+              <li>NIP-05: {SITE.nostr}</li>
+            </ul>
+          </div>
+
+          <div className="sidebar-card">
+            <h4 className="sidebar-title">Based in</h4>
+            <ul className="sidebar-list">
+              <li>{SITE.location}</li>
+              <li>{SITE.timezone}</li>
             </ul>
           </div>
         </div>

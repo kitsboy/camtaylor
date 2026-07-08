@@ -44,3 +44,99 @@
 ---
 
 *Safe Harbour · Part of the [Give A Bit](https://giveabit.io) family.*
+
+## Handoff to Kimi — 2026-07-05 (Grok polish pass)
+
+**Machine:** M3 (Grok)
+**Project:** camtaylor
+
+### Done
+- [x] Sherpa rebrand completed — Command Deck, Hero, all copy aligned
+- [x] Shared data layer: `src/data/{site,ventures,services,axioms,commandDeck}.ts`
+- [x] Formspree contact form with validation, honeypot, real reference IDs (needs `VITE_FORMSPREE_FORM_ID` in `.env`)
+- [x] About section with bio, location (BC), timezone (PT)
+- [x] All 7 ventures now have live URLs
+- [x] Mobile hamburger nav, sticky CTA, scroll-spy `aria-current`, navbar scroll shadow
+- [x] Command Deck: `/services`, tab-complete, ↑↓ history, focus trap, swipe-to-close, `aria-live`
+- [x] Privacy + Terms pages at `/privacy` and `/terms`
+- [x] SEO: og:image, Twitter card, JSON-LD, canonical, robots.txt, sitemap.xml, favicon.svg
+- [x] Self-hosted fonts via @fontsource (no Google CDN)
+- [x] Lazy-loaded CommandDeck chunk, Plausible analytics hook (optional env)
+- [x] Deploy configs: vercel.json, netlify.toml, public/_headers (CSP)
+- [x] CI: `.github/workflows/ci.yml` + Playwright smoke tests (3 passing)
+- [x] Footer social links: GitHub, LinkedIn, X
+
+### Decisions
+- Formspree over Resend — simpler static-site integration; form ID via env var
+- react-router-dom for legal pages (SPA rewrites required on deploy)
+- LinkedIn URL set to `linkedin.com/in/camtaylor` — verify with Cam
+
+### What's Next
+- Cam creates Formspree form → add `VITE_FORMSPREE_FORM_ID` to `.env` and deploy env
+- Deploy to camtaylor.ca (Vercel or Netlify — configs ready)
+- Verify LinkedIn URL is correct
+- Optional: convert og-image.svg to PNG for broader social crawler support
+
+### Git State
+- Last commit SHA: d10702b
+- Branch: main
+- Unpushed: uncommitted local changes
+
+---
+
+## Handoff to Kimi — 2026-07-07
+
+**Machine:** M3 (Grok)
+**Project:** camtaylor
+
+### Done
+- [x] 50-feature polish batch: expedition log, testimonials, anti-services, venture case studies, Command Deck v2 (`/status`, `/route`, `/nostr`, `/summit`, Konami code)
+- [x] Hero YouTube in-frame player — video ID `nJeddv1QbeQ` (configurable in `src/data/site.ts`)
+- [x] 100 mobile improvements: `src/styles/mobile.css`, bottom quick-nav, snap-scroll ventures/testimonials, safe-area insets, bottom-sheet modals
+- [x] Mobile drawer menu with backdrop, trust badges, mailto/copy-email CTAs, sticky CTA auto-hide
+- [x] Night camp theme toggle, scroll progress rope, loading screen, custom cursor (desktop)
+- [x] Pages: `/field-guide`, `/2026`; static `public/llms.txt`, `public/manifest.json`
+- [x] PWA meta tags, YouTube preconnect, dynamic theme-color
+- [x] 6 Playwright tests passing (2 mobile-specific)
+- [x] README.md rewritten; docs updated
+
+### Decisions
+- **Local-first** — Cam deferred GitHub + Cloudflare for a few more weeks of local work
+- Mobile scroll lock uses `overflow:hidden` only (avoids iOS position:fixed jank)
+- YouTube via `youtube-nocookie.com` with click-to-play poster pattern
+- Separate `mobile.css` for maintainability
+
+### What's Next
+- Git commit + push when Cam is ready (51 uncommitted files, no remote)
+- Deploy camtaylor.ca when GitHub/Cloudflare set up
+- Real device QA (iOS Safari, Android Chrome)
+- giveabit.io avatar in namespaceRegistry.js (deferred)
+
+### Git State
+- Last commit SHA: d10702b359fd980db6360a3fe86b649ef6db6997
+- Branch: main
+- Unpushed: no remote configured; ~51 files uncommitted
+
+---
+
+## Latest Session Summary (from 2026-07-07 goodbye)
+
+**Chat topic:** Continued camtaylor.ca locally — 50 ideas implemented, hero YouTube, 100 mobile improvements.
+
+**Finished in this session:**
+- Full feature batch + mobile-first pass
+- Hero YouTube `nJeddv1QbeQ` in gold frame
+- Bottom quick-nav, snap carousels, bottom sheets, night mode
+- Build clean, 6 tests passing
+- All docs updated
+
+**Still to do:**
+- Commit + push (no remote yet)
+- Deploy when Cam ready (GitHub/Cloudflare deferred)
+- giveabit.io avatar, LinkedIn verify, optional og PNG
+
+**Next for Kimi:** Read `SESSION-SUMMARY-2026-07-07.md`. Integrate into vault when synced. Do not overwhelm with raw logs.
+
+---
+
+*Safe Harbour · Part of the [Give A Bit](https://giveabit.io) family.*
