@@ -139,4 +139,58 @@
 
 ---
 
+## Session — 2026-07-09
+
+**Machine:** M3 (Grok)  
+**Project:** camtaylor
+
+### Done
+- [x] `/whatsup` recovery from Jul 7 summary
+- [x] Removed LinkedIn entirely (site data, footer, JSON-LD) — Cam preference
+- [x] Footer social: GitHub · X · Nostr
+- [x] OG image PNG `public/og-image.png` (1200×630); meta tags + alt updated
+- [x] Removed About voice-intro stub and Nostr/Command Deck zap “coming soon” stubs
+- [x] a11y polish (footer nav, form autocomplete, copy-email live region, focus rings, `sr-only`)
+- [x] Build clean; 6 Playwright tests passing
+
+### Decisions
+- **No LinkedIn** — permanent preference for this site
+- **Local-first** — still no deploy; polish only
+- Calendly / PGP remain null until Cam supplies values
+
+### What's Next
+- Commit polish when Cam ready (currently uncommitted)
+- Deploy camtaylor.ca later (Formspree env `xykqodnk`)
+- Real device QA; giveabit.io avatar deferred
+- Optional Calendly / PGP
+
+### Git State
+- Last commit SHA: `a212d184e00dfacb1c1ff57ba7e7674616f89e2b`
+- Branch: main (up to date with `origin/main`)
+- Remote: `github.com:kitsboy/camtaylor.git`
+- Uncommitted: polish batch (8 modified files + `public/og-image.png`)
+- Unpushed commits: none
+
+---
+
+## Latest Session Summary (from 2026-07-09 goodbye)
+
+**Chat topic:** Local polish after whatsup recovery — kill LinkedIn, ship OG PNG, clean stubs, a11y.
+
+**Finished in this session:**
+- LinkedIn removed site-wide
+- `og-image.png` + social meta
+- Voice/zap stubs removed
+- a11y/copy pass
+- Build + 6 tests green
+
+**Still to do:**
+- Commit uncommitted polish (local-first)
+- Deploy when Cam ready
+- Device QA; giveabit avatar; optional Calendly/PGP
+
+**Next for Kimi:** Read `SESSION-SUMMARY-2026-07-09.md`. Note: no LinkedIn on camtaylor; origin remote exists. Integrate when synced. No raw chat logs.
+
+---
+
 *Safe Harbour · Part of the [Give A Bit](https://giveabit.io) family.*

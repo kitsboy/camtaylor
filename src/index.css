@@ -76,6 +76,18 @@ img, video {
   outline-offset: 2px;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ── Scrollbar ──────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
@@ -1700,6 +1712,11 @@ img, video {
   align-items: center;
 }
 .footer-social a:hover { color: var(--green-light); }
+.footer-social a:focus-visible {
+  outline: 2px solid var(--green-light);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
 
 .footer-legal-link {
   color: rgba(255,255,255,.35);
@@ -2587,20 +2604,6 @@ body.custom-cursor-on * { cursor: none !important; }
   border-radius: 8px;
   color: var(--text-muted);
 }
-.nostr-zap-stub {
-  font-size: 0.72rem;
-  color: var(--amber);
-  font-family: var(--font-heading);
-  font-weight: 600;
-}
-
-.about-audio-note {
-  margin-top: 14px;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  font-style: italic;
-}
-
 /* Contact enhancements */
 .expedition-tiers {
   display: grid;

@@ -1,5 +1,5 @@
-# camtaylor — Last Updated 2026-07-07 by Grok
+# camtaylor — Last Updated 2026-07-09 by Grok
 
-Brief: 50 features + 100 mobile improvements, hero YouTube nJeddv1QbeQ
-Commit: d10702b (51 uncommitted files pending)
+Brief: Local polish — no LinkedIn, OG PNG, stubs cleaned, a11y pass
+Commit: a212d18 (polish uncommitted: 8 files + og-image.png)
 Tests: 6 Playwright passing

@@ -142,7 +142,6 @@ export function formatNostr(): string {
     `NIP-05: ${cam.nip05}`,
     `Namespace: ${NOSTR_JSON_URL}`,
     'Relays: relay.damus.io, nos.lol, relay.snort.social',
-    'Zap: Lightning tips — coming soon',
     'DM: Prefer Nostr? Reach via iris.to or coracle.social',
   ].join('\n');
 }

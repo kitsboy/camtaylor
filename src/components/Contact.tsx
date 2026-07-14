@@ -88,18 +88,42 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
       <div className="form-grid">
         <div className="form-group">
           <label htmlFor="name" className="form-label">Full Name</label>
-          <input id="name" type="text" name="name" required className="form-input" placeholder="Your name" />
+          <input
+            id="name"
+            type="text"
+            name="name"
+            required
+            autoComplete="name"
+            className="form-input"
+            placeholder="Your name"
+          />
           <ValidationError prefix="Name" field="name" errors={state.errors} className="form-error" />
         </div>
         <div className="form-group">
           <label htmlFor="organization" className="form-label">Organization</label>
-          <input id="organization" type="text" name="organization" className="form-input" placeholder="Company or entity (optional)" />
+          <input
+            id="organization"
+            type="text"
+            name="organization"
+            autoComplete="organization"
+            className="form-input"
+            placeholder="Company or entity (optional)"
+          />
         </div>
       </div>
 
       <div className="form-group">
         <label htmlFor="email" className="form-label">Email</label>
-        <input id="email" type="email" name="email" required className="form-input" placeholder="you@company.com" />
+        <input
+          id="email"
+          type="email"
+          name="email"
+          required
+          autoComplete="email"
+          inputMode="email"
+          className="form-input"
+          placeholder="you@company.com"
+        />
         <ValidationError prefix="Email" field="email" errors={state.errors} className="form-error" />
       </div>
 
@@ -132,7 +156,15 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
 
       <input type="hidden" name="_subject" value={`New inquiry — ${activeTier.label} (${activeTier.range})`} />
       {referrer && <input type="hidden" name="referrer" value={referrer} />}
-      <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" className="form-honeypot" aria-hidden="true" />
+      <input
+        type="text"
+        name="_gotcha"
+        tabIndex={-1}
+        autoComplete="off"
+        className="form-honeypot"
+        aria-hidden="true"
+        aria-label="Leave blank"
+      />
 
       <ValidationError errors={state.errors} className="form-submit-error" />
 
@@ -165,9 +197,17 @@ function CopyEmailButton() {
     } catch { /* noop */ }
   };
   return (
-    <button type="button" className="copy-email-btn" onClick={copy} aria-label="Copy email">
-      {copied ? <Check size={14} /> : <Copy size={14} />}
+    <button
+      type="button"
+      className="copy-email-btn"
+      onClick={copy}
+      aria-label={copied ? 'Email copied' : `Copy ${SITE.email}`}
+    >
+      {copied ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
       {copied ? 'Copied' : 'Copy email'}
+      <span className="sr-only" aria-live="polite">
+        {copied ? 'Email address copied to clipboard' : ''}
+      </span>
     </button>
   );
 }

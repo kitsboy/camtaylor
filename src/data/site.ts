@@ -18,7 +18,6 @@ export const SITE = {
   pgpFingerprint: null as string | null,
   social: {
     github: 'https://github.com/kitsboy',
-    linkedin: 'https://www.linkedin.com/in/camtaylor',
     x: 'https://x.com/give_bit',
     nostr: 'https://giveabit.io/nostr',
     namespace: 'https://giveabit.io/namespace',

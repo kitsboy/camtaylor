@@ -100,16 +100,11 @@ function NostrCard({ identity, index }: { identity: (typeof NOSTR_IDENTITIES)[0]
 
         <div className="nostr-links">
           <a href={identity.profileUrl} target="_blank" rel="noopener noreferrer" className="nostr-link">
-            Profile <ExternalLink size={11} />
+            Profile <ExternalLink size={11} aria-hidden="true" />
           </a>
           <a href={NOSTR_NAMESPACE_URL} target="_blank" rel="noopener noreferrer" className="nostr-link">
-            Verify namespace <ExternalLink size={11} />
+            Verify namespace <ExternalLink size={11} aria-hidden="true" />
           </a>
-          {identity.id === 'cam' && (
-            <span className="nostr-zap-stub" title="Lightning zaps — coming soon">
-              ⚡ Zap soon
-            </span>
-          )}
         </div>
       </div>
     </motion.div>

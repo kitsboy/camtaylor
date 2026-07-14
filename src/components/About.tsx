@@ -42,18 +42,14 @@ export const About: React.FC = () => {
 
           <div className="about-meta">
             <div className="about-meta-item">
-              <MapPin size={15} />
+              <MapPin size={15} aria-hidden="true" />
               <span>{SITE.location}</span>
             </div>
             <div className="about-meta-item">
-              <Clock size={15} />
+              <Clock size={15} aria-hidden="true" />
               <span>{SITE.timezone}</span>
             </div>
           </div>
-
-          <p className="about-audio-note">
-            Voice intro coming soon — 30 seconds on what a Sherpa does in deal work.
-          </p>
         </motion.div>
       </div>
 
