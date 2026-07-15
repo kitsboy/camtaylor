@@ -193,4 +193,26 @@
 
 ---
 
+## Session — 2026-07-15
+
+**Machine:** M3 (Grok)  
+**Project:** camtaylor
+
+### Done
+- [x] 100 elite upgrades — perf, routes, a11y, features (see SESSION-SUMMARY-2026-07-15.md)
+- [x] Code-split vendor chunks; lazy routes; ThemeProvider; 12 Playwright tests
+- [x] `/route/:ventureId`, 404, hash scroll, Command Deck navigation
+- [x] Cloudflare `_redirects` + CSP fixes; DEPLOYMENT.md rewritten
+- [x] Pushed to origin — no deploy
+
+### Decisions
+- No deploy; Cloudflare Pages documented as planned host
+- Calendly/PGP null; giveabit avatar deferred
+
+### Git State
+- SHA: `d7845d1`
+- Branch: main (pushed)
+
+---
+
 *Safe Harbour · Part of the [Give A Bit](https://giveabit.io) family.*
