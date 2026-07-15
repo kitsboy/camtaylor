@@ -70,6 +70,14 @@ After `/whatsup` recovery: implement all pending issues except deploy, deliver 1
 - **Cloudflare Pages** documented as primary planned host
 - No LinkedIn (unchanged); Formspree `xykqodnk`
 
+## Mission Tie-in
+
+Personal Sherpa site for Cam Taylor and the Give A Bit constellation — privacy-first contact, NOSTR `@giveabit.io`, no rented LinkedIn identity. Clean handoffs keep Kimi/HERMES current without raw chat dumps.
+
+## Update / Status
+
+As of 2026-07-15, camtaylor.ca is **production-ready but not deployed**. Latest commits `d7845d1` + `cfa5adc` on `origin/main`, clean working tree, 12 tests green. Cloudflare Pages configs ready; deploy waits on Cam.
+
 ---
 
 *Safe Harbour · Part of the [Give A Bit](https://giveabit.io) family.*

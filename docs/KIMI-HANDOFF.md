@@ -210,8 +210,29 @@
 - Calendly/PGP null; giveabit avatar deferred
 
 ### Git State
-- SHA: `d7845d1`
-- Branch: main (pushed)
+- SHA: `cfa5adcec8531441a2e6c255e763914b6b4a11fa`
+- Branch: main (pushed, clean working tree)
+- Unpushed: none
+
+---
+
+## Latest Session Summary (from 2026-07-15 goodbye)
+
+**Chat topic:** `/whatsup` recovery → 100 elite upgrades, all pending work except deploy, push to GitHub. Cloudflare (not Vercel/Netlify) noted as planned host.
+
+**Finished in this session:**
+- 100-upgrade batch: perf, routes, a11y, UX, Command Deck workflow
+- `/route/:ventureId`, 404, hash scroll, lazy routes, code splitting (~77KB main)
+- Cloudflare-ready: `_redirects`, CSP fixes, DEPLOYMENT.md rewritten
+- 12 Playwright tests passing
+- Pushed to `origin/main` — no deploy
+
+**Still to do:**
+- Deploy camtaylor.ca via Cloudflare when Cam approves
+- Real device QA (iOS Safari, Android Chrome)
+- Optional Calendly/PGP; giveabit.io avatar (deferred)
+
+**Next for Kimi:** Read `SESSION-SUMMARY-2026-07-15.md`. Integrate into vault when synced. Do not overwhelm with raw chat logs. Planned host: Cloudflare Pages.
 
 ---
 
