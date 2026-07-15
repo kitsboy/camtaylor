@@ -12,6 +12,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ isNight, onToggle }) =
     className="theme-toggle"
     onClick={onToggle}
     aria-label={isNight ? 'Switch to warm camp mode' : 'Switch to night camp mode'}
+    aria-pressed={isNight}
     title={isNight ? 'Warm camp' : 'Night camp'}
   >
     {isNight ? <Sun size={15} /> : <Moon size={15} />}

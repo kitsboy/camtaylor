@@ -1,7 +1,14 @@
 import { LegalPage } from './LegalPage';
 import { SITE } from '../data/site';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 export function TermsPage() {
+  usePageMeta({
+    title: 'Terms of Use',
+    description: `Terms of use for ${SITE.domain}.`,
+    path: '/terms',
+  });
+
   return (
     <LegalPage title="Terms of Use">
       <section>

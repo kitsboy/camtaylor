@@ -5,6 +5,8 @@ export interface ExpeditionEntry {
   title: string;
   outcome: string;
   altitude: 'base' | 'mid' | 'summit' | 'descent';
+  tags?: string[];
+  ventureId?: string;
 }
 
 export const EXPEDITION_LOG: ExpeditionEntry[] = [
@@ -15,6 +17,8 @@ export const EXPEDITION_LOG: ExpeditionEntry[] = [
     title: 'Give A Bit — namespace & micro-donation rails',
     outcome: 'Live platform with NOSTR identity layer and 7-venture constellation.',
     altitude: 'summit',
+    tags: ['NOSTR', 'Social'],
+    ventureId: 'giveabit',
   },
   {
     id: 'openstrata-syndicate',

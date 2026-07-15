@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+function waitForFonts(): Promise<void> {
+  return (document.fonts?.ready ?? Promise.resolve()).then(() => {});
+}
+
+function waitForImage(src: string): Promise<void> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = () => resolve();
+    img.src = src;
+  });
+}
+
 export const LoadingScreen: React.FC = () => {
   const [visible, setVisible] = useState(true);
   const [prefersReduced, setPrefersReduced] = useState(false);
@@ -14,8 +27,12 @@ export const LoadingScreen: React.FC = () => {
       return;
     }
 
-    const timer = setTimeout(() => setVisible(false), 900);
-    return () => clearTimeout(timer);
+    Promise.all([waitForFonts(), waitForImage('/hero-bg.jpg')])
+      .then(() => setVisible(false))
+      .catch(() => setVisible(false));
+
+    const fallback = setTimeout(() => setVisible(false), 1800);
+    return () => clearTimeout(fallback);
   }, []);
 
   if (prefersReduced) return null;

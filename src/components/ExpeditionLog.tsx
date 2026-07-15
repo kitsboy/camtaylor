@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Flag, Mountain } from 'lucide-react';
 import { EXPEDITION_LOG, ALTITUDE_LABELS } from '../data/expeditionLog';
@@ -10,7 +10,19 @@ const ALTITUDE_ICONS: Record<string, string> = {
   descent: '▼',
 };
 
+const TERRAINS = [...new Set(EXPEDITION_LOG.map((e) => e.terrain))];
+
 export const ExpeditionLog: React.FC = () => {
+  const [terrainFilter, setTerrainFilter] = useState<string>('all');
+
+  const entries = useMemo(
+    () =>
+      terrainFilter === 'all'
+        ? EXPEDITION_LOG
+        : EXPEDITION_LOG.filter((e) => e.terrain === terrainFilter),
+    [terrainFilter],
+  );
+
   return (
     <section className="expedition-section" id="expeditions">
       <div className="section-divider section-divider--topo" aria-hidden="true" />
@@ -21,8 +33,30 @@ export const ExpeditionLog: React.FC = () => {
         </p>
       </div>
 
+      <div className="expedition-filters" role="group" aria-label="Filter by terrain">
+        <button
+          type="button"
+          className={`expedition-filter-btn ${terrainFilter === 'all' ? 'expedition-filter-btn--active' : ''}`}
+          onClick={() => setTerrainFilter('all')}
+          aria-pressed={terrainFilter === 'all'}
+        >
+          All terrain
+        </button>
+        {TERRAINS.map((t) => (
+          <button
+            key={t}
+            type="button"
+            className={`expedition-filter-btn ${terrainFilter === t ? 'expedition-filter-btn--active' : ''}`}
+            onClick={() => setTerrainFilter(t)}
+            aria-pressed={terrainFilter === t}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
       <div className="expedition-timeline">
-        {EXPEDITION_LOG.map((entry, idx) => (
+        {entries.map((entry, idx) => (
           <motion.article
             key={entry.id}
             className="expedition-entry"
@@ -32,10 +66,10 @@ export const ExpeditionLog: React.FC = () => {
             transition={{ delay: idx * 0.08, duration: 0.45 }}
           >
             <div className="expedition-rail">
-              <span className="expedition-flag" aria-hidden="true">
+              <span className={`expedition-flag ${entry.altitude === 'summit' ? 'expedition-flag--summit' : ''}`} aria-hidden="true">
                 <Flag size={12} />
               </span>
-              {idx < EXPEDITION_LOG.length - 1 && <span className="expedition-line" />}
+              {idx < entries.length - 1 && <span className="expedition-line" />}
             </div>
 
             <div className="expedition-card glass-depth-2">

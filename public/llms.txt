@@ -1,6 +1,8 @@
 # Cam Taylor — Sherpa
 > Personal site for deal architecture, capital syndication, and venture operations.
 
+Last updated: 2026-07-15
+
 ## Identity
 - Name: Cam Taylor (Cameron Taylor)
 - Title: Sherpa
@@ -9,12 +11,19 @@
 - Email: cam@camtaylor.ca
 - NOSTR NIP-05: cam@giveabit.io
 - URL: https://camtaylor.ca
+- Social: GitHub, X, Nostr only (no LinkedIn)
 
 ## Expertise
 - Deal Architecture
 - Capital Syndication
 - Venture Operations
 - Special Situations
+
+## Expedition Tiers
+- Day Hike (<$100K) — quick advisory
+- Multi-day ($100K–$1M) — structured engagement
+- Expedition ($1M–$5M) — full deal architecture
+- Rescue Mission ($5M+) — special situations
 
 ## Active Ventures
 - Satohash (Crypto Infrastructure) — https://satohash.io
@@ -25,14 +34,22 @@
 - Sherpacarta (MapTech) — https://sherpacarta.org
 - Tadbuy (E-Commerce) — https://tadbuy.giveabit.io
 
+## Command Deck
+Available on homepage. Commands: /help, /about, /status, /services, /ventures, /route, /manifesto, /contact, /book, /nostr, /field-guide, /2026
+
 ## Contact
 Use the contact form at https://camtaylor.ca/#contact or email cam@camtaylor.ca.
 Response time: typically within 48h PT.
 
 ## Pages
-- /field-guide — Sherpa Field Guide
+- / — Homepage with hero, ventures, contact
+- /field-guide — Sherpa Field Guide (printable)
 - /2026 — State of the Route annual review
+- /route/:ventureId — Venture deep-dive pages
 - /privacy — Privacy Policy
 - /terms — Terms of Use
+
+## Deploy
+Local-first. Planned host: Cloudflare Pages. Not deployed yet.
 
 Part of the Give A Bit family — https://giveabit.io

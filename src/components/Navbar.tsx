@@ -3,6 +3,7 @@ import { Terminal, Mountain, Menu, X } from 'lucide-react';
 import { NAV_ITEMS } from '../data/site';
 import { useScrollSpy } from '../hooks/useScrollSpy';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { ThemeToggle } from './ThemeToggle';
 
 interface NavbarProps {
@@ -24,9 +25,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [scrolled, setScrolled] = useState(false);
   const activeId = useScrollSpy(SECTION_IDS);
   const menuRef = useRef<HTMLDivElement>(null);
+  const menuBtnRef = useRef<HTMLButtonElement>(null);
   const touchStartY = useRef(0);
 
   useBodyScrollLock(menuOpen);
+  useFocusTrap(menuRef, menuOpen);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 24);
@@ -38,7 +41,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   useEffect(() => {
     if (!menuOpen) return;
     const close = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false);
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+        menuBtnRef.current?.focus();
+      }
     };
     window.addEventListener('keydown', close);
     return () => window.removeEventListener('keydown', close);
@@ -83,6 +89,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {NAV_ITEMS.map(({ id, label }) => (
               <button
                 key={id}
+                type="button"
                 onClick={() => scrollTo(id)}
                 className="nav-link"
                 aria-current={activeId === id ? 'true' : undefined}
@@ -96,6 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <ThemeToggle isNight={isNight} onToggle={onToggleTheme} />
 
             <button
+              type="button"
               onClick={onToggleTerminal}
               className={`terminal-toggle-btn ${isTerminalOpen ? 'active' : ''}`}
               aria-label="Toggle Command Deck"
@@ -105,6 +113,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             <button
+              ref={menuBtnRef}
+              type="button"
               className="nav-menu-btn"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
@@ -132,6 +142,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {NAV_ITEMS.map(({ id, label }) => (
             <button
               key={id}
+              type="button"
               onClick={() => scrollTo(id)}
               className="nav-mobile-link"
               aria-current={activeId === id ? 'true' : undefined}

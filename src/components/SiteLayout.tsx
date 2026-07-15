@@ -1,17 +1,19 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mountain, ArrowLeft } from 'lucide-react';
 import { SITE } from '../data/site';
+import { ThemeToggle } from './ThemeToggle';
+import { useThemeContext } from '../context/ThemeContext';
 
-interface LegalPageProps {
-  title: string;
-  children: React.ReactNode;
-}
+export function SiteLayout({ children }: { children: React.ReactNode }) {
+  const { toggle, isNight } = useThemeContext();
 
-export const LegalPage: React.FC<LegalPageProps> = ({ title, children }) => {
   return (
-    <div className="legal-page">
-      <header className="legal-header">
+    <div className="site-layout">
+      <a href="#site-main" className="skip-link">
+        Skip to content
+      </a>
+
+      <header className="site-layout-header glass-depth-2">
         <Link to="/" className="legal-back">
           <ArrowLeft size={16} />
           <span>Back to {SITE.domain}</span>
@@ -20,21 +22,22 @@ export const LegalPage: React.FC<LegalPageProps> = ({ title, children }) => {
           <Mountain size={16} />
           <span>{SITE.name}</span>
         </div>
+        <ThemeToggle isNight={isNight} onToggle={toggle} />
       </header>
 
-      <main className="legal-content">
-        <h1>{title}</h1>
-        <p className="legal-updated">Last updated: {SITE.lastUpdated}</p>
+      <main id="site-main" className="site-layout-main">
         {children}
       </main>
 
       <footer className="legal-footer">
         <p>© {new Date().getFullYear()} {SITE.domain}</p>
         <div className="legal-footer-links">
+          <Link to="/field-guide">Field Guide</Link>
+          <Link to="/2026">2026</Link>
           <Link to="/privacy">Privacy</Link>
           <Link to="/terms">Terms</Link>
         </div>
       </footer>
     </div>
   );
-};
+}

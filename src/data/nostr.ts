@@ -32,6 +32,12 @@ export const NOSTR_NAMESPACE_URL = 'https://giveabit.io/namespace';
 export const NOSTR_PAGE_URL = 'https://giveabit.io/nostr';
 export const NOSTR_JSON_URL = `https://${NOSTR_DOMAIN}/.well-known/nostr.json`;
 
+export const NOSTR_RELAYS = [
+  { name: 'damus.io', url: 'wss://relay.damus.io' },
+  { name: 'nos.lol', url: 'wss://nos.lol' },
+  { name: 'snort.social', url: 'wss://relay.snort.social' },
+] as const;
+
 export function nip05LocalPart(nip05: string): string | null {
   const at = nip05.lastIndexOf('@');
   if (at < 1) return null;

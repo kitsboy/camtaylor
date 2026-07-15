@@ -1,0 +1,453 @@
+/* Elite upgrade layer — tokens, motion, polish */
+
+:root {
+  --text-hero: clamp(2.4rem, 8vw, 3.8rem);
+  --text-section: clamp(1.35rem, 4vw, 1.75rem);
+  --text-body: clamp(0.92rem, 2.5vw, 1rem);
+  --section-gap: clamp(48px, 8vh, 80px);
+  --nav-height: 72px;
+  --glass-blur-nav: 20px;
+  --glass-blur-card: 12px;
+  --glass-saturate: 1.15;
+}
+
+[data-theme="night"] {
+  --green-light: #5aa87a;
+  --gold-light: #e0b84a;
+  --glass-bg: rgba(22, 19, 16, 0.88);
+  --glass-border: rgba(236, 230, 219, 0.08);
+  --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+.section-title {
+  letter-spacing: 0.06em;
+  text-wrap: balance;
+}
+
+.hero-description .hero-lead {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.manifesto-section,
+.services-section,
+.ventures-section,
+.contact-section,
+.about-section,
+.testimonials-section,
+.expedition-log-section,
+.anti-services-section {
+  padding-top: var(--section-gap);
+  padding-bottom: var(--section-gap);
+}
+
+.navbar-scrolled .nav-container {
+  padding: 8px 16px;
+  border-radius: 12px;
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate));
+}
+
+.nav-link[aria-current="true"]::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gold);
+  border-radius: 1px;
+  transform: scaleX(1);
+}
+
+.nav-link {
+  position: relative;
+}
+
+.nav-link[aria-current="true"]::after {
+  animation: nav-underline-in 0.25s var(--ease-out);
+}
+
+@keyframes nav-underline-in {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.text-gradient.section-title {
+  background-size: 200% 200%;
+  animation: gradient-drift 8s ease infinite;
+}
+
+@keyframes gradient-drift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  box-shadow:
+    0 0 0 2px var(--green),
+    0 0 0 4px rgba(184, 135, 42, 0.25);
+}
+
+.btn-primary:active,
+.btn-secondary:active,
+.submit-btn:active {
+  transform: scale(0.97);
+}
+
+.contact-sidebar {
+  position: sticky;
+  top: calc(var(--nav-height) + 24px);
+  align-self: start;
+}
+
+.footer::before {
+  content: '';
+  display: block;
+  height: 64px;
+  margin-top: -64px;
+  background: linear-gradient(to bottom, var(--bg), transparent);
+  pointer-events: none;
+}
+
+.tier-description-panel {
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.venture-card {
+  --venture-accent: var(--green-light);
+}
+
+.venture-card[data-accent] {
+  border-color: color-mix(in srgb, var(--venture-accent) 25%, transparent);
+}
+
+.venture-card[data-accent]:hover {
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--venture-accent) 18%, transparent);
+}
+
+.venture-link-btn:hover svg {
+  transform: translate(2px, -2px);
+}
+
+.venture-dots {
+  display: none;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.venture-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  opacity: 0.4;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.venture-dot--active {
+  background: var(--gold);
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+.venture-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.venture-filter-btn {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-card);
+  font-size: 0.8rem;
+  font-family: var(--font-heading);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.venture-filter-btn--active,
+.venture-filter-btn:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.hero-route-rotator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 1.4em;
+}
+
+.hero-route-cursor {
+  animation: blink 1s step-end infinite;
+  color: var(--gold);
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.hero-video-live--featured {
+  background: var(--green);
+  color: #fff;
+}
+
+.site-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.site-layout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  margin: 0 auto;
+  max-width: 1180px;
+  width: 100%;
+}
+
+.site-layout-main {
+  flex: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  width: 100%;
+}
+
+.not-found-page,
+.venture-route-page {
+  text-align: center;
+}
+
+.not-found-code {
+  font-family: var(--font-heading);
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--green);
+  opacity: 0.2;
+  line-height: 1;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+.venture-route-page {
+  text-align: left;
+}
+
+.venture-route-eyebrow {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  margin-top: 24px;
+}
+
+.field-guide-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 20px 0 32px;
+}
+
+.red-flag-list li {
+  color: var(--text-secondary);
+}
+
+.red-flag-list li::marker {
+  color: var(--amber);
+}
+
+.expedition-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.expedition-filter-btn {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.expedition-filter-btn--active {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+
+.testimonial-spotlight {
+  margin-top: 16px;
+  padding: 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--gold);
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.testimonial-spotlight cite {
+  display: block;
+  margin-top: 8px;
+  font-style: normal;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.scroll-rope [role="progressbar"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.nostr-copy-btn--success {
+  border-color: var(--green-light) !important;
+  color: var(--green) !important;
+}
+
+.service-feature-tag:hover {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+
+.about-photo-ring {
+  box-shadow: 0 0 0 3px var(--gold-light);
+  transition: box-shadow 0.3s var(--ease-out);
+}
+
+.about-photo:hover .about-photo-ring {
+  box-shadow: 0 0 0 4px var(--gold);
+}
+
+.submit-spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.venture-talent-badge {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--gold);
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.expedition-flag--summit {
+  color: var(--gold);
+}
+
+.page-loading {
+  padding: 48px;
+  text-align: center;
+  color: var(--text-muted);
+  font-family: var(--font-heading);
+}
+
+.tier-duration {
+  color: var(--text-muted);
+}
+
+[data-reduced-motion="true"] *,
+[data-reduced-motion="true"] *::before,
+[data-reduced-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+@media (hover: none) {
+  .venture-card:hover,
+  .service-card:hover,
+  .testimonial-card:hover {
+    transform: none !important;
+  }
+
+  .venture-card:active,
+  .service-card:active {
+    transform: scale(0.98);
+  }
+}
+
+@media (max-width: 900px) {
+  .contact-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .venture-dots {
+    display: flex;
+  }
+}
+
+@media print {
+  .navbar,
+  .mobile-quick-nav,
+  .sticky-cta,
+  .terminal-overlay,
+  .scroll-rope,
+  .custom-cursor,
+  .site-layout-header .theme-toggle {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .legal-content,
+  .site-layout-main {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  a[href]::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+  }
+}

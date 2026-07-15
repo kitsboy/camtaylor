@@ -15,6 +15,8 @@ export const COMMANDS = [
   'contact',
   'book',
   'nostr',
+  'field-guide',
+  '2026',
   'ascii',
   'summit',
   'copy',
@@ -40,8 +42,10 @@ export function formatHelp(): string {
     '  /ventures  - Portfolio and active operations',
     '  /route     - Deep-dive a venture (/route giveabit)',
     '  /manifesto - Sherpa philosophy',
-    '  /contact   - Get in touch',
+    '  /contact   - Get in touch (scrolls to form)',
     '  /book      - Schedule a route check',
+    '  /field-guide - Sherpa Field Guide',
+    '  /2026      - State of the Route review',
     '  /nostr     - NIP-05 identity & relays',
     '  /ascii     - Sherpa ASCII logo',
     '  /copy      - Export session transcript',
@@ -60,7 +64,7 @@ export function formatAbout(): string {
     `Location: ${SITE.location} (${SITE.timezone})`,
     'Specialization: Deal architecture, capital syndication, venture operations.',
     `Mission: ${SITE.tagline}`,
-    `Route: ${SITE.currentRoute}`,
+    `Route: ${SITE.currentRoutes[0]}`,
   ].join('\n');
 }
 
@@ -70,7 +74,7 @@ export function formatStatus(): string {
     'Availability: Accepting new expeditions (2 slots)',
     `Timezone: ${SITE.timezone}`,
     `Response SLA: ${SITE.responseTime}`,
-    `Current route: ${SITE.currentRoute}`,
+    `Current route: ${SITE.currentRoutes[0]}`,
     'Queue: Open',
   ].join('\n');
 }
@@ -114,7 +118,7 @@ export function formatManifesto(): string {
 export function formatContact(): string {
   return [
     'COMMUNICATION:',
-    'Contact form: Scroll to Connect section on this page.',
+    'Contact form: Navigating to Connect section…',
     `Email: ${SITE.email}`,
     `Location: ${SITE.location}`,
     `Response: ${SITE.responseTime}`,

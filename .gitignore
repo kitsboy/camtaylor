@@ -26,3 +26,5 @@ dist-ssr
 *.sln
 *.sw?
 .aider*
+test-results/
+playwright-report/

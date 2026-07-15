@@ -83,6 +83,10 @@ export const BackgroundCanvas: React.FC = () => {
     window.addEventListener('click',      handleMouseClick);
 
     const render = () => {
+      if (document.visibilityState === 'hidden') {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
       ctx.clearRect(0, 0, width, height);
 
       // Very faint topographic-style grid

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Cam Taylor — Expedition Log</title>
+    <link>https://camtaylor.ca/#expeditions</link>
+    <description>Deal architecture and venture operations from the field.</description>
+    <lastBuildDate>Wed, 15 Jul 2026 19:43:26 GMT</lastBuildDate>
+    <item>
+      <title>camtaylor.ca — 100 elite upgrades</title>
+      <link>https://camtaylor.ca/</link>
+      <pubDate>Wed, 15 Jul 2026 19:43:26 GMT</pubDate>
+      <description>Mobile-first polish, a11y, performance, and Cloudflare-ready deploy config.</description>
+    </item>
+  </channel>
+</rss>

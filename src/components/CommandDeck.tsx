@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Terminal, X, CornerDownLeft, Copy, Check } from 'lucide-react';
 import {
   completeCommand,
@@ -14,26 +15,34 @@ import {
   formatVentures,
   SHERPA_ASCII,
 } from '../data/commandDeck';
+import { VENTURES } from '../data/ventures';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 
 interface CommandDeckProps {
   isOpen: boolean;
   onClose: () => void;
+  onNavigate?: (sectionId: string) => void;
 }
 
 interface LogEntry {
+  id: string;
   type: 'input' | 'output' | 'error' | 'system' | 'summit';
   text: string;
 }
 
+let logId = 0;
+const nextLogId = () => `log-${++logId}`;
+
 const BOOT_LOGS: LogEntry[] = [
-  { type: 'system', text: 'CAM TAYLOR // SHERPA COMMAND DECK v2.0.0' },
-  { type: 'system', text: 'Initializing secure node connection to camtaylor.ca...' },
-  { type: 'system', text: 'Connection established. Type "/help" to view available protocols.' },
-  { type: 'system', text: 'Tip: ↑↓↓←→←→BA opens deck from anywhere.' },
+  { id: nextLogId(), type: 'system', text: 'CAM TAYLOR // SHERPA COMMAND DECK v2.1.0' },
+  { id: nextLogId(), type: 'system', text: 'Initializing secure node connection to camtaylor.ca...' },
+  { id: nextLogId(), type: 'system', text: 'Connection established. Type "/help" to view available protocols.' },
+  { id: nextLogId(), type: 'system', text: 'Tip: ↑↓↓←→←→BA opens deck from anywhere.' },
 ];
 
-export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose }) => {
+export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose, onNavigate }) => {
+  const navigate = useNavigate();
   const [history, setHistory] = useState<LogEntry[]>(BOOT_LOGS);
   const [input, setInput] = useState('');
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
@@ -47,6 +56,7 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose }) => 
   const touchStartY = useRef(0);
 
   useFocusTrap(windowRef, isOpen);
+  useBodyScrollLock(isOpen);
 
   useEffect(() => {
     if (isOpen && inputRef.current) inputRef.current.focus();
@@ -57,12 +67,8 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose }) => 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
-    document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
   useEffect(() => {
@@ -83,7 +89,10 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose }) => 
       const cleanCmd = cmd.trim().toLowerCase();
       if (cleanCmd === '') return;
 
-      const newHistory = [...history, { type: 'input' as const, text: `camtaylor.ca $> ${cmd}` }];
+      const newHistory: LogEntry[] = [
+        ...history,
+        { id: nextLogId(), type: 'input', text: `camtaylor.ca $> ${cmd}` },
+      ];
 
       if (cleanCmd.startsWith('/')) {
         const parts = cleanCmd.slice(1).split(/\s+/);
@@ -92,50 +101,71 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose }) => 
 
         switch (command) {
           case 'help':
-            newHistory.push({ type: 'output', text: formatHelp() });
+            newHistory.push({ id: nextLogId(), type: 'output', text: formatHelp() });
             break;
           case 'about':
-            newHistory.push({ type: 'output', text: formatAbout() });
+            newHistory.push({ id: nextLogId(), type: 'output', text: formatAbout() });
             break;
           case 'status':
-            newHistory.push({ type: 'output', text: formatStatus() });
+            newHistory.push({ id: nextLogId(), type: 'output', text: formatStatus() });
             break;
           case 'services':
-            newHistory.push({ type: 'output', text: 'AREAS OF EXPERTISE:\n' + formatServices() });
+            newHistory.push({ id: nextLogId(), type: 'output', text: 'AREAS OF EXPERTISE:\n' + formatServices() });
             break;
           case 'ventures':
-            newHistory.push({ type: 'output', text: 'ACTIVE ENTITIES:\n' + formatVentures() });
+            newHistory.push({ id: nextLogId(), type: 'output', text: 'ACTIVE ENTITIES:\n' + formatVentures() });
             break;
           case 'route': {
             if (!arg) {
-              newHistory.push({ type: 'error', text: 'Usage: /route <venture>  e.g. /route giveabit' });
+              newHistory.push({ id: nextLogId(), type: 'error', text: 'Usage: /route <venture>  e.g. /route giveabit' });
             } else {
               const detail = formatRoute(arg);
-              newHistory.push({
-                type: detail ? 'output' : 'error',
-                text: detail ?? `Venture not found: "${arg}". Try /ventures`,
-              });
+              const venture = VENTURES.find(
+                (x) => x.id === arg || x.name.toLowerCase() === arg.toLowerCase(),
+              );
+              if (detail && venture) {
+                newHistory.push({ id: nextLogId(), type: 'output', text: detail });
+                onClose();
+                navigate(`/route/${venture.id}`);
+              } else {
+                newHistory.push({
+                  id: nextLogId(),
+                  type: 'error',
+                  text: `Venture not found: "${arg}". Try /ventures`,
+                });
+              }
             }
             break;
           }
           case 'manifesto':
-            newHistory.push({ type: 'output', text: 'SHERPA PHILOSOPHY:\n' + formatManifesto() });
+            newHistory.push({ id: nextLogId(), type: 'output', text: 'SHERPA PHILOSOPHY:\n' + formatManifesto() });
             break;
           case 'contact':
-            newHistory.push({ type: 'output', text: formatContact() });
+            newHistory.push({ id: nextLogId(), type: 'output', text: formatContact() });
+            onClose();
+            onNavigate?.('contact');
             break;
           case 'book':
-            newHistory.push({ type: 'output', text: formatBook() });
+            newHistory.push({ id: nextLogId(), type: 'output', text: formatBook() });
             break;
           case 'nostr':
-            newHistory.push({ type: 'output', text: formatNostr() });
+            newHistory.push({ id: nextLogId(), type: 'output', text: formatNostr() });
+            break;
+          case 'field-guide':
+            onClose();
+            navigate('/field-guide');
+            break;
+          case '2026':
+            onClose();
+            navigate('/2026');
             break;
           case 'ascii':
-            newHistory.push({ type: 'output', text: SHERPA_ASCII });
+            newHistory.push({ id: nextLogId(), type: 'output', text: SHERPA_ASCII });
             break;
           case 'summit':
             setSummitMode(true);
             newHistory.push({
+              id: nextLogId(),
               type: 'summit',
               text: '🏔 SUMMIT REACHED — You found the easter egg. The view is worth the climb.',
             });
@@ -143,7 +173,7 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose }) => 
             break;
           case 'copy':
             copySession();
-            newHistory.push({ type: 'system', text: 'Session copied to clipboard.' });
+            newHistory.push({ id: nextLogId(), type: 'system', text: 'Session copied to clipboard.' });
             break;
           case 'clear':
             setHistory([]);
@@ -155,12 +185,14 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose }) => 
             break;
           default:
             newHistory.push({
+              id: nextLogId(),
               type: 'error',
               text: `Command not found: "${cmd}". Type "/help" for options.`,
             });
         }
       } else {
         newHistory.push({
+          id: nextLogId(),
           type: 'error',
           text: 'Invalid syntax. Commands must start with a slash (e.g. "/help").',
         });
@@ -171,7 +203,7 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose }) => 
       setHistoryIndex(-1);
       setInput('');
     },
-    [history, onClose, copySession],
+    [history, onClose, onNavigate, navigate, copySession],
   );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -242,7 +274,7 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose }) => 
             >
               {copied ? <Check size={13} /> : <Copy size={13} />}
             </button>
-            <button className="terminal-close-btn" onClick={onClose} aria-label="Close terminal">
+            <button type="button" className="terminal-close-btn" onClick={onClose} aria-label="Close terminal">
               <X size={14} />
             </button>
           </div>
@@ -250,8 +282,8 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose }) => 
 
         <div className="terminal-body" onClick={() => inputRef.current?.focus()}>
           <div className="terminal-logs" aria-live="polite" aria-relevant="additions">
-            {history.map((entry, index) => (
-              <div key={index} className={`terminal-log-entry log-${entry.type}`}>
+            {history.map((entry) => (
+              <div key={entry.id} className={`terminal-log-entry log-${entry.type}`}>
                 {entry.text}
               </div>
             ))}
@@ -259,8 +291,8 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose }) => 
           </div>
 
           <div className="terminal-pills">
-            {['/status', '/route', '/nostr', '/book', '/about', '/help'].map((cmd) => (
-              <button key={cmd} onClick={() => runCommand(cmd)} className="terminal-pill">
+            {['/status', '/route', '/nostr', '/book', '/field-guide', '/help'].map((cmd) => (
+              <button key={cmd} type="button" onClick={() => runCommand(cmd)} className="terminal-pill">
                 {cmd}
               </button>
             ))}

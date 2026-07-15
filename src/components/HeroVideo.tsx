@@ -7,12 +7,8 @@ export const HeroVideo: React.FC = () => {
   const [playing, setPlaying] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
 
-  const thumbUrl = `https://i.ytimg.com/vi/${SITE.heroVideoId}/hqdefault.jpg`;
+  const posterUrl = '/hero-bg.jpg';
   const embedUrl = `https://www.youtube-nocookie.com/embed/${SITE.heroVideoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
-
-  const startPlay = () => {
-    setPlaying(true);
-  };
 
   return (
     <motion.div
@@ -31,7 +27,9 @@ export const HeroVideo: React.FC = () => {
           <div className="hero-video-header">
             <Film size={13} />
             <span>{SITE.heroVideoLabel}</span>
-            <span className="hero-video-live">TEMP</span>
+            {SITE.heroVideoBadge && (
+              <span className="hero-video-live hero-video-live--featured">{SITE.heroVideoBadge}</span>
+            )}
           </div>
 
           <div className="hero-video-viewport">
@@ -47,11 +45,11 @@ export const HeroVideo: React.FC = () => {
               <button
                 type="button"
                 className="hero-video-poster"
-                onClick={startPlay}
+                onClick={() => setPlaying(true)}
                 aria-label={`Play ${SITE.heroVideoLabel}`}
               >
                 <img
-                  src={thumbUrl}
+                  src={posterUrl}
                   alt=""
                   className="hero-video-thumb"
                   loading="eager"

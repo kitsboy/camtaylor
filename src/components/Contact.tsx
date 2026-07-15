@@ -1,21 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm, ValidationError } from '@formspree/react';
-import { Send, CheckCircle2, ShieldAlert, Clock, Zap, Copy, Check, Mail } from 'lucide-react';
+import {
+  Send,
+  CheckCircle2,
+  ShieldAlert,
+  Clock,
+  Zap,
+  Copy,
+  Check,
+  Mail,
+  Lock,
+  Globe,
+  Loader2,
+} from 'lucide-react';
 import { FORMSPREE_FORM_ID, SITE } from '../data/site';
 import { DEAL_TIERS } from '../data/dealTiers';
+import { TESTIMONIALS } from '../data/testimonials';
 import { useReferrer } from '../hooks/useReferrer';
 import { trackEvent } from '../utils/analytics';
 
+const SPOTLIGHT = TESTIMONIALS[0];
+
 function ContactFormBody({ onReset }: { onReset: () => void }) {
   const [state, handleSubmit] = useForm(FORMSPREE_FORM_ID);
-  const [tierId, setTierId] = useState('multi-day');
+  const [tierId, setTierId] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('tier') ?? params.get('service') ?? 'multi-day';
+  });
   const [submittedName, setSubmittedName] = useState('');
   const [referenceId, setReferenceId] = useState('');
   const [started, setStarted] = useState(false);
   const referrer = useReferrer();
 
   const activeTier = DEAL_TIERS.find((t) => t.id === tierId) ?? DEAL_TIERS[1];
+
+  useEffect(() => {
+    if (state.succeeded) trackEvent('form_success');
+  }, [state.succeeded]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     const form = e.currentTarget;
@@ -27,7 +49,6 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
   };
 
   if (state.succeeded) {
-    trackEvent('form_success');
     const nostrNote = encodeURIComponent(
       `Reached base camp at camtaylor.ca — inquiry ref ${referenceId}. @giveabit.io`,
     );
@@ -37,6 +58,8 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ type: 'spring', stiffness: 100 }}
+        role="status"
+        aria-live="polite"
       >
         <CheckCircle2 className="success-icon" size={48} />
         <h3 className="success-title">Message received</h3>
@@ -63,7 +86,7 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
           <Zap size={14} />
           Share on Nostr
         </a>
-        <button onClick={onReset} className="btn-reset">
+        <button type="button" onClick={onReset} className="btn-reset">
           Send another message
         </button>
       </motion.div>
@@ -84,6 +107,7 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
           trackEvent('form_start');
         }
       }}
+      aria-busy={state.submitting}
     >
       <div className="form-grid">
         <div className="form-group">
@@ -106,6 +130,7 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
             type="text"
             name="organization"
             autoComplete="organization"
+            maxLength={120}
             className="form-input"
             placeholder="Company or entity (optional)"
           />
@@ -144,13 +169,36 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
             </button>
           ))}
         </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTier.id}
+            className="tier-description-panel"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            role="status"
+          >
+            {activeTier.description}
+            {activeTier.duration && (
+              <span className="tier-duration"> · Typical: {activeTier.duration}</span>
+            )}
+          </motion.div>
+        </AnimatePresence>
         <input type="hidden" name="dealSize" value={`${activeTier.label} (${activeTier.range})`} />
         <input type="hidden" name="dealTier" value={activeTier.id} />
       </div>
 
       <div className="form-group">
         <label htmlFor="message" className="form-label">Brief overview</label>
-        <textarea id="message" name="message" required rows={4} className="form-textarea" placeholder="Structure, assets, timeline, and what you're looking for..." />
+        <textarea
+          id="message"
+          name="message"
+          required
+          rows={4}
+          maxLength={2000}
+          className="form-textarea"
+          placeholder="Structure, assets, timeline, and what you're looking for..."
+        />
         <ValidationError prefix="Message" field="message" errors={state.errors} className="form-error" />
       </div>
 
@@ -166,11 +214,16 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
         aria-label="Leave blank"
       />
 
-      <ValidationError errors={state.errors} className="form-submit-error" />
+      <div role="alert" aria-live="assertive">
+        <ValidationError errors={state.errors} className="form-submit-error" />
+      </div>
 
-      <button type="submit" className="submit-btn" disabled={state.submitting}>
+      <button type="submit" className="submit-btn" disabled={state.submitting} aria-busy={state.submitting}>
         {state.submitting ? (
-          <span className="spinner">Sending...</span>
+          <>
+            <Loader2 size={16} className="submit-spinner" aria-hidden="true" />
+            <span>Sending…</span>
+          </>
         ) : (
           <>
             <span>Send message</span>
@@ -232,16 +285,39 @@ export const Contact: React.FC = () => {
 
         <div className="contact-sidebar">
           <div className="trust-badges">
-            <span className="trust-badge">🔒 Confidential</span>
-            <span className="trust-badge">⚡ 48h response</span>
-            <span className="trust-badge">🌐 Nostr ready</span>
+            <span className="trust-badge">
+              <Lock size={14} aria-hidden="true" />
+              Confidential
+            </span>
+            <span className="trust-badge">
+              <Clock size={14} aria-hidden="true" />
+              48h response
+            </span>
+            <span className="trust-badge">
+              <Globe size={14} aria-hidden="true" />
+              Nostr ready
+            </span>
           </div>
+
+          <blockquote className="testimonial-spotlight">
+            &ldquo;{SPOTLIGHT.quote}&rdquo;
+            <cite>
+              — {SPOTLIGHT.author}, {SPOTLIGHT.role}
+              {SPOTLIGHT.venture ? ` · ${SPOTLIGHT.venture}` : ''}
+            </cite>
+          </blockquote>
 
           <a href={`mailto:${SITE.email}`} className="mobile-email-cta">
             <Mail size={18} />
             <span>{SITE.email}</span>
           </a>
           <CopyEmailButton />
+
+          {SITE.calendlyUrl && (
+            <a href={SITE.calendlyUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary sidebar-calendly">
+              Book a route check
+            </a>
+          )}
 
           <div className="sidebar-card">
             <ShieldAlert className="sidebar-icon" size={24} />
@@ -273,6 +349,13 @@ export const Contact: React.FC = () => {
               <li>NIP-05: {SITE.nostr}</li>
             </ul>
           </div>
+
+          {SITE.pgpFingerprint && (
+            <div className="sidebar-card">
+              <h4 className="sidebar-title">PGP</h4>
+              <code className="pgp-fingerprint">{SITE.pgpFingerprint}</code>
+            </div>
+          )}
 
           <div className="sidebar-card">
             <h4 className="sidebar-title">Based in</h4>

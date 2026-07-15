@@ -6,6 +6,7 @@ import {
   NOSTR_NAMESPACE_URL,
   NOSTR_PAGE_URL,
   NOSTR_JSON_URL,
+  NOSTR_RELAYS,
   nip05LocalPart,
 } from '../data/nostr';
 
@@ -85,7 +86,7 @@ function NostrCard({ identity, index }: { identity: (typeof NOSTR_IDENTITIES)[0]
           <button
             type="button"
             onClick={copyNip05}
-            className="nostr-copy-btn"
+            className={`nostr-copy-btn ${copied ? 'nostr-copy-btn--success' : ''}`}
             aria-label={`Copy ${identity.nip05}`}
           >
             {copied ? <Check size={14} /> : <Copy size={14} />}
@@ -93,8 +94,10 @@ function NostrCard({ identity, index }: { identity: (typeof NOSTR_IDENTITIES)[0]
         </div>
 
         <div className="nostr-relays">
-          {['damus.io', 'nos.lol', 'snort.social'].map((r) => (
-            <span key={r} className="nostr-relay-chip">{r}</span>
+          {NOSTR_RELAYS.map((r) => (
+            <span key={r.name} className="nostr-relay-chip" title={r.url}>
+              {r.name}
+            </span>
           ))}
         </div>
 

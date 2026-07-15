@@ -1,7 +1,14 @@
 import { LegalPage } from './LegalPage';
 import { SITE } from '../data/site';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 export function PrivacyPage() {
+  usePageMeta({
+    title: 'Privacy Policy',
+    description: `Privacy policy for ${SITE.domain} — how contact form data and analytics are handled.`,
+    path: '/privacy',
+  });
+
   return (
     <LegalPage title="Privacy Policy">
       <section>

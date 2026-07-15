@@ -12,7 +12,14 @@ export const SITE = {
   nostr: 'cam@giveabit.io',
   heroVideoId: 'nJeddv1QbeQ',
   heroVideoLabel: 'The Route — Intro',
+  heroVideoBadge: 'FEATURED' as string | null,
   currentRoute: 'Q3 2026: Syndicating OpenStrata · Accepting 2 new expeditions',
+  currentRoutes: [
+    'Q3 2026: Syndicating OpenStrata · Accepting 2 new expeditions',
+    '2 expedition slots open — structured deals preferred',
+    'NOSTR: cam@giveabit.io · Reply within 48h PT',
+  ],
+  lastUpdated: '2026-07-15',
   responseTime: 'Typically replies within 48h PT',
   calendlyUrl: null as string | null,
   pgpFingerprint: null as string | null,
@@ -25,19 +32,24 @@ export const SITE = {
 } as const;
 
 export const HERO_METRICS = [
-  { label: 'Expeditions', value: 7, suffix: '+', display: '7+ Active' },
-  { label: 'Terrain', value: 3, suffix: '', display: 'Tech · Capital · Deals' },
-  { label: 'Base', value: 0, suffix: '', display: 'camtaylor.ca' },
+  { label: 'Expeditions', value: 7, suffix: '+', display: '7+ Active', type: 'count' as const },
+  { label: 'Terrain', value: 3, suffix: '', display: 'Tech · Capital · Deals', type: 'static' as const },
+  { label: 'Base', value: 0, suffix: '', display: 'camtaylor.ca', type: 'static' as const },
 ] as const;
 
 export const NAV_ITEMS = [
-  { id: 'about', label: 'About' },
-  { id: 'expeditions', label: 'Log' },
-  { id: 'manifesto', label: 'Philosophy' },
-  { id: 'services', label: 'Expertise' },
-  { id: 'ventures', label: 'Ventures' },
-  { id: 'contact', label: 'Connect' },
+  { id: 'about', label: 'About', mobileLabel: 'About' },
+  { id: 'expeditions', label: 'Log', mobileLabel: 'Log' },
+  { id: 'manifesto', label: 'Philosophy', mobileLabel: 'Philosophy' },
+  { id: 'services', label: 'Expertise', mobileLabel: 'Expertise' },
+  { id: 'testimonials', label: 'Proof', mobileLabel: 'Proof' },
+  { id: 'ventures', label: 'Ventures', mobileLabel: 'Ventures' },
+  { id: 'contact', label: 'Connect', mobileLabel: 'Connect' },
 ] as const;
+
+export const MOBILE_QUICK_NAV = NAV_ITEMS.filter((item) =>
+  ['about', 'expeditions', 'manifesto', 'services', 'testimonials', 'ventures', 'contact'].includes(item.id),
+);
 
 export const FORMSPREE_FORM_ID =
   import.meta.env.VITE_FORMSPREE_FORM_ID ?? 'xykqodnk';

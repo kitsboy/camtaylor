@@ -17,6 +17,7 @@ export interface Venture {
   altitude: number;
   stacks?: string[];
   needsTalent?: boolean;
+  accent?: string;
   caseStudy: VentureCaseStudy;
 }
 
@@ -37,6 +38,7 @@ export const VENTURES: Venture[] = [
     url: 'https://satohash.io',
     status: 'live',
     altitude: 92,
+    accent: '#d4a340',
     stacks: ['Bitcoin', 'Rust', 'Lightning'],
     caseStudy: {
       problem: 'Fragmented node ops with no yield orchestration layer.',
@@ -53,6 +55,7 @@ export const VENTURES: Venture[] = [
     url: 'https://katoa.org',
     status: 'live',
     altitude: 78,
+    accent: '#4a8f68',
     stacks: ['TypeScript', 'React', 'AI Systems'],
     caseStudy: {
       problem: 'Founders need elite eng without full-time overhead.',
@@ -69,6 +72,7 @@ export const VENTURES: Venture[] = [
     url: 'https://giveabit.io',
     status: 'live',
     altitude: 88,
+    accent: '#b8872a',
     stacks: ['React', 'NOSTR', 'Bitcoin'],
     needsTalent: true,
     caseStudy: {

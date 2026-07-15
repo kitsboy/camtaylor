@@ -1,10 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Cpu, Activity, Route } from 'lucide-react';
+import { ArrowRight, Cpu } from 'lucide-react';
 import { SITE, HERO_METRICS } from '../data/site';
 import { HeroVideo } from './HeroVideo';
+import { RouteStatusRotator } from './RouteStatusRotator';
 import { useCountUp } from '../hooks/useCountUp';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface HeroProps {
   onOpenTerminal: () => void;
@@ -14,12 +16,13 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
   const sectionRef = useRef<HTMLElement>(null);
   const [metricsVisible, setMetricsVisible] = useState(false);
   const metricsRef = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
   });
-  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, 40]);
+  const parallaxY = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [0, 40]);
 
   const expeditions = useCountUp(HERO_METRICS[0].value, metricsVisible);
 
@@ -34,19 +37,20 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
     return () => obs.disconnect();
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
-  };
+  const containerVariants = reduced
+    ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
+    : { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.12 } } };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 24 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { type: 'spring' as const, stiffness: 90, damping: 18 },
-    },
-  };
+  const itemVariants = reduced
+    ? { hidden: { opacity: 1, y: 0 }, visible: { opacity: 1, y: 0 } }
+    : {
+        hidden: { opacity: 0, y: 24 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: { type: 'spring' as const, stiffness: 90, damping: 18 },
+        },
+      };
 
   return (
     <section className="hero-section" id="hero" ref={sectionRef}>
@@ -62,15 +66,14 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
       >
         <motion.div className="hero-badge-container" variants={itemVariants}>
           <div className="hero-badge">
-            <Activity className="badge-icon pulse" size={11} />
+            <span className="badge-icon pulse" aria-hidden="true">●</span>
             <span>ACCEPTING NEW EXPEDITIONS</span>
           </div>
         </motion.div>
 
-        <motion.p className="hero-route-status" variants={itemVariants}>
-          <Route size={13} />
-          <span>{SITE.currentRoute}</span>
-        </motion.p>
+        <motion.div variants={itemVariants}>
+          <RouteStatusRotator />
+        </motion.div>
 
         <div className="hero-grid">
           <motion.div className="hero-copy" variants={itemVariants}>
@@ -85,16 +88,13 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
         </div>
 
         <motion.p className="hero-description" variants={itemVariants}>
-          Guiding founders, capital, and companies through the most demanding terrain.
+          <strong className="hero-lead">Guiding founders, capital, and companies through the most demanding terrain.</strong>{' '}
           From base camp to summit — deal architecture, venture operations, and the long descent home.
         </motion.p>
 
         <motion.div className="hero-actions" variants={itemVariants}>
           <button
-            onClick={() => {
-              const el = document.getElementById('services');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
+            onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
             className="btn-primary"
           >
             <span>See the Route</span>
@@ -112,22 +112,19 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
         </motion.div>
 
         <motion.div className="hero-metrics" variants={itemVariants} ref={metricsRef}>
-          <div className="metric-item">
-            <span className="metric-label">{HERO_METRICS[0].label}</span>
-            <span className="metric-value metric-value--count">
-              {metricsVisible ? `${expeditions}${HERO_METRICS[0].suffix}` : HERO_METRICS[0].display}
-            </span>
-          </div>
-          <div className="metric-divider" />
-          <div className="metric-item">
-            <span className="metric-label">{HERO_METRICS[1].label}</span>
-            <span className="metric-value">{HERO_METRICS[1].display}</span>
-          </div>
-          <div className="metric-divider" />
-          <div className="metric-item">
-            <span className="metric-label">{HERO_METRICS[2].label}</span>
-            <span className="metric-value">{HERO_METRICS[2].display}</span>
-          </div>
+          {HERO_METRICS.map((metric, idx) => (
+            <React.Fragment key={metric.label}>
+              {idx > 0 && <div className="metric-divider" />}
+              <div className="metric-item">
+                <span className="metric-label">{metric.label}</span>
+                <span className={`metric-value ${metric.type === 'count' ? 'metric-value--count' : ''}`}>
+                  {metric.type === 'count' && metricsVisible
+                    ? `${expeditions}${metric.suffix}`
+                    : metric.display}
+                </span>
+              </div>
+            </React.Fragment>
+          ))}
         </motion.div>
       </motion.div>
     </section>

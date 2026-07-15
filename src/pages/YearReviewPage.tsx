@@ -1,44 +1,80 @@
-import { LegalPage } from './LegalPage';
+import { Link } from 'react-router-dom';
+import { usePageMeta } from '../hooks/usePageMeta';
+import { SiteLayout } from '../components/SiteLayout';
 import { EXPEDITION_LOG } from '../data/expeditionLog';
-import { VENTURES } from '../data/ventures';
+import { VENTURES, VENTURE_STATUS_LABELS } from '../data/ventures';
+import {
+  YEAR_REVIEW_HIGHLIGHTS,
+  YEAR_REVIEW_LESSONS,
+  YEAR_REVIEW_QUARTERS,
+  YEAR_REVIEW_LAST_UPDATED,
+} from '../data/yearReview';
 
 export function YearReviewPage() {
+  usePageMeta({
+    title: 'State of the Route — 2026',
+    description: 'Annual review of ventures, deals, and lessons from the field.',
+    path: '/2026',
+  });
+
+  const currentQuarter = `q${Math.ceil((new Date().getMonth() + 1) / 3)}` as keyof typeof YEAR_REVIEW_QUARTERS;
+
   return (
-    <LegalPage title="State of the Route — 2026">
-      <p>
-        Annual review of ventures, deals, and lessons from the field. Updated as the year progresses.
-      </p>
+    <SiteLayout>
+      <article className="legal-content year-review-content">
+        <h1>State of the Route — 2026</h1>
+        <p className="legal-updated">Last updated: {YEAR_REVIEW_LAST_UPDATED}</p>
+        <p>
+          Annual review of ventures, deals, and lessons from the field. Updated as the year progresses.
+        </p>
 
-      <h2>Highlights</h2>
-      <ul>
-        <li>camtaylor.ca Sherpa command centre launched</li>
-        <li>Give A Bit constellation at 7 active ventures</li>
-        <li>OpenStrata syndication round in progress</li>
-        <li>NOSTR identity layer live at @giveabit.io</li>
-      </ul>
+        <h2>Highlights</h2>
+        <ul>
+          {YEAR_REVIEW_HIGHLIGHTS.map((h) => (
+            <li key={h}>{h}</li>
+          ))}
+        </ul>
 
-      <h2>Expedition Log</h2>
-      <ul>
-        {EXPEDITION_LOG.map((e) => (
-          <li key={e.id}>
-            <strong>{e.date}</strong> — {e.title}: {e.outcome}
-          </li>
-        ))}
-      </ul>
+        <h2>Current quarter ({currentQuarter.toUpperCase()})</h2>
+        <ul>
+          {YEAR_REVIEW_QUARTERS[currentQuarter].map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
 
-      <h2>Venture Altitudes</h2>
-      <ul>
-        {VENTURES.map((v) => (
-          <li key={v.id}>
-            {v.name}: {v.altitude}% — {v.status}
-          </li>
-        ))}
-      </ul>
+        <h2>Expedition Log</h2>
+        <ul>
+          {EXPEDITION_LOG.map((e) => (
+            <li key={e.id}>
+              <strong>{e.date}</strong> — {e.title}: {e.outcome}
+            </li>
+          ))}
+        </ul>
+        <p>
+          <Link to="/#expeditions">View full log on homepage</Link>
+        </p>
 
-      <h2>Lessons</h2>
-      <p>
-        Skin in the game beats hourly advice. Structure before scale. The descent matters as much as the summit.
-      </p>
-    </LegalPage>
+        <h2>Venture Altitudes</h2>
+        <ul>
+          {VENTURES.map((v) => (
+            <li key={v.id}>
+              <Link to={`/route/${v.id}`}>{v.name}</Link>: {v.altitude}% — {VENTURE_STATUS_LABELS[v.status]}
+            </li>
+          ))}
+        </ul>
+        <p>
+          <Link to="/#ventures">Portfolio on homepage</Link>
+        </p>
+
+        <h2>Lessons</h2>
+        <ul>
+          {YEAR_REVIEW_LESSONS.map((lesson) => (
+            <li key={lesson.id}>
+              <strong>{lesson.title}</strong> — {lesson.context}
+            </li>
+          ))}
+        </ul>
+      </article>
+    </SiteLayout>
   );
 }

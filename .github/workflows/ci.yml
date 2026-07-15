@@ -20,6 +20,8 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
+        env:
+          VITE_FORMSPREE_FORM_ID: xykqodnk
 
   test:
     runs-on: ubuntu-latest
@@ -34,3 +36,5 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test
+        env:
+          VITE_FORMSPREE_FORM_ID: xykqodnk

@@ -12,7 +12,6 @@ import { Ventures } from '../components/Ventures';
 import { Contact } from '../components/Contact';
 import { Footer } from '../components/Footer';
 import { StickyCta } from '../components/StickyCta';
-import { Analytics } from '../components/Analytics';
 import { ScrollProgress } from '../components/ScrollProgress';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { CustomCursor } from '../components/CustomCursor';
@@ -20,7 +19,10 @@ import { MobileQuickNav } from '../components/MobileQuickNav';
 import { BackToTop } from '../components/BackToTop';
 import { useKonamiCode } from '../hooks/useKonamiCode';
 import { useGoldenHour } from '../hooks/useGoldenHour';
-import { useTheme } from '../hooks/useTheme';
+import { useThemeContext } from '../context/ThemeContext';
+import { useHashScroll } from '../hooks/useHashScroll';
+import { usePageMeta } from '../hooks/usePageMeta';
+import { SITE } from '../data/site';
 
 const CommandDeck = lazy(() =>
   import('../components/CommandDeck').then((m) => ({ default: m.CommandDeck })),
@@ -28,12 +30,26 @@ const CommandDeck = lazy(() =>
 
 export function HomePage() {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
-  const { toggle, isNight } = useTheme();
+  const { toggle, isNight } = useThemeContext();
+
+  usePageMeta({
+    title: `${SITE.name} | ${SITE.title} — Deal Architecture & Venture Operations`,
+    description:
+      'Cam Taylor — Sherpa. We get people to the top and back down again. Deal architecture, capital syndication, and venture operations from British Columbia, Canada.',
+    path: '/',
+  });
 
   useGoldenHour();
+  useHashScroll();
 
   const openTerminal = useCallback(() => setIsTerminalOpen(true), []);
   const toggleTerminal = useCallback(() => setIsTerminalOpen((v) => !v), []);
+  const closeTerminal = useCallback(() => setIsTerminalOpen(false), []);
+
+  const scrollToSection = useCallback((id: string) => {
+    closeTerminal();
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  }, [closeTerminal]);
 
   useKonamiCode(openTerminal);
 
@@ -42,7 +58,6 @@ export function HomePage() {
       <LoadingScreen />
       <ScrollProgress />
       <CustomCursor />
-      <Analytics />
 
       <a href="#hero" className="skip-link">
         Skip to content
@@ -71,7 +86,11 @@ export function HomePage() {
 
       {isTerminalOpen && (
         <Suspense fallback={null}>
-          <CommandDeck isOpen={isTerminalOpen} onClose={() => setIsTerminalOpen(false)} />
+          <CommandDeck
+            isOpen={isTerminalOpen}
+            onClose={closeTerminal}
+            onNavigate={scrollToSection}
+          />
         </Suspense>
       )}
 

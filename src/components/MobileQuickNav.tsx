@@ -1,37 +1,45 @@
 import React from 'react';
-import { User, BookOpen, Briefcase, Rocket, MessageCircle } from 'lucide-react';
+import { User, BookOpen, Briefcase, Rocket, MessageCircle, Map, Quote } from 'lucide-react';
+import { MOBILE_QUICK_NAV } from '../data/site';
 import { useScrollSpy } from '../hooks/useScrollSpy';
 
-const ITEMS = [
-  { id: 'about', label: 'About', Icon: User },
-  { id: 'manifesto', label: 'Philosophy', Icon: BookOpen },
-  { id: 'services', label: 'Expertise', Icon: Briefcase },
-  { id: 'ventures', label: 'Ventures', Icon: Rocket },
-  { id: 'contact', label: 'Connect', Icon: MessageCircle },
-] as const;
+const ICONS: Record<string, React.FC<{ size?: number; strokeWidth?: number }>> = {
+  about: User,
+  expeditions: Map,
+  manifesto: BookOpen,
+  services: Briefcase,
+  testimonials: Quote,
+  ventures: Rocket,
+  contact: MessageCircle,
+};
 
 export const MobileQuickNav: React.FC = () => {
-  const activeId = useScrollSpy(ITEMS.map((i) => i.id));
+  const activeId = useScrollSpy(MOBILE_QUICK_NAV.map((i) => i.id));
 
   const scrollTo = (id: string) => {
+    navigator.vibrate?.(8);
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <nav className="mobile-quick-nav" aria-label="Quick section navigation">
-      {ITEMS.map(({ id, label, Icon }) => (
-        <button
-          key={id}
-          type="button"
-          className={`mobile-quick-nav-btn ${activeId === id ? 'active' : ''}`}
-          onClick={() => scrollTo(id)}
-          aria-current={activeId === id ? 'true' : undefined}
-          aria-label={label}
-        >
-          <Icon size={18} strokeWidth={activeId === id ? 2.5 : 2} />
-          <span>{label}</span>
-        </button>
-      ))}
+      {MOBILE_QUICK_NAV.map(({ id, mobileLabel }) => {
+        const Icon = ICONS[id] ?? User;
+        const isActive = activeId === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            className={`mobile-quick-nav-btn ${isActive ? 'active' : ''}`}
+            onClick={() => scrollTo(id)}
+            aria-current={isActive ? 'true' : undefined}
+            aria-label={mobileLabel}
+          >
+            <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
+            <span>{mobileLabel}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 };
