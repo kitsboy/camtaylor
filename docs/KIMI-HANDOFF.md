@@ -237,3 +237,26 @@
 ---
 
 *Safe Harbour · Part of the [Give A Bit](https://giveabit.io) family.*
+
+## Session — 2026-07-19
+
+**Machine:** M3 (Grok)
+**Project:** camtaylor
+
+**Done:**
+- [x] Added thin Satohash API client `src/lib/satohash.ts` (`X-Satohash-Client: camtaylor`)
+- [x] Exports: `stampHash`, `getApiHealth`, `verifyUrl`, `stampGuideUrl`, `sha256Hex`
+- [x] Defaults: API `https://api.satohash.io`, site `https://satohash.io`
+- [x] Graceful offline (`ok: false`, no throw on network failure); optional `VITE_SATOHASH_*` env (no secrets committed)
+- [x] Typed `VITE_SATOHASH_API_URL` / `VITE_SATOHASH_URL` / `VITE_SATOHASH_KEY` in `src/vite-env.d.ts`
+- [x] `tsc -b` clean
+
+**Decisions:**
+- Client is library-only (not wired into UI yet) — ready for portfolio/snapshot seals
+- Matches family motopass-style graceful returns; no FAMILY key in repo
+
+**Git State:**
+- Branch: main
+- See commit after push
+
+---
