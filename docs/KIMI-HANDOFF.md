@@ -26,6 +26,11 @@
 ### Open items (next week, no rush)
 - Cam has another site to move over — will do with Kimi's help next week.
 - Set GitHub default branch to `main` (`origin/HEAD` still points at `talent`).
+- **Stale doc to reconcile (Buffy, 2026-09-24):** `ref/GROK-BOOT.md` still instructs adding the
+  Umami script (`https://analytics.giveabit.io/script.js`, website id
+  `640018e2-6c1e-4053-b72d-b9b2be0aa952`), which contradicts Cam's no-analytics decision and
+  `docs/DEPLOYMENT.md` ("Analytics — None is shipped"). `ref/` is gitignored, so this file is
+  local-only and will not show up on M4 — it needs a decision from Kimi, not a silent edit.
 
 ### Buffy — read these before any session (in order)
 1. `AGENTS.md`
