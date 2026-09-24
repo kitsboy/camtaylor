@@ -1,3 +1,84 @@
+## Session — 2026-09-24 (UI legibility pass + contrast guard)
+
+**Machine:** M3 (Buffy) · **Project:** camtaylor
+
+### Done — five UI items, each verified against the rendered page
+
+1. **`--text-muted` was failing WCAG AA.** It was 3.60:1 on the page and 4.18:1 on
+   cards. This one token carries the waypoint blurbs, every form placeholder, the kit
+   notes, testimonial attributions and the dispatch captions — roughly twenty separate
+   findings. Now `#554e44` (5.7:1 on the page, 6.6:1 on cards, 5.0:1 on the darkest
+   surface it lands on). `--text-secondary` darkened with it to `#4a443b` so the type
+   hierarchy (primary → secondary → muted) still reads in the same order.
+2. **Faint white text in the dark shells** raised past the 0.5 alpha floor, which is the
+   point where white crosses AA on every dark surface in this palette. Footer sitemap
+   indices went 4.08:1 → 7.2:1; the agent search icon and its placeholder 3.82:1 → ~7:1;
+   the live-chart range and foot labels ~4.1:1 → ~7.6:1.
+3. **Command Deck legibility.** The boot log — the first thing anyone sees when they open
+   the deck — was white at 25% opacity, 2.23:1. Now 7.6:1. The input's placeholder was
+   inheriting a browser default at 4.05:1 and is now explicit at 7.6:1; the enter-icon
+   affordance went from 1.9:1 to 6.5:1.
+4. **Accents that disappeared on their own backgrounds.** The section kicker was 1.88:1
+   on the agent and proof shells (deep teal on ink) and now takes a light teal there while
+   keeping the original on light surfaces. The family card index numerals were 1.02–2.68:1
+   (light accent on light paper) and are now blended 28% toward ink. The "Hiring" badge
+   was white on gold at 3.21:1 and now uses ink. The footer ecosystem chips were white on
+   light glass at **1.39:1** — effectively invisible — and now sit on a dark tint.
+5. **Hero copy tightened**, and a **contrast guard** shipped to keep this from regressing:
+   `tests/contrast.spec.ts`.
+
+### The guard, and what it does not cover
+
+`tests/contrast.spec.ts` samples the actual rendered backdrop pixel by pixel rather than
+reading `background-color`, because much of this site paints backgrounds as gradients
+(including `body`) that `getComputedStyle` cannot reduce to one colour. It is aware of
+occlusion, stacking order and animation, and it **asserts that it actually sampled text**,
+so a vacuous pass cannot hide behind an empty audit.
+
+Coverage today: 657 checks on the homepage, 28 on a dispatch, 13 in the command deck.
+Deliberate blind spots, each documented in the file:
+
+- **Night theme is not audited.** The guard runs the light theme only. The night tokens
+  were checked by hand (`--text-muted` `#71867e` = 4.94:1 / 4.51:1, passing) but nothing
+  automates it.
+- Anything **animating** or **covered by a fixed overlay** is skipped — its pixels change
+  frame to frame or belong to another layer.
+- Gradients are sampled where they land, so a gradient that shifts under a restyle can
+  still change contrast without the guard noticing the cause.
+
+### Still outstanding (UI-focused — the rest of the launch gate is unchanged)
+
+- [ ] **Night-theme contrast** — extend the guard to run both themes.
+- [ ] **Keyboard + screen-reader pass** on the live URL.
+- [ ] **Reduced-motion pass** on the live URL. (The guard *runs* with reduced motion, but
+      nothing asserts the preference is honoured in every animated component.)
+- [ ] **Mobile QA at 375 / 414 px and on real hardware.** 320 / 390 px stay automated in
+      `tests/device-qa.spec.ts`.
+- [ ] **Desktop QA at laptop and ultra-wide widths.**
+- [ ] **Hero and backdrop art read by eye** — the busiest gradient areas are the least
+      machine-checkable part of the page.
+- [ ] **Seed dispatches reviewed by Cam** (content, not UI).
+- [ ] **Contact form test submission** reaching the real inbox.
+
+### Decisions
+
+- Fixed contrast by changing CSS values, not the brand tokens: `--acid` is untouched and
+  `--violet` stays locked, so only the light-theme *uses* of violet were darkened.
+- Where a token was doing two jobs (the kicker on light *and* dark shells), the light
+  value stays and a scoped dark-shell override was added instead of flattening the token.
+- Took an instrument-first approach: the guard was written and debugged until its readings
+  were trustworthy, and the fixes were driven by what it found rather than by guesswork.
+  Several early "failures" were the instrument's fault (gradient bodies, un-revealed
+  animation frames, a fixed preview banner) and were fixed in the guard, not in the CSS.
+
+### Git State
+
+- SHA: `8ec846a9ec70871fea4ec8289da5cb80d9f35c8e` (UI + guard)
+- Verified: `npm run quality` ✓ · `npx tsc -b` ✓ · `npm run lint` 0 errors (1 pre-existing
+  `ThemeContext.tsx` warning) · `npm test` **45/45** (41 before, +4 contrast)
+
+---
+
 ## Handoff — 2026-09-24 (OWNERSHIP SETTLED + LIVE)
 
 **Machine:** THOR (Kimi) · **Project:** camtaylor
