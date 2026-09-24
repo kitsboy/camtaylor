@@ -37,7 +37,7 @@ export const Manifesto: React.FC = () => {
               >
                 🚩
               </motion.div>
-              <div className="axiom-num">{axiom.number}</div>
+              <div className="axiom-num" aria-hidden="true">{axiom.number}</div>
               <div className="axiom-icon-wrapper">
                 <Icon className="axiom-icon" size={20} />
               </div>

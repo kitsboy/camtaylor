@@ -18,7 +18,7 @@
 .footer--basecamp .footer-container { position: relative; z-index: 1; }
 .footer--basecamp .ecosystem-ribbon { background: #0d2025; border-bottom-color: rgba(100,230,226,.2); }
 .footer--basecamp .ecosystem-ribbon-label { color: #d7ff55; }
-.footer--basecamp .ecosystem-chip { color: rgba(255,255,255,.58); border-color: rgba(255,255,255,.14); }
+.footer--basecamp .ecosystem-chip { color: rgba(255,255,255,.72); background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); }
 .footer--basecamp .ecosystem-chip:hover { color: #081317; background: #d7ff55; border-color: #d7ff55; }
 .footer-hero { display: flex; justify-content: space-between; align-items: end; gap: 28px; padding: clamp(52px, 8vw, 92px) 0 48px; }
 .footer-kicker { display: flex; align-items: center; gap: 7px; color: #64e6e2; font: 700 .65rem/1 var(--font-heading); letter-spacing: .18em; }
@@ -92,7 +92,7 @@
 .footer-sitemap-item:nth-child(odd) { border-right: 1px solid rgba(255,255,255,.08); }
 .footer-sitemap-item:hover, .footer-sitemap-item:focus-visible { color: #d7ff55; background: rgba(100,230,226,.1); }
 .footer-sitemap-item:focus-visible { outline: 2px solid #64e6e2; outline-offset: -2px; }
-.footer-sitemap-index { color: rgba(255,255,255,.42); font: 600 .58rem/1 var(--font-heading); }
+.footer-sitemap-index { color: rgba(255,255,255,.6); font: 600 .58rem/1 var(--font-heading); }
 .footer-sitemap-color { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
 .footer-sitemap-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .footer-sitemap-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 .72rem/1 var(--font-heading); }

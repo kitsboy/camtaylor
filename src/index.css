@@ -4,8 +4,8 @@
   --bg-card:      #ece6db;
   --bg-subtle:    #d0c9bd;
   --text-primary: #1a1712;
-  --text-secondary: #5c564c;
-  --text-muted:   #736c60;
+  --text-secondary: #4a443b;
+  --text-muted:   #554e44;
 
   /* Accents */
   --green:        #1e4534;
@@ -874,7 +874,7 @@ img, video {
 .venture-role {
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--green-light);
+  color: #245a42;
   margin-bottom: 12px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1192,7 +1192,7 @@ img, video {
 }
 
 .terminal-log-entry { margin-bottom: 8px; }
-.log-system { color: rgba(255,255,255,.25); }
+.log-system { color: rgba(255,255,255,.62); }
 .log-input  { color: rgba(255,255,255,.85); }
 .log-output { color: #4a8f68; }
 .log-error  { color: #e06c75; }
@@ -1239,7 +1239,9 @@ img, video {
   outline: none;
 }
 
-.terminal-enter-icon { color: rgba(255,255,255,.2); }
+.terminal-input::placeholder { color: rgba(255,255,255,.62); }
+
+.terminal-enter-icon { color: rgba(255,255,255,.55); }
 
 /* ── Footer ─────────────────────────────────────────────── */
 .footer {
@@ -1410,7 +1412,7 @@ img, video {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--green-light);
+  color: #245a42;
   margin-bottom: 10px;
 }
 

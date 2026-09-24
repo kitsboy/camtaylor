@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Cpu, Activity, Orbit, ShieldCheck, Sparkles, MapPin } from 'lucide-react';
+import { ArrowRight, Cpu, Activity, Orbit, ShieldCheck, MapPin } from 'lucide-react';
 import { SITE, HERO_SIGNALS } from '../data/site';
 import { HeroVideo } from './HeroVideo';
 import { RouteStatusRotator } from './RouteStatusRotator';
@@ -60,7 +60,6 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
         <motion.div className="hero-card-meta" variants={itemVariants}>
           <span><MapPin size={12} /> BRITISH COLUMBIA / PT</span>
           <span><ShieldCheck size={12} /> PROOF-FIRST PRACTICE</span>
-          <span><Sparkles size={12} /> FOUNDER-LED</span>
         </motion.div>
 
         <motion.div className="hero-badge-container" variants={itemVariants}>
@@ -95,8 +94,8 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
           </motion.div>
 
           <motion.p className="hero-description" variants={itemVariants}>
-          <strong className="hero-lead">Guiding founders, capital, and companies through the most demanding terrain.</strong>{' '}
-          From base camp to summit — deal architecture, venture operations, and the long descent home.
+          <strong className="hero-lead">Guiding founders, capital, and companies through demanding terrain.</strong>{' '}
+          Deal architecture, capital syndication, and venture operations.
         </motion.p>
 
         <motion.div className="hero-actions" variants={itemVariants}>
