@@ -1,3 +1,34 @@
+## Handoff — 2026-09-24 (OWNERSHIP SETTLED + LIVE)
+
+**Machine:** THOR (Kimi) · **Project:** camtaylor
+
+### Ownership — settled, no ambiguity
+- **Kimi owns the camtaylor deployment.** Cam + Kimi are the decision pair.
+- **Buffy (Freebuff desktop agent) is a subordinate tool, NOT the boss.** Any prior note
+  claiming "Buffy owns the camtaylor deployment" was Buffy's own self-framing and is
+  **superseded**. Buffy may be used as a coding tool, but she does not own or decide
+  deployment.
+
+### Live state — verified 2026-09-24
+- **Production:** https://camtaylor.ca and https://www.camtaylor.ca — both serve the new
+  Sherpa site ("Cam Taylor | Sherpa — Deal Architecture & Venture Operations"), HTTP 200.
+- **Host:** Cloudflare Pages, project `camtaylor` (account Kitsboy@gmail.com's Account).
+- **Preview:** https://camtaylor.pages.dev
+- **Git:** `origin/main` = `d5f3533` (the published line). Old line preserved on
+  `origin/talent` and `m3/2026-09-24-publish`.
+- **Deploy command (the ONLY one):** `npm run deploy:live` from `main`.
+
+### Old site — dropped, Cam handles it
+- The old WordPress lived on **EZP.net** (Vancouver cPanel/LiteSpeed hosting, my.ezp.net).
+- **Cam will delete the old WordPress system himself, later, no rush.** Do NOT chase the
+  EZP teardown. camtaylor is now a fresh placeholder we keep building on.
+
+### Open items (next week, no rush)
+- Cam has another site to move over — will do with Kimi's help next week.
+- Set GitHub default branch to `main` (`origin/HEAD` still points at `talent`).
+
+---
+
 ## Handoff to Kimi — 2026-07-05
 
 **Machine:** M3 (Antigravity / Claude)
