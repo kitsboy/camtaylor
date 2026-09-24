@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowUp, ArrowUpRight, Bot, Compass, Gauge, Mail, Mountain, ShieldCheck, Terminal, Copy, Check, ExternalLink, Heart, KeyRound, Sparkles, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { SITE } from '../data/site';
+import { IS_PRIVATE_PREVIEW, SITE } from '../data/site';
 import { FAMILY_OFFERINGS } from '../data/family';
 import { EcosystemRibbon } from './EcosystemRibbon';
 
@@ -78,7 +78,10 @@ export const Footer: React.FC<FooterProps> = ({ onToggleTerminal }) => {
         </div>
 
         <div className="footer-signal-row">
-          <div className="footer-signal"><span className="footer-signal-dot" /> PRIVATE PREVIEW / LOCAL BUILD</div>
+          <div className="footer-signal">
+            <span className="footer-signal-dot" />{' '}
+            {IS_PRIVATE_PREVIEW ? 'PRIVATE PREVIEW / LOCAL BUILD' : 'PUBLIC / LIVE'}
+          </div>
           <div className="footer-signal-line" />
           <div className="footer-signal"><ShieldCheck size={13} /> PROOF OVER PROMISE</div>
         </div>

@@ -1,4 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const failures = [];
 const requiredFiles = ['public/robots.txt', 'public/manifest.json', 'public/favicon.svg', 'public/og-image.png'];
@@ -17,6 +18,23 @@ if (!envExample.includes('VITE_PRIVATE_PREVIEW=true')) failures.push('Private pr
 
 const robots = readFileSync('public/robots.txt', 'utf8');
 if (!robots.includes('Sitemap:')) failures.push('robots.txt must declare a sitemap');
+
+// Preview copy must never be hard-coded: every mention has to sit behind
+// IS_PRIVATE_PREVIEW, or a public build will announce itself as a preview.
+function walk(dir) {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) return walk(path);
+    return entry.name.endsWith('.tsx') ? [path] : [];
+  });
+}
+
+for (const file of walk('src')) {
+  const source = readFileSync(file, 'utf8');
+  if (/private preview/i.test(source) && !source.includes('IS_PRIVATE_PREVIEW')) {
+    failures.push(`${file} mentions the private preview without gating it on IS_PRIVATE_PREVIEW`);
+  }
+}
 
 if (failures.length) {
   console.error(failures.map((failure) => `✗ ${failure}`).join('\n'));

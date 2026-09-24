@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Terminal, Mountain, Menu, X, Bot, ArrowUpRight } from 'lucide-react';
-import { NAV_ITEMS } from '../data/site';
+import { IS_PRIVATE_PREVIEW, NAV_ITEMS } from '../data/site';
 import { useScrollSpy } from '../hooks/useScrollSpy';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -73,7 +73,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`} role="navigation" aria-label="Main">
         <div className="nav-container">
-          <div className="nav-identity-badge" aria-hidden="true"><span className="nav-signal-dot" /> LIVE / PRIVATE PREVIEW</div>
+          <div className="nav-identity-badge" aria-hidden="true">
+            <span className="nav-signal-dot" />{' '}
+            {IS_PRIVATE_PREVIEW ? 'LIVE / PRIVATE PREVIEW' : 'LIVE / CAMTAYLOR.CA'}
+          </div>
           <div
             className="nav-brand"
             onClick={scrollTop}

@@ -379,7 +379,13 @@ export const Contact: React.FC = () => {
           </div>
         </div>
       </div>
-      <p className="contact-delivery-note">When live on <strong>{SITE.domain}</strong>, approved submissions will be delivered to <strong>{SITE.email}</strong> through Formspree. Private preview never sends.</p>
+      <p className="contact-delivery-note">
+        {IS_PRIVATE_PREVIEW ? (
+          <>Nothing is sent from a private preview build. Submissions will be delivered to <strong>{SITE.email}</strong> through Formspree once <strong>{SITE.domain}</strong> goes public.</>
+        ) : (
+          <>Submissions are delivered to <strong>{SITE.email}</strong> through Formspree. Nothing else is stored on this site.</>
+        )}
+      </p>
     </section>
   );
 };
