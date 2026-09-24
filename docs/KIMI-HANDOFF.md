@@ -764,3 +764,38 @@
 - Left locally on purpose: `.env` (ignored), `ref/` (ignored), `.aider.*` chat history files (ignored — his call whether to delete).
 
 ---
+
+## Session — 2026-09-24 (port the August fixes, go live, kill the preview copy)
+
+**Machine:** M3 (Buffy)
+**Project:** camtaylor
+**Continues:** the dispatch-engine / route-spine session above.
+
+**Done:**
+- [x] **Ported the worthwhile August-line fixes onto the local line** (Cam chose "my Sep line, port their fixes"): new `src/components/SatohashProvenance.tsx` rendered on `/route/:ventureId`, `https://api.satohash.io` added to the CSP `connect-src`, `min-height: 100dvh`, 44px `nav-menu-btn`, `-webkit-backdrop-filter` on every remaining backdrop, and `axioms-grid` two-column ≤1000px / one-column ≤640px. Deliberately **not** ported: the remote `index.css` consolidation (it would collide with `bold-modern.css`) and the "Deal Architect" voice — Sherpa wins.
+- [x] **Ported the device-QA matrix** as `tests/device-qa.spec.ts`, rewritten against current markup and driven by viewport size rather than a UA string.
+- [x] **The matrix immediately found three real phone defects, all fixed:** (1) `.glow-orb` (`right: -15%`) gave the page a horizontal scrollbar on phones; (2) `.log-filter-btn`, `.venture-filter-btn` and `.theme-toggle` were under 40px tall; (3) `.nostr-card` could not shrink below its min-content, forcing 19px of overflow at 320px — fixed with `min-width: 0` on the card and its header column.
+- [x] **Deployed to production.** Created the Cloudflare Pages project `camtaylor` (`wrangler pages project create camtaylor --production-branch main`) and ran `npm run deploy:live`. Production URL: **https://camtaylor.pages.dev** (currently serving `assets/index-DiA1UCzx.js`). Verified live: routes 200, `/feed.xml` with six items, `/sitemap.xml`, dispatch reader, venture route, CSP header carries `api.satohash.io`.
+- [x] **Found and fixed a launch blocker on the first public deploy.** The navbar badge, the footer signal and the contact delivery note were *hardcoded* preview copy, so the live site still read `LIVE / PRIVATE PREVIEW` in the header and told visitors "Private preview never sends." All three now branch on `IS_PRIVATE_PREVIEW`, and `scripts/quality-check.mjs` gained a guard that fails the build when preview copy is not gated.
+- [x] Redeployed after the fix; served bundle verified free of preview copy, and a temporary live spec (since deleted) confirmed homepage, dispatch reader, feed, venture provenance and an enabled contact form against the real URL.
+- [x] `npm run quality` ✓, `npx tsc -b` ✓, `npm run lint` 0 errors / 1 pre-existing warning, `npm test` **41/41** pass (was 35).
+
+**Decisions:**
+- Porting was **selective**: features and defects only, never the August theme tokens or the rebranded voice, because Cam locked the reviewed Sherpa design this session.
+- Preview copy must be *branched*, never hardcoded — the quality-check guard exists so a public build can never regress into advertising a private preview.
+- `origin/main` is **not** touched. It is a parallel lineage (2026-08-09 → 08-13, "Deal Architect" maturity rebrand) that diverges in 28 files. Local `main` is the published line; it is backed up on the remote as `m3/2026-09-24-publish`. Promoting local `main` to `origin/main` needs an explicit decision from Cam (it is a force-push on a public repo).
+
+**Git State:**
+- SHA: `0212943b489a5168dece2e42312cd9f64b0a203f` (branch `main`)
+- `origin/main..HEAD` — 5 commits ahead (`ea82bdf`, `9cbbcc3`, `26401bf`, `63bf10c`, `0212943`); also 11 behind. All five are pushed to remote branch **`m3/2026-09-24-publish`** (nothing unpushed there).
+- `origin/HEAD` points at `origin/talent`, which is why a PR would need its base set by hand.
+- Working tree clean; `.env`, `ref/` and `.aider.*` remain ignored and local.
+
+**Open for Cam:**
+1. Review the six seed dispatches and test one real contact-form submission.
+2. Switch `camtaylor.ca` + `www` to the Pages project in the Cloudflare dashboard (see below) and delete the old WordPress records.
+3. Decide whether local `main` replaces `origin/main`.
+
+**DNS switch (dashboard, no wrangler DNS scope):** Workers & Pages → `camtaylor` → Custom domains → **Set up a domain** → add `camtaylor.ca`, then `www`. Cloudflare will offer to create the CNAME/proxy records; accept **only** if it removes the old WordPress `A`/`CNAME` records for the apex and `www`. The live WordPress origin is LiteSpeed/PHP 8.1.34 behind the proxy — its origin records must be deleted, then the hosting cancelled.
+
+---

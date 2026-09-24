@@ -18,6 +18,9 @@ dashboard because DNS edit is not delegated to the build machine.
 - [x] `npm run quality` passes
 - [x] `npx tsc -b` clean
 - [x] `npm run lint` — 0 errors (1 pre-existing fast-refresh warning in `ThemeContext.tsx`)
+- [x] Deployed to Pages project `camtaylor` with `VITE_PRIVATE_PREVIEW=false` → https://camtaylor.pages.dev
+- [x] Satohash provenance ported onto `/route/*` (health check + route hash + verify/stamp links)
+- [x] Public build no longer advertises a preview: navbar, footer and contact note all gated on `IS_PRIVATE_PREVIEW`, with a `quality-check.mjs` guard against regressions
 - [x] Production build clean; Playwright suite green
 - [x] Dispatches moved from stub XML to generated `feed.xml`; old `expedition-log.xml` removed
 - [x] Repository tidy: Vercel/Netlify configs, stale session summaries, `.DS_Store`, unused `og-image.svg` removed
