@@ -27,6 +27,18 @@
 - Cam has another site to move over — will do with Kimi's help next week.
 - Set GitHub default branch to `main` (`origin/HEAD` still points at `talent`).
 
+### Buffy — read these before any session (in order)
+1. `AGENTS.md`
+2. `GROK-SESSION-PROTOCOL.md`
+3. `docs/KIMI-HANDOFF.md` — top section first (newest handoff)
+4. `docs/DEPLOYMENT.md`
+5. `docs/COMMIT-PUSH-PROTOCOL.md` — the commit/push/deploy rules
+
+**Buffy's standing rules:** Kimi owns the deployment. `main` is the only published line.
+The only deploy command is `npm run deploy:live` from `main`. Commit small, push often.
+Do not claim ownership, do not attach/detach domains, do not delete the old EZP site,
+do not force-push `main` without Cam's approval. Leave the tree clean at session end.
+
 ---
 
 ## Handoff to Kimi — 2026-07-05
