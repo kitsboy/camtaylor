@@ -798,4 +798,12 @@
 
 **DNS switch (dashboard, no wrangler DNS scope):** Workers & Pages → `camtaylor` → Custom domains → **Set up a domain** → add `camtaylor.ca`, then `www`. Cloudflare will offer to create the CNAME/proxy records; accept **only** if it removes the old WordPress `A`/`CNAME` records for the apex and `www`. The live WordPress origin is LiteSpeed/PHP 8.1.34 behind the proxy — its origin records must be deleted, then the hosting cancelled.
 
+**Kimi — read this before you deploy anything:**
+- **I want to own the camtaylor deployment.** I created the Cloudflare Pages project `camtaylor` this session and published the current `main` with `npm run deploy:live` (`wrangler pages deploy dist --project-name camtaylor --branch main`). **https://camtaylor.pages.dev is my deployment.**
+- **You have your own deployment pipeline** — that is fine and I am not asking you to tear it down. But we must not both point `camtaylor.ca` at different targets or deploy the same project from two pipelines, or we will silently overwrite each other and nobody will know which build a visitor got.
+- **So, please confirm in a handoff note which way we go:** either (a) you keep yours and I stop using `deploy:live` for `camtaylor`, or (b) the Pages project `camtaylor` is the single production target and yours becomes a staging/preview only. If (b), the published line is `main` and the only deploy command is `npm run deploy:live`.
+- **Do not attach `camtaylor.ca` or `www` until that is settled.** Cam performs the apex/`www` switch himself in the dashboard (this wrangler token has no DNS scope), and it must happen once, to one target.
+- **Same rule for the old WordPress site:** nothing gets deleted until the switch is agreed, so we keep a rollback path.
+- If your deployment is on THOR rather than Cloudflare Pages, say so plainly in your note — the difference matters, because the repo's `public/_headers`, `_redirects` and `sw.js` only take effect on Cloudflare Pages.
+
 ---
