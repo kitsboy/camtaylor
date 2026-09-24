@@ -1,3 +1,22 @@
+.private-preview-banner {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 1000;
+  pointer-events: none;
+  padding: 0.45rem 1rem;
+  background: #211d18;
+  color: #f2d18b;
+  font: 600 0.68rem/1.2rem 'Outfit', sans-serif;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+.form-preview-notice {
+  margin: 0 0 1rem;
+  color: #a87925;
+  font-size: 0.85rem;
+}
+
 /* Elite upgrade layer — tokens, motion, polish */
 
 :root {
@@ -180,6 +199,7 @@
   border-radius: 999px;
   border: 1px solid var(--glass-border);
   background: var(--bg-card);
+  color: var(--text-primary);
   font-size: 0.8rem;
   font-family: var(--font-heading);
   cursor: pointer;

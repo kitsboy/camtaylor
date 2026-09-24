@@ -48,6 +48,16 @@ export const Services: React.FC = () => {
         })}
       </div>
 
+      <div className="services-signal-panel" aria-label="Operating model overview">
+        <div className="signal-heading"><span className="signal-dot" /> OPERATING MODEL <span>Q3 / 2026</span></div>
+        <div className="signal-grid">
+          <div><strong>04</strong><span>disciplines</span></div>
+          <div><strong>07</strong><span>active routes</span></div>
+          <div><strong>48h</strong><span>reply window</span></div>
+          <div><strong>∞</strong><span>downside awareness</span></div>
+        </div>
+      </div>
+
       <AntiServices />
     </section>
   );

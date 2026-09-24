@@ -6,17 +6,21 @@ export function useInViewport(
 ): boolean {
   const [visible, setVisible] = useState(false);
 
+  const root = options?.root ?? null;
+  const rootMargin = options?.rootMargin ?? '';
+  const threshold = options?.threshold ?? 0.15;
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
     const obs = new IntersectionObserver(([entry]) => {
       setVisible(entry.isIntersecting);
-    }, { threshold: 0.15, ...options });
+    }, { root, rootMargin, threshold });
 
     obs.observe(el);
     return () => obs.disconnect();
-  }, [ref, options?.root, options?.rootMargin, options?.threshold]);
+  }, [ref, root, rootMargin, threshold]);
 
   return visible;
 }

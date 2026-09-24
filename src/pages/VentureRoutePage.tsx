@@ -45,7 +45,7 @@ export function VentureRoutePage() {
         <p>{venture.desc}</p>
 
         <div className="venture-route-case">
-          <h2>Case study</h2>
+          <h2>Case file</h2>
           <div className="venture-slide">
             <span className="venture-slide-num">01</span>
             <h3>Problem</h3>
@@ -58,9 +58,18 @@ export function VentureRoutePage() {
           </div>
           <div className="venture-slide">
             <span className="venture-slide-num">03</span>
+            <h3>Capital</h3>
+            <p>{venture.caseStudy.capital}</p>
+          </div>
+          <div className="venture-slide">
+            <span className="venture-slide-num">04</span>
             <h3>Outcome</h3>
             <p>{venture.caseStudy.outcome}</p>
           </div>
+          <p className="venture-route-note">
+            Amounts and terms stay with the participants. This page describes the shape of
+            the deal, never somebody else's numbers.
+          </p>
         </div>
 
         <div className="venture-route-actions">

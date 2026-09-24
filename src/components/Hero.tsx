@@ -1,11 +1,10 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Cpu } from 'lucide-react';
-import { SITE, HERO_METRICS } from '../data/site';
+import { ArrowRight, Cpu, Activity, Orbit, ShieldCheck, Sparkles, MapPin } from 'lucide-react';
+import { SITE, HERO_SIGNALS } from '../data/site';
 import { HeroVideo } from './HeroVideo';
 import { RouteStatusRotator } from './RouteStatusRotator';
-import { useCountUp } from '../hooks/useCountUp';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface HeroProps {
@@ -14,7 +13,6 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
   const sectionRef = useRef<HTMLElement>(null);
-  const [metricsVisible, setMetricsVisible] = useState(false);
   const metricsRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
 
@@ -24,15 +22,10 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
   });
   const parallaxY = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [0, 40]);
 
-  const expeditions = useCountUp(HERO_METRICS[0].value, metricsVisible);
-
   useEffect(() => {
     const el = metricsRef.current;
     if (!el) return;
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setMetricsVisible(true); },
-      { threshold: 0.5 },
-    );
+    const obs = new IntersectionObserver(() => undefined, { threshold: 0.5 });
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
@@ -64,10 +57,16 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
         initial="hidden"
         animate="visible"
       >
+        <motion.div className="hero-card-meta" variants={itemVariants}>
+          <span><MapPin size={12} /> BRITISH COLUMBIA / PT</span>
+          <span><ShieldCheck size={12} /> PROOF-FIRST PRACTICE</span>
+          <span><Sparkles size={12} /> FOUNDER-LED</span>
+        </motion.div>
+
         <motion.div className="hero-badge-container" variants={itemVariants}>
           <div className="hero-badge">
             <span className="badge-icon pulse" aria-hidden="true">●</span>
-            <span>ACCEPTING NEW EXPEDITIONS</span>
+            <span>{HERO_SIGNALS.badge}</span>
           </div>
         </motion.div>
 
@@ -85,9 +84,17 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
           </motion.div>
 
           <HeroVideo />
-        </div>
+        </div>          <motion.div className="hero-intelligence-strip" variants={itemVariants} aria-label="Route intelligence">
+            <div className="intelligence-label"><Activity size={13} /> {HERO_SIGNALS.intelligenceLabel}</div>
+            <div className="intelligence-bars" aria-hidden="true">
+              {[42, 68, 54, 82, 71, 94, 78, 100, 88, 96, 84, 100].map((height, index) => (
+                <span key={index} style={{ height: `${height}%` }} />
+              ))}
+            </div>
+            <div className="intelligence-value"><Orbit size={13} /> {HERO_SIGNALS.intelligenceValue}</div>
+          </motion.div>
 
-        <motion.p className="hero-description" variants={itemVariants}>
+          <motion.p className="hero-description" variants={itemVariants}>
           <strong className="hero-lead">Guiding founders, capital, and companies through the most demanding terrain.</strong>{' '}
           From base camp to summit — deal architecture, venture operations, and the long descent home.
         </motion.p>
@@ -112,15 +119,13 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
         </motion.div>
 
         <motion.div className="hero-metrics" variants={itemVariants} ref={metricsRef}>
-          {HERO_METRICS.map((metric, idx) => (
+          {HERO_SIGNALS.metrics.map((metric, idx) => (
             <React.Fragment key={metric.label}>
               {idx > 0 && <div className="metric-divider" />}
               <div className="metric-item">
                 <span className="metric-label">{metric.label}</span>
-                <span className={`metric-value ${metric.type === 'count' ? 'metric-value--count' : ''}`}>
-                  {metric.type === 'count' && metricsVisible
-                    ? `${expeditions}${metric.suffix}`
-                    : metric.display}
+                <span className="metric-value">
+                  {metric.display}
                 </span>
               </div>
             </React.Fragment>

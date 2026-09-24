@@ -28,3 +28,7 @@ dist-ssr
 .aider*
 test-results/
 playwright-report/
+
+# Local-only reference material (boot docs, scratch notes)
+ref/
+

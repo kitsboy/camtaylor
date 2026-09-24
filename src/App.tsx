@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { Analytics } from './components/Analytics';
 import { HomePage } from './pages/HomePage';
+import { IS_PRIVATE_PREVIEW } from './data/site';
 
 const PrivacyPage = lazy(() =>
   import('./pages/PrivacyPage').then((m) => ({ default: m.PrivacyPage })),
@@ -22,6 +23,9 @@ const NotFoundPage = lazy(() =>
 const VentureRoutePage = lazy(() =>
   import('./pages/VentureRoutePage').then((m) => ({ default: m.VentureRoutePage })),
 );
+const DispatchPage = lazy(() =>
+  import('./pages/DispatchPage').then((m) => ({ default: m.DispatchPage })),
+);
 
 function PageFallback() {
   return (
@@ -36,6 +40,11 @@ function App() {
     <ThemeProvider>
       <BrowserRouter>
         <div className="app-container">
+          {IS_PRIVATE_PREVIEW && (
+            <div className="private-preview-banner" role="status">
+              PRIVATE PREVIEW · Not public · Form delivery and analytics disabled
+            </div>
+          )}
           <Analytics />
           <Suspense fallback={<PageFallback />}>
             <Routes>
@@ -45,6 +54,7 @@ function App() {
               <Route path="/field-guide" element={<FieldGuidePage />} />
               <Route path="/2026" element={<YearReviewPage />} />
               <Route path="/route/:ventureId" element={<VentureRoutePage />} />
+              <Route path="/dispatch/:slug" element={<DispatchPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>

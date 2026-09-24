@@ -1,1 +1,5 @@
+# SPA fallback
 /*    /index.html   200
+
+# The old stub feed was replaced by a generated one (dispatches → RSS).
+/expedition-log.xml  /feed.xml  301

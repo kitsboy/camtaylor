@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Cam Taylor — Expedition Log</title>
+    <link>https://camtaylor.ca/#expeditions</link>
+    <atom:link href="https://camtaylor.ca/feed.xml" rel="self" type="application/rss+xml" />
+    <description>Dated dispatches from the field: deal architecture, capital, and venture operations.</description>
+    <language>en-ca</language>
+    <lastBuildDate>Thu, 24 Sep 2026 19:10:05 GMT</lastBuildDate>
+    <item>
+      <title>Proof before promise</title>
+      <link>https://camtaylor.ca/dispatch/proof-before-promise</link>
+      <guid isPermaLink="true">https://camtaylor.ca/dispatch/proof-before-promise</guid>
+      <category>Method</category>
+      <pubDate>Fri, 18 Sep 2026 12:00:00 GMT</pubDate>
+      <description>How I open a deal — read the terrain, verify the numbers, and only then talk structure.</description>
+    </item>
+    <item>
+      <title>A syndicate that survives the descent</title>
+      <link>https://camtaylor.ca/dispatch/syndicate-that-survives-the-descent</link>
+      <guid isPermaLink="true">https://camtaylor.ca/dispatch/syndicate-that-survives-the-descent</guid>
+      <category>Capital</category>
+      <pubDate>Fri, 04 Sep 2026 12:00:00 GMT</pubDate>
+      <description>Syndicates do not break on the way up. They break on the way down — so I design for the descent first.</description>
+    </item>
+    <item>
+      <title>Strata is a legal problem wearing a software costume</title>
+      <link>https://camtaylor.ca/dispatch/strata-is-a-legal-problem</link>
+      <guid isPermaLink="true">https://camtaylor.ca/dispatch/strata-is-a-legal-problem</guid>
+      <category>PropTech</category>
+      <pubDate>Sat, 15 Aug 2026 12:00:00 GMT</pubDate>
+      <description>What OpenStrata keeps teaching me — the hard part of strata was never the dashboard.</description>
+    </item>
+    <item>
+      <title>NOSTR as a front door, not a megaphone</title>
+      <link>https://camtaylor.ca/dispatch/nostr-as-a-front-door</link>
+      <guid isPermaLink="true">https://camtaylor.ca/dispatch/nostr-as-a-front-door</guid>
+      <category>Identity</category>
+      <pubDate>Sat, 01 Aug 2026 12:00:00 GMT</pubDate>
+      <description>Why Give A Bit treats NOSTR keys as identity rather than as another channel to post into.</description>
+    </item>
+    <item>
+      <title>Sherpa, not saviour</title>
+      <link>https://camtaylor.ca/dispatch/sherpa-not-saviour</link>
+      <guid isPermaLink="true">https://camtaylor.ca/dispatch/sherpa-not-saviour</guid>
+      <category>Method</category>
+      <pubDate>Mon, 20 Jul 2026 12:00:00 GMT</pubDate>
+      <description>The job ends at the trailhead. If a company still needs me next season, I did it wrong.</description>
+    </item>
+    <item>
+      <title>Why this site was rebuilt from scratch</title>
+      <link>https://camtaylor.ca/dispatch/why-this-site-was-rebuilt</link>
+      <guid isPermaLink="true">https://camtaylor.ca/dispatch/why-this-site-was-rebuilt</guid>
+      <category>Studio</category>
+      <pubDate>Sun, 05 Jul 2026 12:00:00 GMT</pubDate>
+      <description>The old site was a brochure that had not changed in two years. A practice that moves every week deserves better than that.</description>
+    </item>
+  </channel>
+</rss>

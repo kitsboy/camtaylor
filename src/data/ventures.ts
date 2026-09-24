@@ -3,6 +3,11 @@ export type VentureStatus = 'building' | 'live' | 'stealth' | 'syndicating';
 export interface VentureCaseStudy {
   problem: string;
   structure: string;
+  /**
+   * Shape of the capital, not the amount. Nothing here publishes a figure or
+   * a term sheet — those belong to the participants, not to this website.
+   */
+  capital: string;
   outcome: string;
 }
 
@@ -43,6 +48,7 @@ export const VENTURES: Venture[] = [
     caseStudy: {
       problem: 'Fragmented node ops with no yield orchestration layer.',
       structure: 'JV between infra operators and capital syndicate.',
+      capital: 'Funded inside the operator/syndicate JV — participant terms, not a public round.',
       outcome: 'Live stack serving institutional-grade uptime.',
     },
   },
@@ -60,6 +66,7 @@ export const VENTURES: Venture[] = [
     caseStudy: {
       problem: 'Founders need elite eng without full-time overhead.',
       structure: 'Principal-agent model with milestone gates.',
+      capital: 'Fee-based engagements — this route takes no outside capital.',
       outcome: 'Product pipelines shipping across 4 verticals.',
     },
   },
@@ -78,6 +85,7 @@ export const VENTURES: Venture[] = [
     caseStudy: {
       problem: 'Donation platforms lack transparency and identity.',
       structure: 'Micro-yield rails with NOSTR namespace registry.',
+      capital: 'Sponsor-architected with family capital behind the build.',
       outcome: '7-venture constellation under one mission.',
     },
   },
@@ -95,6 +103,7 @@ export const VENTURES: Venture[] = [
     caseStudy: {
       problem: 'Strata management is opaque and legally fragmented.',
       structure: 'LP syndicate with automated compliance pipelines.',
+      capital: 'Syndicating now: limited-partner alignment first, allocation second. Terms private.',
       outcome: 'Active syndication round — Q3 2026.',
     },
   },
@@ -111,6 +120,7 @@ export const VENTURES: Venture[] = [
     caseStudy: {
       problem: 'Vehicle history is siloed across dealers and insurers.',
       structure: 'Digital passport with chain-of-custody ledger.',
+      capital: 'Strategic position staged on milestones rather than one cheque.',
       outcome: 'MVP registry in active development.',
     },
   },
@@ -127,6 +137,7 @@ export const VENTURES: Venture[] = [
     caseStudy: {
       problem: 'Expedition routing lacks real-time topo intelligence.',
       structure: 'Advisor role with geo-stack integration.',
+      capital: 'Advisor equity against the build — no cash raise.',
       outcome: 'Live mapping platform for route coordination.',
     },
   },
@@ -143,6 +154,7 @@ export const VENTURES: Venture[] = [
     caseStudy: {
       problem: 'Volume procurement lacks intelligent routing.',
       structure: 'Deal-sponsored purchasing rails with arbitrage logic.',
+      capital: 'Sponsor capital on private rails while the alpha is tested.',
       outcome: 'Alpha rails in private testing.',
     },
   },

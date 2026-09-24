@@ -38,7 +38,7 @@ const BOOT_LOGS: LogEntry[] = [
   { id: nextLogId(), type: 'system', text: 'CAM TAYLOR // SHERPA COMMAND DECK v2.1.0' },
   { id: nextLogId(), type: 'system', text: 'Initializing secure node connection to camtaylor.ca...' },
   { id: nextLogId(), type: 'system', text: 'Connection established. Type "/help" to view available protocols.' },
-  { id: nextLogId(), type: 'system', text: 'Tip: ↑↓↓←→←→BA opens deck from anywhere.' },
+  { id: nextLogId(), type: 'system', text: 'Tip: press "/" (or ⌘K) to summon this deck from anywhere.' },
 ];
 
 export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose, onNavigate }) => {

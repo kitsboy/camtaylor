@@ -729,3 +729,38 @@
 - **Risk for Cam:** two months of design work (2026-08-24 → 2026-09-24) lives only in this working tree, not in the repo. Committing it is the next safe step.
 
 ---
+
+## Session — 2026-09-24 (dispatch engine, route spine, publish)
+
+**Machine:** M3 (Buffy)
+**Project:** camtaylor
+
+**Done:**
+- [x] **Expedition log is now a real content engine.** Dispatches are markdown files in `src/content/dispatches/*.md` with plain `key: value` frontmatter (title, date, terrain, camp, tags, summary, optional ventureId/draft). Six seed dispatches shipped.
+- [x] `src/utils/dispatches.ts` loads them through `import.meta.glob(..., '?raw')`, parses frontmatter, derives the slug from the filename **minus its date prefix**, computes reading time and sorts newest-first. `src/components/DispatchBody.tsx` renders the body as React elements (headings, paragraphs, lists, quotes, bold/italic/code, http-only links) — no `dangerouslySetInnerHTML`, no markdown dependency.
+- [x] `ExpeditionLog` rebuilt as a dated timeline: gutter month + node, camp chip, terrain chip, reading time, `Latest` flag, terrain filters, tags, per-entry link, and a `/feed.xml` subscribe line.
+- [x] New `/dispatch/:slug` reader (`src/pages/DispatchPage.tsx`): meta line, summary lede, body, tags, older/newer navigation, honest not-found state.
+- [x] `scripts/generate-static.mjs` now writes `public/feed.xml` (RSS 2.0, one item per dispatch, atom self link) and includes every dispatch in `sitemap.xml`. The stub `public/expedition-log.xml` was deleted and `/expedition-log.xml → /feed.xml` added to `_redirects`. `index.html` advertises the feed via `rel="alternate"`.
+- [x] **Route spine.** `src/data/waypoints.ts` defines twelve waypoints (section id, camp, framing altitude, qualitative condition, blurb). `WaypointBand` renders trail signage in the gap before each homepage section, and `RouteRail` is now an interactive map: index, progress-filled spine, active waypoint tracking, camp/altitude/conditions in the tooltip and `title` (the accessible name stays the action, so it can't collide with other controls' names).
+- [x] **Venture case files** carry four blocks — problem, structure, **capital**, outcome — plus a note that amounts and terms stay with the participants. `capital` was added to all seven ventures in the same qualitative register as the rest of the file.
+- [x] **Repository tidy:** deleted `vercel.json`, `netlify.toml`, four stale `SESSION-SUMMARY-*.md`, `public/og-image.svg`, the old `expedition-log.xml`, and every `.DS_Store`; `ref/` is now gitignored.
+- [x] **Service worker rewritten.** It was cache-first for everything, which could pin a visitor to an old build forever. Now network-first for navigations (cached shell only as an offline fallback) and cache-first only for hashed `/assets/*`.
+- [x] **Publish plumbing:** Cloudflare-only `docs/DEPLOYMENT.md`, `npm run build:live`, `npm run deploy`, `npm run deploy:live`, CSP tightened by removing the unused analytics hosts, README rewritten, `.env.example` clarified.
+- [x] `playwright.config.ts` caps workers at 3 — the homepage is heavy enough that more workers starve each other and turn assertions into 60s timeouts. Five new tests cover the log timeline, the dispatch reader (including list rendering), the RSS item count, the twelve waypoints + rail progress, and the case-file capital block.
+- [x] `npm run quality` ✓, `npx tsc -b` ✓, `npm run lint` 0 errors / 1 pre-existing warning, `npm test` **35/35** pass.
+
+**Decisions:**
+- Markdown frontmatter is deliberately trivial (`key: value`, comma-separated tags) so `src/utils/dispatches.ts` and `scripts/generate-static.mjs` can parse the same files without a markdown toolchain. Keep the two parsers in step.
+- Slugs drop the `YYYY-MM-DD-` filename prefix: files sort on disk, URLs stay readable.
+- The rail's accessible name is the action (`Go to Expertise`); camp, altitude and conditions live in `title`. Putting "Glacier" in the accessible name collided with the family filter named `glacier` and broke a strict-mode locator.
+- Waypoint altitudes are framing labels, not measurements, and conditions are qualitative — the site's no-invented-numbers rule still holds; the only live numbers are in the signal section.
+- Case-file capital text describes the *shape* of a deal and never an amount, consistent with the existing case-study copy.
+- Publish decisions confirmed by Cam this session: private preview **off** for production (form live), **no analytics**, Cloudflare Pages only, **he** performs the DNS switch in the dashboard (wrangler here has no DNS scope), and old-site cleanup is wanted.
+
+**Git State:**
+- Branch `main`, remote `git@github.com:kitsboy/camtaylor.git`. Everything is committed and pushed this session (no unpushed commits).
+- Deployed to Cloudflare Pages project **`camtaylor`** (https://camtaylor.pages.dev) with `VITE_PRIVATE_PREVIEW=false`.
+- **Open for Cam:** verify the six seed dispatches (written in his voice), test the contact form into the real inbox, and perform the apex/`www` DNS switch — see `docs/DEPLOYMENT.md` § Attaching the domain and `docs/PRIVATE-LAUNCH-GATE.md`.
+- Left locally on purpose: `.env` (ignored), `ref/` (ignored), `.aider.*` chat history files (ignored — his call whether to delete).
+
+---

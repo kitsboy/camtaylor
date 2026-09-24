@@ -401,3 +401,115 @@ test('command deck closes with escape', async ({ page }) => {
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog', { name: 'Sherpa Command Deck' })).toBeHidden();
 });
+
+test('expedition log is a dated timeline of real dispatches', async ({ page }) => {
+  await page.goto('/');
+  const log = page.locator('#expeditions');
+  await expect(log.getByRole('heading', { name: /Expedition Log/i })).toBeVisible();
+
+  const entries = log.locator('.log-entry');
+  const count = await entries.count();
+  expect(count).toBeGreaterThanOrEqual(4);
+
+  await expect(entries.first().locator('.log-latest')).toHaveText('Latest');
+  await expect(entries.first().locator('.log-title a')).toHaveAttribute('href', /\/dispatch\//);
+  await expect(entries.first().locator('.log-meta time')).toBeVisible();
+  await expect(entries.first().locator('.log-camp')).toContainText(/Camp|Summit|Traverse|Glacier|Headwall|Ridge|Log|Station/i);
+  await expect(entries.first().locator('.log-summary')).not.toHaveText('');
+  await expect(log.locator('.log-feed a')).toHaveAttribute('href', '/feed.xml');
+
+  const terrainFilter = log.locator('.log-filter-btn', { hasText: 'Method' });
+  await terrainFilter.click();
+  await expect(terrainFilter).toHaveAttribute('aria-pressed', 'true');
+  const shown = await log.locator('.log-entry .log-terrain').allTextContents();
+  expect(shown.length).toBeGreaterThan(0);
+  expect(shown.every((terrain) => terrain === 'Method')).toBe(true);
+});
+
+test('a dispatch reads end to end and links to its neighbours', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#expeditions .log-title a').first().click();
+  await expect(page).toHaveURL(/\/dispatch\//);
+
+  await expect(page.locator('.dispatch-title')).not.toHaveText('');
+  await expect(page.locator('.dispatch-meta time')).toBeVisible();
+  await expect(page.locator('.dispatch-summary')).not.toHaveText('');
+
+  const body = page.locator('.dispatch-body');
+  await expect(body.locator('p').first()).toBeVisible();
+  await expect(body.locator('strong').first()).toBeVisible();
+
+  // Lists and headings render too (this dispatch is written with a list).
+  await page.goto('/dispatch/syndicate-that-survives-the-descent');
+  await expect(page.locator('.dispatch-body li')).toHaveCount(4);
+  await expect(page.locator('.dispatch-body strong').first()).toBeVisible();
+
+  const next = page.locator('.dispatch-nav-link');
+  await expect(next.first()).toBeVisible();
+  await next.first().click();
+  await expect(page.locator('.dispatch-title')).toBeVisible();
+});
+
+test('an unknown dispatch fails honestly', async ({ page }) => {
+  await page.goto('/dispatch/not-a-real-dispatch');
+  await expect(page.getByRole('heading', { name: /No such dispatch/i })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Back to the log/i })).toBeVisible();
+});
+
+test('the log ships an RSS feed with one item per dispatch', async ({ page, request }) => {
+  await page.goto('/');
+  const count = await page.locator('#expeditions .log-entry').count();
+
+  const feed = await request.get('/feed.xml');
+  expect(feed.ok()).toBe(true);
+  const body = await feed.text();
+  expect((body.match(/<item>/g) ?? []).length).toBe(count);
+  expect(body).toContain('<link>https://camtaylor.ca/dispatch/');
+  await expect(page.locator('link[rel="alternate"][href="/feed.xml"]')).toHaveCount(1);
+});
+
+test('every homepage section is a waypoint on one route', async ({ page }) => {
+  await page.goto('/');
+
+  const bands = page.locator('.waypoint-band');
+  await expect(bands).toHaveCount(12);
+  await expect(bands.first()).toContainText('Base Camp');
+  await expect(bands.last()).toContainText('Summit');
+  await expect(bands.first().locator('.waypoint-altitude')).toHaveText(/\d[\d,]* m/);
+  await expect(bands.first().locator('.waypoint-condition')).not.toHaveText('');
+
+  const targets = await bands.evaluateAll((nodes) =>
+    nodes.map((node) => node.getAttribute('data-waypoint')),
+  );
+  for (const id of targets) {
+    await expect(page.locator(`#${id}`)).toHaveCount(1);
+  }
+
+  const rail = page.locator('.route-rail');
+  await expect(rail.locator('.route-rail-marker')).toHaveCount(12);
+  await expect(rail.locator('.route-rail-marker').first()).toHaveAttribute('aria-label', /^Go to /);
+  await expect(rail.locator('.route-rail-marker').first()).toHaveAttribute('title', /conditions/);
+
+  // Climb: the standing waypoint follows you and the spine fills in.
+  await page.locator('#services').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  await expect(rail.locator('.route-rail-marker[aria-current="true"]')).toHaveAttribute(
+    'data-section',
+    'services',
+    { timeout: 20000 },
+  );
+  await expect
+    .poll(
+      async () =>
+        rail.locator('.route-rail-progress').evaluate((el) => Math.round(el.getBoundingClientRect().height)),
+      { timeout: 20000 },
+    )
+    .toBeGreaterThan(0);
+});
+
+test('venture case files carry the capital shape as well as the outcome', async ({ page }) => {
+  await page.goto('/route/openstrata');
+  await expect(page.getByRole('heading', { name: /OpenStrata/i })).toBeVisible();
+  await expect(page.locator('.venture-slide')).toHaveCount(4);
+  await expect(page.locator('.venture-route-case')).toContainText('Capital');
+  await expect(page.locator('.venture-route-note')).toContainText(/participants/i);
+});

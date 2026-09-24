@@ -11,7 +11,15 @@ import '@fontsource/playfair-display/700.css';
 import './index.css';
 import './styles/mobile.css';
 import './styles/upgrades.css';
+import './styles/bold-modern.css';
+import './styles/footer.css';
 import App from './App.tsx';
+import { validateSiteConfig } from './data/site';
+
+if (import.meta.env.DEV) {
+  const configErrors = validateSiteConfig();
+  if (configErrors.length > 0) console.warn('Site configuration warnings:', configErrors);
+}
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {

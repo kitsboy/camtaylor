@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Terminal, Mountain, Menu, X } from 'lucide-react';
+import { Terminal, Mountain, Menu, X, Bot, ArrowUpRight } from 'lucide-react';
 import { NAV_ITEMS } from '../data/site';
 import { useScrollSpy } from '../hooks/useScrollSpy';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
@@ -73,6 +73,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`} role="navigation" aria-label="Main">
         <div className="nav-container">
+          <div className="nav-identity-badge" aria-hidden="true"><span className="nav-signal-dot" /> LIVE / PRIVATE PREVIEW</div>
           <div
             className="nav-brand"
             onClick={scrollTop}
@@ -85,8 +86,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="brand-dot">SHERPA</span>
           </div>
 
+          <a className="nav-agents-cta" href="https://agents.giveabit.io" target="_blank" rel="noopener noreferrer">
+            <Bot size={14} /><span>Meet agents</span><ArrowUpRight size={12} />
+          </a>
+
           <div className="nav-links">
-            {NAV_ITEMS.map(({ id, label }) => (
+            {NAV_ITEMS.filter(({ id }) => ['about', 'agents', 'family', 'proof', 'signal', 'services', 'kit', 'contact'].includes(id)).map(({ id, label }) => (
               <button
                 key={id}
                 type="button"
@@ -110,6 +115,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Terminal size={14} />
               <span className="terminal-toggle-label">{isTerminalOpen ? 'Exit' : 'Command Deck'}</span>
+              <kbd className="nav-keycap" aria-hidden="true">/</kbd>
             </button>
 
             <button
@@ -139,6 +145,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             if (delta < -60) setMenuOpen(false);
           }}
         >
+          <a className="nav-mobile-agents" href="https://agents.giveabit.io" target="_blank" rel="noopener noreferrer">
+            <Bot size={15} /> Meet the agents <ArrowUpRight size={14} />
+          </a>
           {NAV_ITEMS.map(({ id, label }) => (
             <button
               key={id}

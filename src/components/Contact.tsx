@@ -13,8 +13,9 @@ import {
   Lock,
   Globe,
   Loader2,
+  ArrowUpRight,
 } from 'lucide-react';
-import { FORMSPREE_FORM_ID, SITE } from '../data/site';
+import { FORMSPREE_FORM_ID, IS_PRIVATE_PREVIEW, SITE } from '../data/site';
 import { DEAL_TIERS } from '../data/dealTiers';
 import { TESTIMONIALS } from '../data/testimonials';
 import { useReferrer } from '../hooks/useReferrer';
@@ -40,7 +41,9 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
   }, [state.succeeded]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const form = e.currentTarget;
+    if (IS_PRIVATE_PREVIEW) return;
     const name = (form.elements.namedItem('name') as HTMLInputElement)?.value ?? '';
     setSubmittedName(name);
     setReferenceId(`CT-${Date.now().toString(36).toUpperCase()}`);
@@ -218,7 +221,12 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
         <ValidationError errors={state.errors} className="form-submit-error" />
       </div>
 
-      <button type="submit" className="submit-btn" disabled={state.submitting} aria-busy={state.submitting}>
+      {IS_PRIVATE_PREVIEW && (
+        <p className="form-preview-notice" role="note">
+          Private preview: message delivery is disabled until launch approval.
+        </p>
+      )}
+      <button type="submit" className="submit-btn" disabled={IS_PRIVATE_PREVIEW || state.submitting} aria-busy={state.submitting}>
         {state.submitting ? (
           <>
             <Loader2 size={16} className="submit-spinner" aria-hidden="true" />
@@ -269,13 +277,18 @@ export const Contact: React.FC = () => {
   const [formKey, setFormKey] = useState(0);
 
   return (
-    <section className="contact-section" id="contact">
+    <section className="contact-section" id="contact" aria-labelledby="contact-title">
       <div className="section-divider section-divider--topo" aria-hidden="true" />
       <div className="section-header">
-        <h2 className="section-title text-gradient">GET IN TOUCH</h2>
+        <p className="section-kicker">OPEN CHANNEL</p>
+        <h2 className="section-title text-gradient" id="contact-title">GET IN TOUCH</h2>
         <p className="section-subtitle">
           Share your deal, venture, or partnership idea. All inquiries are handled confidentially.
         </p>
+        <div className="contact-front-door-links">
+          <a href={SITE.agentsUrl} target="_blank" rel="noopener noreferrer">Meet the agents <ArrowUpRight size={14} /></a>
+          <a href={`mailto:${SITE.familyEmail}`}>{SITE.familyEmail} <ArrowUpRight size={14} /></a>
+        </div>
       </div>
 
       <div className="contact-container">
@@ -366,6 +379,7 @@ export const Contact: React.FC = () => {
           </div>
         </div>
       </div>
+      <p className="contact-delivery-note">When live on <strong>{SITE.domain}</strong>, approved submissions will be delivered to <strong>{SITE.email}</strong> through Formspree. Private preview never sends.</p>
     </section>
   );
 };

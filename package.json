@@ -8,8 +8,12 @@
     "prebuild": "node scripts/generate-static.mjs",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
+    "quality": "node scripts/quality-check.mjs",
     "preview": "vite preview",
-    "test": "playwright test"
+    "test": "playwright test",
+    "build:live": "VITE_PRIVATE_PREVIEW=false npm run build",
+    "deploy": "npm run build && npx wrangler pages deploy dist --project-name camtaylor --branch main --commit-dirty=true",
+    "deploy:live": "npm run build:live && npx wrangler pages deploy dist --project-name camtaylor --branch main --commit-dirty=true"
   },
   "dependencies": {
     "@fontsource/outfit": "^5.2.6",

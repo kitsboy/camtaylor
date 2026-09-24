@@ -1,5 +1,7 @@
 # camtaylor — Last Updated 2026-09-24 by Buffy (M3)
 
-Brief: Hardcore masthead pass — heavier brand wordmark, uppercase tracked nav with an acid lit edge, chipped meta, a much larger `Sherpa.` role line and a jewel-offset hero shell — plus a tightened live signal: every card now owns one fixed, grid-lined chart frame (equal tops and heights, full-bleed edge to edge) with its readings pinned to the card floor, and the four chain readings moved into the chain card so the three panels read as one organised band.
+Brief: The expedition log became a real content engine — markdown dispatches in `src/content/dispatches`, a dated timeline, a `/dispatch/:slug` reader and a generated RSS feed (`/feed.xml`). The homepage is now one route of twelve waypoints with trail signage between sections and an interactive rail that shows camp, framing altitude and conditions. Venture case files gained the capital block. Repo tidied for a Cloudflare-only publish (Vercel/Netlify configs, stale summaries and the cache-first service worker are gone), and the site is deployed to the Pages project `camtaylor` with the private preview off.
 
-Commit: local only (no push, no deploy — private preview still on)
+Next for Cam: review the six seed dispatches, test the contact form into the real inbox, then switch `camtaylor.ca` + `www` to the Pages project in the Cloudflare dashboard (see `docs/DEPLOYMENT.md`).
+
+Commit: pushed to `main` (Cloudflare Pages: project `camtaylor`)

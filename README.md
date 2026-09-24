@@ -2,7 +2,7 @@
 
 Personal site for deal architecture, capital syndication, and venture operations. Part of the [Give A Bit](https://giveabit.io) family.
 
-**Stack:** Vite · React 19 · TypeScript · vanilla CSS · Framer Motion · Formspree · Playwright
+**Stack:** Vite · React 19 · TypeScript · vanilla CSS · Framer Motion · Formspree · Cloudflare Pages · Playwright
 
 ---
 
@@ -18,10 +18,14 @@ npm run dev            # http://localhost:5173
 | Command | Purpose |
 |---------|---------|
 | `npm run dev` | Local dev server |
-| `npm run build` | Production build → `dist/` |
-| `npm run preview` | Preview production build |
-| `npm test` | Playwright smoke tests (6) |
+| `npm run build` | Production build → `dist/` (also regenerates `sitemap.xml` + `feed.xml`) |
+| `npm run build:live` | Same, with `VITE_PRIVATE_PREVIEW=false` (public behaviour) |
+| `npm run preview` | Preview the production build locally |
+| `npm test` | Playwright smoke tests |
 | `npm run lint` | Oxlint |
+| `npm run quality` | Metadata / privacy / asset gate |
+| `npm run deploy` | Build + deploy current state to Cloudflare Pages (`camtaylor`) |
+| `npm run deploy:live` | Same with the private-preview flag off |
 
 ---
 
@@ -29,34 +33,69 @@ npm run dev            # http://localhost:5173
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `VITE_FORMSPREE_FORM_ID` | Yes | Formspree form ID (`xykqodnk`) |
-| `VITE_PLAUSIBLE_DOMAIN` | No | Plausible analytics domain |
+| `VITE_FORMSPREE_FORM_ID` | No | Formspree form ID (`xykqodnk` fallback) |
+| `VITE_PLAUSIBLE_DOMAIN` | No | Plausible domain — only used when private preview is off |
+| `VITE_UMAMI_WEBSITE_ID` | No | Umami website ID — only used when private preview is off |
+| `VITE_PRIVATE_PREVIEW` | No | Defaults to `true`. `false` publishes the site: banner off, form live |
 
 ---
 
-## Site structure
+## Routes
 
 | Route | Page |
 |-------|------|
-| `/` | Home — Hero, About, Expedition Log, Philosophy, Expertise, Ventures, Contact |
+| `/` | Home — one route of twelve waypoints, from Base Camp to Summit |
+| `/dispatch/:slug` | One expedition-log dispatch (rendered from markdown) |
+| `/route/:ventureId` | Venture case file — problem, structure, capital, outcome |
 | `/field-guide` | Sherpa Field Guide (downloadable reference) |
 | `/2026` | State of the Route — annual review |
-| `/privacy` | Privacy Policy |
-| `/terms` | Terms of Use |
+| `/privacy` · `/terms` | Legal pages |
 
-**Static assets:** `public/llms.txt`, `public/manifest.json`, `public/sitemap.xml`, `public/robots.txt`
+**Generated at build time:** `public/sitemap.xml` (static routes + one entry per dispatch) and `public/feed.xml` (RSS 2.0) via `scripts/generate-static.mjs`.
+
+---
+
+## The expedition log
+
+Dispatches are real markdown files, not CMS records:
+
+```
+src/content/dispatches/2026-09-18-proof-before-promise.md
+```
+
+Frontmatter is deliberately plain so the app (`src/utils/dispatches.ts`), the RSS
+generator (`scripts/generate-static.mjs`) and any editor can all read it:
+
+```markdown
+---
+title: Proof before promise
+date: 2026-09-18
+terrain: Method
+camp: Base Camp
+tags: [Method, Trust]
+summary: One sentence for the timeline, the feed and the social card.
+ventureId: openstrata   # optional, links to the case file
+draft: false            # optional, true hides it everywhere
+---
+```
+
+Add a file, run `npm run build`, and it appears in the timeline, the sitemap and
+`/feed.xml` at once. Bodies support headings, paragraphs, lists, quotes,
+bold/italic/code and links — rendered as React elements, never raw HTML.
 
 ---
 
 ## Key features
 
-- **Sherpa brand** — warm gray-brown palette, glass cards, animated hero backdrop
-- **Hero YouTube** — in-frame video player (`SITE.heroVideoId` in `src/data/site.ts`)
-- **Command Deck** — terminal overlay with `/status`, `/route`, `/nostr`, `/summit` easter egg, Konami code
+- **One route, twelve waypoints** — waypoint signage between sections (`src/data/waypoints.ts`) and an interactive desktop rail with the camp, framing altitude and conditions for each waypoint
+- **Live signal** — keyless public readings (mempool.space, Coinbase) with honest offline states and USD/CAD toggle
+- **Proof layer** — browser-side reachability checks, no invented numbers anywhere
+- **Expedition log** — markdown dispatches, timeline, RSS
+- **Command Deck** — terminal overlay with `/status`, `/route`, `/nostr`, `/summit` and the `/` or ⌘K shortcut
 - **NOSTR** — `cam@giveabit.io` + `kimi@giveabit.io` with live NIP-05 verification
-- **Mobile-first** — bottom quick-nav, snap-scroll ventures/testimonials, bottom-sheet modals, safe-area insets
-- **Night camp** — dark mode toggle (navbar)
-- **Deploy ready** — `vercel.json`, `netlify.toml`, CSP headers (no remote configured yet)
+- **Mobile-first** — bottom quick-nav, snap-scroll carousels, bottom-sheet modals, safe-area insets
+- **Night camp** — dark mode toggle
+- **Service worker** — network-first navigations, cache-first hashed assets (never pins a stale build)
 
 ---
 
@@ -64,31 +103,37 @@ npm run dev            # http://localhost:5173
 
 ```
 src/
-  components/     # UI (Hero, CommandDeck, Ventures, etc.)
-  data/           # site, ventures, expeditionLog, commandDeck, nostr…
+  components/     # UI (Hero, RouteRail, ExpeditionLog, LiveSignal, Ventures…)
+  content/        # dispatches/*.md — the expedition log source
+  data/           # site, waypoints, ventures, liveSignal, agents, family…
   hooks/          # scrollSpy, theme, konami, bodyScrollLock…
-  pages/          # HomePage, legal pages, field guide, 2026 review
-  styles/         # mobile.css (100-improvement mobile pass)
+  pages/          # HomePage, DispatchPage, VentureRoutePage, legal pages
+  styles/         # bold-modern.css is the override layer (loaded last)
+  utils/          # dispatches (markdown), signalChart, readJson
+scripts/
+  generate-static.mjs  # sitemap.xml + feed.xml
+  quality-check.mjs    # metadata / privacy / asset gate
 docs/
-  KIMI-HANDOFF.md # Agent handoff for Kimi / HERMES
+  DEPLOYMENT.md          # Cloudflare Pages, step by step
+  PRIVATE-LAUNCH-GATE.md # what must be true before/after publishing
+  KIMI-HANDOFF.md        # agent handoff history
 ```
 
 ---
 
-## Deploy (when ready)
+## Publishing
 
-1. Push to GitHub
-2. Connect Vercel or Netlify (configs in repo root)
-3. Set env: `VITE_FORMSPREE_FORM_ID=xykqodnk`
-4. Point `camtaylor.ca` DNS to host
-5. SPA rewrites required for `/privacy`, `/terms`, `/field-guide`, `/2026`
+Hosting is **Cloudflare Pages** only (project `camtaylor`). Full runbook:
+`docs/DEPLOYMENT.md`. Checklist: `docs/PRIVATE-LAUNCH-GATE.md`.
+
+```bash
+npm run test && npm run quality   # verify
+npm run deploy:live               # build with the public flag + deploy
+```
+
+Then attach `camtaylor.ca` to the Pages project and point the apex/www DNS at it.
+Nothing else in this repo deploys the site — CI only lints, builds and tests.
 
 ---
-
-## Handoff & continuity
-
-- **Latest session:** `SESSION-SUMMARY-2026-07-07.md`
-- **Kimi handoff:** `docs/KIMI-HANDOFF.md`
-- **Recovery in new chat:** say `/whatsup`
 
 *Safe Harbour · Part of the [Give A Bit](https://giveabit.io) family.*
