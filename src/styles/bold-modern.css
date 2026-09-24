@@ -699,6 +699,7 @@ body {
   background: rgba(255, 253, 247, .6);
   border: 1px solid var(--line-bright);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transform: translateY(-50%);
 }
 
@@ -1713,3 +1714,96 @@ body {
   .dispatch-nav-link--next svg { order: -1; }
 }
 
+
+/* ── Satohash provenance (ported from the Aug line) ─────── */
+.satohash-proof {
+  margin-top: 32px;
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-bright);
+  border-radius: var(--radius);
+  text-align: left;
+}
+
+.satohash-proof-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.satohash-proof-icon { color: var(--green); }
+
+.satohash-proof-state {
+  margin-left: auto;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.satohash-proof-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 8px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.satohash-proof-dot--online { background: var(--green-light); box-shadow: 0 0 8px var(--green-light); }
+.satohash-proof-dot--offline { background: var(--amber); }
+.satohash-proof-dot--checking { background: var(--text-muted); }
+
+.satohash-proof-body {
+  margin: 10px 0 12px;
+  font-size: .86rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.satohash-proof-body code {
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(106, 43, 255, .1);
+  font-size: .78rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.satohash-proof-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.satohash-proof-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.satohash-proof-link:hover { text-decoration: underline; }
+.satohash-proof-link svg { transition: transform .15s var(--ease-out); }
+.satohash-proof-link:hover svg { transform: translate(2px, -2px); }
+
+.satohash-proof-offline {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .7rem;
+  color: var(--text-muted);
+}
+
+[data-theme="night"] .satohash-proof { background: rgba(255, 255, 255, .04); border-color: rgba(255, 255, 255, .14); }
+[data-theme="night"] .satohash-proof-icon,
+[data-theme="night"] .satohash-proof-link { color: var(--acid); }
+[data-theme="night"] .satohash-proof-body { color: #c7d8d2; }
+[data-theme="night"] .satohash-proof-body code { color: var(--acid); background: rgba(215, 255, 85, .12); }

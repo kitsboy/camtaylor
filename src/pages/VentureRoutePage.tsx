@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowUpRight, Users } from 'lucide-react';
 import { VENTURES, VENTURE_STATUS_LABELS } from '../data/ventures';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { SiteLayout } from '../components/SiteLayout';
+import { SatohashProvenance } from '../components/SatohashProvenance';
 
 export function VentureRoutePage() {
   const { ventureId } = useParams<{ ventureId: string }>();
@@ -82,6 +83,12 @@ export function VentureRoutePage() {
             </Link>
           )}
         </div>
+
+        <SatohashProvenance
+          id={venture.id}
+          source={`https://camtaylor.ca/route/${venture.id}`}
+          subject={`${venture.name} — ${venture.role}`}
+        />
       </article>
     </SiteLayout>
   );

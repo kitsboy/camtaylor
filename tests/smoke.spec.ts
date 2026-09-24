@@ -513,3 +513,20 @@ test('venture case files carry the capital shape as well as the outcome', async 
   await expect(page.locator('.venture-route-case')).toContainText('Capital');
   await expect(page.locator('.venture-route-note')).toContainText(/participants/i);
 });
+
+test('venture routes publish a Satohash provenance panel and stay usable offline', async ({
+  page,
+}) => {
+  // Fail the health check so the offline branch is what renders.
+  await page.route('**/api.satohash.io/**', (route) => route.abort());
+  await page.goto('/route/satohash');
+
+  const proof = page.locator('.satohash-proof');
+  await expect(proof).toBeVisible();
+  await expect(proof).toContainText('Satohash provenance');
+  await expect(proof.locator('code')).not.toHaveText('hashing…');
+  await expect(proof.locator('.satohash-proof-offline')).toBeVisible();
+
+  const verify = proof.getByRole('link', { name: /Verify on Satohash/i });
+  await expect(verify).toHaveAttribute('href', /satohash\.io\/verify\//);
+});

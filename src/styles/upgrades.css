@@ -64,6 +64,7 @@
   padding: 8px 16px;
   border-radius: 12px;
   backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate));
 }
 
 .nav-link[aria-current="true"]::after {

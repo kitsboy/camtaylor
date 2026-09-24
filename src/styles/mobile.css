@@ -59,8 +59,17 @@ a,
   .venture-case-btn,
   .venture-link-btn,
   .copy-email-btn,
+  .log-filter-btn,
+  .venture-filter-btn,
   .mobile-email-cta {
     min-height: var(--touch-min);
+    min-width: var(--touch-min);
+  }
+
+  /* The decorative right-hand orb bleeds past the viewport and gives the page
+     a horizontal scrollbar on phones. Pull it inside the section instead. */
+  .glow-orb {
+    right: 0;
   }
 
   .btn-primary:active,
@@ -81,6 +90,7 @@ a,
   z-index: 99;
   background: rgba(10, 9, 8, 0.45);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border: none;
   cursor: pointer;
   animation: fade-in 0.2s ease;
