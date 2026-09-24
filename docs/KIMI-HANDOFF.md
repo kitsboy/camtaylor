@@ -238,6 +238,445 @@
 
 *Safe Harbour · Part of the [Give A Bit](https://giveabit.io) family.*
 
+## Session — 2026-08-25 (contact + polish continuation)
+
+**Done:**
+- [x] Centralized `SITE.familyEmail` (`hello@giveabit.io`) and `SITE.agentsUrl` (`https://agents.giveabit.io`).
+- [x] Added explicit contact delivery note: live `camtaylor.ca` submissions route through Formspree to `cam@camtaylor.ca`; private preview never sends.
+- [x] Added visible family-card tooltips and agent profile hints.
+- [x] Added proof refresh busy state and local verification timestamp.
+- [x] Added contact section labeling and delivery destination copy.
+- [x] Expanded browser coverage; quality, build, lint, and 17 Playwright tests pass.
+
+**Decisions:**
+- Formspree remains the static-site delivery mechanism; recipient configuration belongs in Formspree, not frontend secrets.
+- No live email was sent and no production configuration was changed.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (polish continuation)
+
+**Done:**
+- [x] Improved family discovery with category filters and live route count.
+- [x] Added agent search empty state and live result count.
+- [x] Added proof refresh control and local last-checked timestamp.
+- [x] Added constellation/orbit treatment to dark information panels.
+- [x] Renamed duplicate nav label from second “Proof” to “Stories”.
+- [x] Added 4 browser tests; quality, build, lint, and 17 Playwright tests pass.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (ecosystem founder pass)
+
+**Done:**
+- [x] Added canonical family offerings data for all 10 requested Give A Bit properties.
+- [x] Added 10 approachable agent profiles with roles, identities, and agent front-door links.
+- [x] Added Agents, Family, and Proof sections to the homepage and navigation.
+- [x] Added color-coded family cards, agent search, family filters, live browser reachability checks, refresh signal, and recurring `Meet the agents` CTAs.
+- [x] Updated contact area to point people toward `agents.giveabit.io` and `hello@giveabit.io`.
+- [x] Added 2 browser tests; quality, build, lint, and 15 Playwright tests pass.
+
+**Decisions / uncertainties:**
+- External URLs are represented exactly from Cam’s brief; launch gate still requires human verification of each URL.
+- Browser health checks use `no-cors`, so “Reachable” means the request completed, not that content or uptime is guaranteed.
+- Static CSS/HTML visualizations were retained to avoid adding chart-library weight.
+
+## Session — 2026-08-25
+
+**Machine:** M3 coding agent
+**Project:** camtaylor
+
+**Done:**
+- [x] Added bold modern visual layer: ink/acid/cyan/violet/coral palette, editorial contrast, grid texture, hard-shadow cards, richer dark theme.
+- [x] Added hero Route Intelligence chart strip with animated readiness bars.
+- [x] Added operating-model signal dashboard to Expertise.
+- [x] Improved buttons, filters, venture altitude meters, cards, footer status, and mobile layouts.
+- [x] Added `npm run quality` checks and fixed viewport hook lint warning.
+- [x] Verified quality, build, lint, and 13 Playwright tests.
+
+**Decisions:**
+- Kept the existing Sherpa/alpine metaphor but pushed it toward a modern intelligence-dashboard aesthetic.
+- No external design or chart dependency added; charts are lightweight CSS/HTML and remain deterministic.
+- Private preview remains enabled; no publish or deployment actions performed.
+
+**Git State:**
+- Local changes only; no GitHub push.
+
+## Session — 2026-08-24
+
+**Machine:** M3 coding agent
+**Project:** camtaylor
+
+**Done:**
+- [x] Enforced private-preview default with visible banner.
+- [x] Disabled Formspree delivery and Plausible/Umami analytics while private preview is enabled.
+- [x] Removed hard-coded Umami script from `index.html`.
+- [x] Added environment documentation and `docs/PRIVATE-LAUNCH-GATE.md`.
+- [x] Verified build, lint, and 12 Playwright tests pass.
+
+**Decisions:**
+- No GitHub push, deploy, DNS change, or production operation is authorized.
+- `VITE_PRIVATE_PREVIEW` remains enabled unless Cam explicitly approves release.
+
+**Git State:**
+- Existing local changes remain uncommitted; no push performed.
+
+## Session — 2026-08-25 (dynamic footer)
+
+**Done:**
+- [x] Replaced the minimal footer with a high-contrast Base Camp closing experience.
+- [x] Added grouped Explore and Read / connect navigation with internal routes and ecosystem CTAs.
+- [x] Added GitHub, X, Nostr, and family email icon links with hover and keyboard-focus states.
+- [x] Added a data-driven 10-offering family spectrum chart using each offering's identity color.
+- [x] Added responsive layouts, solid dark surfaces, lit trims, reduced-motion handling, and back-to-top control.
+- [x] Fixed the footer smoke-test selector to account for the intentional duplicate family email links.
+- [x] Verified 20 Playwright tests, quality checks, production build, and lint with zero errors.
+
+**Decisions:**
+- The footer chart communicates identity/color, not fake performance metrics; its labels explicitly state that distinction.
+- Kept the footer CSS/HTML-only and dependency-free for fast rendering.
+- Private preview remains enabled; no email was sent, GitHub push, deployment, DNS change, or production operation occurred.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (site-wide contrast audit)
+
+**Done:**
+- [x] Audited text and control color rules across light and night themes.
+- [x] Strengthened family card metadata and descriptions for light-background readability.
+- [x] Improved venture live/building/syndicating status contrast and focus visibility.
+- [x] Brightened supporting labels in dark agents, proof, services, and footer panels.
+- [x] Added regression coverage for readable venture filter text in default and active states.
+- [x] Verified 20 Playwright tests, quality checks, production build, and lint with zero errors.
+
+**Decisions:**
+- Preserved the jewel-tone visual language while replacing low-opacity text where it carried meaning.
+- Kept decorative lines and shadows subdued; increased contrast only for readable content and controls.
+- Private preview remains enabled; no push, deployment, DNS change, or production operation occurred.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (family filter contrast correction)
+
+**Done:**
+- [x] Corrected the family filter buttons for All routes, Satohash, Katoa, GiveABit, OpenStrata, Motopass, Sherpacarta, and Tadbuy.
+- [x] Added explicit high-contrast light-theme text/background colors instead of relying on translucent theme tokens.
+- [x] Added explicit night-theme colors with readable white inactive text and dark active text on acid-lime.
+- [x] Added visible cyan keyboard-focus outlines.
+- [x] Verified 20 Playwright tests, quality checks, production build, and lint with zero errors.
+
+**Decisions:**
+- Used opaque button surfaces to prevent background art and transparency from reducing legibility.
+- Kept the existing jewel-tone active state while making inactive labels consistently readable.
+- Private preview remains enabled; no push or deployment occurred.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (hero card enhancement)
+
+**Done:**
+- [x] Added a compact hero metadata rail for location, proof-first practice, and founder-led identity.
+- [x] Added Lucide icons for the new hero signals.
+- [x] Added responsive wrapping and mobile spacing for the metadata rail.
+- [x] Added browser coverage confirming the proof-first hero signal renders.
+- [x] Verified 20 Playwright tests, quality checks, production build, and lint with zero errors.
+
+**Decisions:**
+- Kept the hero enhancement informational and lightweight rather than adding another heavy visual widget.
+- Preserved existing motion, contrast, and reduced-motion behavior.
+- Private preview remains enabled; no push or deployment occurred.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (footer refinement)
+
+**Done:**
+- [x] Added a dedicated family email contact chip with copy-to-clipboard action.
+- [x] Added copied-state feedback and accessible tooltip/label behavior.
+- [x] Improved footer brand/contact hierarchy and social-link spacing.
+- [x] Added browser coverage for the copy-email control.
+- [x] Verified 20 Playwright tests, quality checks, production build, and lint with zero errors.
+
+**Decisions:**
+- Kept contact delivery as a direct `mailto:` path; the copy action only copies the public family address and exposes no secret.
+- Preserved the dark Base Camp palette and existing private-preview safeguards.
+- No push or deployment occurred.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (footer upgrade batch)
+
+**Done:**
+- [x] Added a sovereignty manifesto strip with key, heart, and accessible supporting copy.
+- [x] Added richer family spectrum hover/focus affordances and external-link indicators.
+- [x] Added accessible labels for every family spectrum link.
+- [x] Added responsive manifesto layout and reduced-motion handling.
+- [x] Expanded footer browser coverage.
+- [x] Verified 20 Playwright tests, quality checks, production build, and lint with zero errors.
+
+**Decisions:**
+- Kept upgrades lightweight and CSS/data-driven; no new dependency or runtime-heavy charting.
+- Used the footer to reinforce the site's sovereignty message while preserving strong dark-panel contrast.
+- Private preview remains enabled; no push or deployment occurred.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (expandable footer sitemap)
+
+**Done:**
+- [x] Added a collapsed-by-default “All Give A Bit routes” footer sitemap.
+- [x] Populated all 10 property links directly from `FAMILY_OFFERINGS`.
+- [x] Added accessible `aria-expanded` and `aria-controls` behavior.
+- [x] Added identity-color markers, numbered routes, labels, and external-link affordances.
+- [x] Added responsive one-column mobile layout and keyboard focus styling.
+- [x] Added Playwright coverage confirming expansion and all 10 routes.
+- [x] Verified 20 Playwright tests, quality checks, production build, and lint with zero errors.
+
+**Decisions:**
+- Kept the sitemap closed by default to preserve footer clarity and reduce visual density.
+- Used the canonical family data source so future offerings automatically appear in the sitemap.
+- Private preview remains enabled; no push or deployment occurred.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (family filter contrast finalization)
+
+**Done:**
+- [x] Added a final selector-specific contrast guard for all family filter buttons.
+- [x] Set opaque cream inactive buttons with near-black text and 2px borders.
+- [x] Set acid-lime active/hover buttons with near-black text and stronger shadow.
+- [x] Added explicit focus outlines and matching night-theme behavior.
+- [x] Added direct Playwright assertions for rendered text color and border width.
+- [x] Verified 20 Playwright tests, quality checks, production build, and lint with zero errors.
+
+**Decisions:**
+- Used `!important` only in this narrow component scope because multiple legacy style layers were overriding the family filter colors.
+- Prioritized guaranteed readability over translucent styling for these controls.
+- Private preview remains enabled; no push or deployment occurred.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (editorial image pass)
+
+**Done:**
+- [x] Added four relevant local SVG editorial illustrations: founder route, sovereign tools, family spectrum, and proof network.
+- [x] Placed imagery in the hero, About, Give A Bit family, and Proof sections.
+- [x] Added descriptive alt text, captions, fixed aspect ratios, lazy loading, and async decoding.
+- [x] Kept assets local, dependency-free, lightweight, and private with no external image licensing or tracking dependency.
+- [x] Added browser coverage for the hero image and editorial image count.
+- [x] Verified 20 Playwright tests, quality checks, production build, and lint with zero errors.
+
+**Decisions:**
+- Used a blended editorial/alpine/protocol visual language, rendered as local SVG artwork rather than unverified stock assets.
+- Hero imagery loads eagerly for the first visual impression; below-the-fold images lazy-load to protect performance and CLS.
+- Private preview remains enabled; no push or deployment occurred.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (editorial image rollback)
+
+**Done:**
+- [x] Removed the four newly added editorial image placements from the hero, About, Family, and Proof sections.
+- [x] Deleted the four local SVG assets from `public/editorial/`.
+- [x] Removed the related browser assertions.
+- [x] Restored the pre-image visual layout without touching existing site visuals.
+
+**Decisions:**
+- Rolled back the image pass at Cam’s request because it weakened the design.
+- Kept all prior footer, contrast, sitemap, and hero improvements intact.
+- Private preview remains enabled; no push or deployment occurred.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (factual hero signals)
+
+**Done:**
+- [x] Replaced numeric hero readiness and expedition displays with factual, non-numeric labels.
+- [x] Added configurable `HERO_SIGNALS` in `src/data/site.ts` for launch review.
+- [x] Updated hero badge, route intelligence label/value, and metric strip.
+- [x] Added development validation rejecting digits in hero signal strings.
+- [x] Added browser assertions for the factual hero state.
+- [x] Verified 20 Playwright tests, quality checks, production build, and lint with zero errors.
+
+**Decisions:**
+- Removed `94.8 READINESS`, `7+ Active`, and related numeric hero claims to honor the proof-over-promise standard.
+- Kept numeric information elsewhere only where it represents actual structural data or navigation counts; hero marketing signals are now configurable and factual.
+- Private preview remains enabled; no push or deployment occurred.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (eight GUI upgrades)
+
+**Done:**
+- [x] Added family spotlight mode when a family filter is selected.
+- [x] Added a lightweight agent constellation backdrop behind the agent grid.
+- [x] Added proof status legend and dashboard-style proof rows.
+- [x] Added desktop sitemap expand/collapse transition and retained mobile accordion behavior.
+- [x] Added unified CTA focus, hover, tap, and reduced-motion interaction rules.
+- [x] Added browser assertions for family spotlight, agent constellation, and proof legend.
+- [x] Verified 20 Playwright tests, quality checks, production build, and lint with zero errors.
+
+**Decisions:**
+- Implemented the eight GUI upgrades as lightweight CSS/HTML enhancements rather than adding animation or chart dependencies.
+- Kept the agent constellation decorative and non-interactive so it does not interfere with keyboard navigation.
+- Private preview remains enabled; no push or deployment occurred.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-08-25 (footer GUI upgrade set)
+
+**Done:**
+- [x] Added a dedicated Meet-the-agents footer panel with supporting copy.
+- [x] Added rotating footer wisdom lines using the two approved brand statements.
+- [x] Added scroll-progress treatment around the back-to-top control.
+- [x] Added spectrum-bar tooltips and external-link affordances.
+- [x] Added distinct social icon hover identities for GitHub, X, Nostr, and email.
+- [x] Added animated gradient footer edge and preserved reduced-motion behavior.
+- [x] Added footer proof legend/dashboard polish and family spotlight styling.
+- [x] Expanded footer browser coverage.
+- [x] Verified 20 Playwright tests, quality checks, production build, and lint with zero errors.
+
+**Decisions:**
+- Kept all enhancements CSS/HTML/data-driven with no new dependencies.
+- Rotation is non-interactive and slow to avoid disrupting reading; reduced-motion users receive static behavior.
+- Private preview remains enabled; no push or deployment occurred.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-09-24 (trail kit + colour intensity)
+
+**Machine:** M3 coding agent
+**Project:** camtaylor
+
+**Done:**
+- [x] Added a **Trail Kit** affiliate section (`#kit`) between Ventures and Contact.
+- [x] New data model `src/data/affiliates.ts` — one fixed card shape (name, label, tagline, note, brand colour, referral flag) so future tools drop in unchanged.
+- [x] New component `src/components/Affiliates.tsx` — uniform small cards, one-line explanation, honest referral tag, plain-language disclosure line.
+- [x] First tool live: Freebuff (referral link `freebuff.com/get-started?ref=…`), lime-on-ink brand treatment matching the site's acid accent.
+- [x] Wired into nav ("Kit") and the footer Explore column.
+- [x] UI upgrade 2 — **colour intensity pass**: stronger cyan/violet/coral tokens, richer body + hero aurora, bolder card shadows, accent bar on section kickers. `--acid` deliberately untouched (tests + brand depend on it).
+- [x] UI upgrade 3 — **pointer spotlight** on kit/family/service/venture/proof cards via `src/hooks/useCardSpotlight.ts` (pointer-only, skipped for touch and reduced motion).
+- [x] Added 1 Playwright test (21 total) asserting card slot uniformity, referral honesty and the Freebuff link.
+- [x] Quality, build, lint (0 errors, 1 pre-existing warning) and 21 Playwright tests pass.
+
+**Decisions:**
+- Affiliate tone stays humble: "Tools I actually use", no urgency, no hard sell, explicit referral disclosure.
+- Card layout is fixed-height and slot-identical so a growing list stays tidy.
+- Freebuff brand colour is a single constant in `affiliates.ts` (`color`/`ink`) — one-line change if Cam wants a different shade.
+- Private preview remains enabled; no email sent, no push, deployment, DNS change or production operation.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-09-24 (live signal + bolder colour + 3 polish upgrades)
+
+**Machine:** M3 coding agent
+**Project:** camtaylor
+
+**Done:**
+- [x] UI upgrade 1 — **Bolder colour pass 2** in `src/styles/bold-modern.css`: hotter jewel tokens (`--cyan #07cdc4`, `--violet #6a2bff`, `--coral #ff3d0f`), deeper ink, four-radial body wash, more saturated hero aurora, gradient underline on every `.section-title`, heavier offset card/shell shadows, darker night theme. `--acid` untouched.
+- [x] UI upgrade 2 — **Route conditions ticker** (`RouteTicker.tsx`) between Hero and About: a slow marquee of standing conditions plus a live Pacific clock, duplicated track `aria-hidden`, pauses on hover, stops for reduced motion.
+- [x] UI upgrade 3 — **Route rail** (`RouteRail.tsx`): desktop-only (≥1200px) vertical scroll markers, one per section, active marker follows scroll via `useScrollSpy`, hover reveals the label, click travels.
+- [x] UI upgrade 4 — **Command Deck shortcut** (`useCommandShortcut.ts`): `/` or `⌘K`/`Ctrl+K` toggles the deck from anywhere, ignored while typing in a field; keycap hint added to the nav toggle; Command Deck boot tip updated.
+- [x] **New live data panel** (`#signal`, `LiveSignal.tsx`): real Bitcoin readings pulled in the browser from the keyless `mempool.space` public API — transactions-per-block area chart (last 14 blocks), tip height, mempool backlog, fast fee, block age, and four recommended fee tiers.
+- [x] `src/hooks/useLiveBitcoinSignal.ts` — 3 parallel reads with 5s abort timeout, `Promise.allSettled`; block read failing = `OFFLINE` state, never a remembered or invented number.
+- [x] `src/data/liveSignal.ts` — endpoints, chart copy, honest note, ticker conditions.
+- [x] Added `https://mempool.space` to `connect-src` in `public/_headers` (it would have been blocked in production otherwise); noted in `docs/PRIVATE-LAUNCH-GATE.md`.
+- [x] Nav wiring: `signal` nav item (desktop nav, footer Explore, scrollspy, route rail); 4 new Playwright tests (25 total).
+- [x] `npm run quality` ✓, `npx tsc -b` ✓, `npm run lint` 0 errors / 1 pre-existing warning, `npm test` 25/25 pass.
+
+**Decisions:**
+- The live panel only ever shows raw API readings, names its source, and shows an honest offline card if the read fails — matching the existing Proof dashboard tone (proof over promise).
+- `gravity_index` has no catalog entry for keyless blockchain/market data APIs (returned no options), so `mempool.space` was chosen directly: no key, CORS-open, Bitcoin-native, tiny payloads.
+- Live chart *ideas* offered to Cam (not yet built): Lightning channel capacity/flow, Nostr relay note throughput (WebSocket, NIP-01 `REQ`), sats-per-USD price sparkline, and difficulty-adjustment countdown.
+- Colour work still preserves the literals asserted in `tests/smoke.spec.ts` (family filter `rgb(16,23,19)`/acid, venture `rgb(26,23,18)`/`rgb(215,255,85)`).
+- Private preview stays on; nothing pushed, deployed, or emailed.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-09-24 (Lightning capacity panel)
+
+**Machine:** M3 coding agent
+**Project:** camtaylor
+
+**Done:**
+- [x] Added a **Lightning capacity panel** inside `#signal`, sitting beside the Bitcoin block chart in a responsive two-column grid (`.live-panels`, 1.25fr/1fr above 900px).
+- [x] `src/hooks/useLightningSignal.ts` reads `mempool.space/api/v1/lightning/statistics/3m` (daily snapshots) — sorts, caps at 30 samples, requires ≥2 points to plot.
+- [x] Panel shows capacity trend in BTC, plus capacity (BTC + sats), channels, nodes, and Tor share; the honest line names the source and states that private/unannounced channels cannot be counted.
+- [x] Extracted shared pieces: `src/utils/signalChart.ts` (geometry), `src/components/SignalChart.tsx` (reusable SVG line/area), `src/utils/readJson.ts` (timeout-safe JSON read, now used by both signal hooks).
+- [x] `public/_headers` CSP already allowed `mempool.space`; no new host added.
+- [x] Footer "Refresh reading" refreshes both readings.
+- [x] Added 1 Playwright test (26 total). Fixed two test issues found on the way: a strict-mode selector collision (`.live-chart-line` now exists in both charts → scoped to `.live-chart-wrap`) and a flaky Escape-after-keyboard-open race (now retried with `expect(...).toPass()`).
+- [x] `npm run quality` ✓, `npx tsc -b` ✓, `npm run lint` 0 errors / 1 pre-existing warning, `npm test` 26/26 pass.
+
+**Decisions:**
+- Lightning statistics are a *daily* series, so they are fetched once and never re-timed like the 14-block feed; a series too short to plot renders an honest empty state rather than a one-point "trend".
+- Block chart keeps class `.live-chart`, Lightning uses `.lightning-chart` so test selectors stay unambiguous.
+- Note for Cam: `/api/v1/lightning/statistics/1w` and `/1m` currently return `[]` upstream, so the panel requests `3m` (which returns the available daily snapshots).
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-09-24 (sats-per-dollar price panel)
+
+**Machine:** M3 coding agent
+**Project:** camtaylor
+
+**Done:**
+- [x] Added a third `.live-panel--price` to `#signal`: **Sats per dollar** sparkline over the last 24 hourly closes, with sats per $1, BTC price, day move %, and the hourly USD low–high range.
+- [x] `src/hooks/usePriceSignal.ts` reads `api.exchange.coinbase.com/products/BTC-USD/candles?granularity=3600` — one keyless, CORS-open GET (`access-control-allow-origin: *` verified), sorted ascending, capped at 24 samples, needs ≥2 points to plot.
+- [x] Sats per dollar computed as `100,000,000 ÷ close` from the raw candle, never from a rounded headline price.
+- [x] `public/_headers` `connect-src` gained `https://api.exchange.coinbase.com` (would be CSP-blocked in production otherwise); `docs/PRIVATE-LAUNCH-GATE.md` note updated to list both external hosts.
+- [x] `.live-panels` grid now 3-up above 1200px, 2-up above 900px, 1-up below; mini stat grids renamed to `.live-mini-stats` / `.live-mini-stat` (shared by the Lightning and price panels).
+- [x] Footer "Refresh reading" now refreshes all three readings.
+- [x] Added 1 Playwright test (27 total). Made the keyboard-shortcut test deterministic (wait for the deck input to be focused before sending Escape, instead of retrying) and marked it `test.slow()` — it was brushing the 30s default under 4-worker load.
+- [x] `npm run quality` ✓, `npx tsc -b` ✓, `npm run lint` 0 errors / 1 pre-existing warning, `npm test` 27/27 pass.
+
+**Decisions:**
+- Chose Coinbase Exchange public candles over Kraken (HEAD returns 404, no CORS headers observed) and over mempool.space price endpoints (`/api/v1/historical-price` only resolved one of three requested timestamps, so it cannot plot a series).
+- Price is the only new external host; the note names it plainly so the panel never hides where a number came from.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+## Session — 2026-09-24 (USD/CAD toggle)
+
+**Machine:** M3 coding agent
+**Project:** camtaylor
+
+**Done:**
+- [x] Added a small **USD / CAD toggle** (`.live-quote-toggle`, `aria-pressed`, `role="group"`) to the sats-per-dollar panel; the whole panel — chart, sats per $1, price, day move, hourly range — flips currency together.
+- [x] `usePriceSignal` now also reads `mempool.space/api/v1/prices` for the live USD→CAD rate (one extra keyless GET, host already allowed).
+- [x] Panel copy states the method outright: "CAD is that series converted at the live mempool.space USD→CAD rate", and selecting CAD appends "Live rate: 1 USD = x.xxxx CAD (mempool.space)."
+- [x] Failure-safe: `activeQuote` falls back to USD whenever the live rate is missing, so a label can never claim Canadian dollars over American numbers; the CAD button is disabled with an explanatory `title` in that case.
+- [x] Playwright config: raised to `timeout: 60_000` and `expect.timeout: 10_000`. The homepage is heavy (video, canvas, four external reads) and 3 pre-existing tests were tripping the 30s default under 4-worker parallel load.
+- [x] Sats-per-dollar test extended with toggle coverage (27 tests total). `npm run quality` ✓, `npx tsc -b` ✓, `npm run lint` 0 errors / 1 pre-existing warning, `npm test` 27/27 pass.
+
+**Decisions:**
+- No genuine CAD series is browser-reachable: Coinbase has no `BTC-CAD` product (404) and Kraken's `XBTCAD` OHLC works but sends no `Access-Control-Allow-Origin`, so a browser fetch is blocked. Converting the real USD series at the live rate (and saying so) was the honest option.
+- Note for Cam: if you want a true CAD-denominated series later, it needs a server/proxy hop or a CAD-quoting exchange that sets CORS headers.
+
+**Git State:**
+- Local changes only; no GitHub push or deployment.
+
+---
+
 ## Session — 2026-07-19
 
 **Machine:** M3 (Grok)
@@ -258,5 +697,35 @@
 **Git State:**
 - Branch: main
 - See commit after push
+
+---
+
+## Session — 2026-09-24 (masthead pass + live signal tightening)
+
+**Machine:** M3 (Buffy)
+**Project:** camtaylor
+
+**Done:**
+- [x] Hardcore masthead pass in `src/styles/bold-modern.css`. Brand wordmark at `clamp(1rem, 2.2vw, 1.18rem)/800` with the SHERPA chip restyled as an ink-on-acid pill; nav links are now uppercase `.64rem/800` at `.15em` tracking with a hover wash and an acid→cyan underline; the glass nav container gained a lit acid gradient edge, a heavier glass gradient and a deeper scrolled shadow; the Command Deck button is now the ink/acid primary in the header.
+- [x] Hero type. `.title-name` is a tracked eyebrow with a fading rule, `.title-role` moved to `clamp(2.9rem, 10.5vw, 5.2rem)/900` at `-.05em`, `.title-tagline` is a serif quote on an acid rule, meta items became chips, badge/strip/metrics re-spaced, and `.hero-shell` gained a 4px acid→coral top edge, radius 20 and a jewel offset shadow.
+- [x] Header overflow verified by measurement, not eyeball: `scrollWidth` vs `clientWidth` for `.nav-container` and `.hero-shell` at 1440 → 360 px. Nav-link steps down at 1160/1040/980/899, keycap hidden ≤899, identity badge ≤860, theme toggle and SHERPA chip leave the nav ≤430, route strip stacks ≤480.
+- [x] Live signal tightened. All three panels are flex columns with `align-items: stretch`, a fixed one-line head (`min-height: 34px` + hairline) and a new `.live-chart-well`: a fixed-height (`clamp(104px, 12vw, 146px)`) full-bleed frame with grid guides that the SVG fills via `preserveAspectRatio="none"` plus `vector-effect="non-scaling-stroke"`.
+- [x] The four chain readings (tip height, mempool, fast fee, block age) moved out of the old wide row and into the chain card as `.live-mini-stat.live-stat` items (still exactly four `.live-stat` nodes), so every card reads head → chart → readings with the bottom block pinned to the card floor. The row below the panels is now the fee tiers only.
+- [x] Empty and offline states stay honest: `.live-panel-empty` and `.live-offline` render inside the chart frame, so card geometry never shifts when a read fails.
+- [x] Two new Playwright tests: `masthead holds the brand and never overflows its container` (nav + hero shell fit at 1440/1024/780/430) and `live signal charts share one frame and one reading row` (three wells, equal tops and heights, four readings in the chain card, bottoms within 14px). Three `toBeInViewport` waits raised 8s → 20s and the masthead test marked `test.slow()` — the suite now saturates 4 workers and was flaking on scroll assertions.
+- [x] `npm run quality` ✓, `npx tsc -b` ✓, `npm run lint` 0 errors / 1 pre-existing warning, `npm test` **29/29** pass.
+
+**Decisions:**
+- The chart frame owns the height and its children are absolutely pinned to it. Letting the SVG resolve a percentage of an indefinite flex height was what had put the old charts off-grid.
+- The frame is a fixed height rather than flex-grown: growing gave each card a different chart height (the chain card has one block of content, the two market cards have two), which is exactly the loose look Cam flagged. Slack now goes to `margin-top: auto` on the last block of each card, so every chart top and every card bottom lines up.
+- Chain readings moved into the chain card instead of staying in a wide row — at ≥1200px that row left the first card visibly empty.
+- Pre-existing CSS quirk left alone and documented: the `@media (max-width: 1100px)` rule in `bold-modern.css` that shows `.nav-identity-badge` and hides `.nav-agents-cta` is overridden by the later base rules in the same file, so the badge never renders and the agents CTA shows at every width above the mobile breakpoint. Changing it would have re-introduced header overflow at ~780px, so it stays as-is pending a deliberate nav decision.
+- Local commit only. **No push, no deploy, no DNS change, private preview still on** (`VITE_PRIVATE_PREVIEW` untouched).
+
+**Git State:**
+- Branch: `main`; remote `git@github.com:kitsboy/camtaylor.git` (plus an HTTPS push URL alongside the SSH one).
+- Committed locally this session: `src/styles/bold-modern.css`, `src/components/LiveSignal.tsx`, `src/components/SignalChart.tsx`, `tests/smoke.spec.ts`, `docs/KIMI-HANDOFF.md`, `LATEST-UPDATE.md` (the first three were untracked files that had never been committed).
+- Still uncommitted in the working tree (≈44 paths from earlier sessions): `src/components/Navbar.tsx`, `Hero.tsx`, `src/pages/HomePage.tsx`, `src/styles/upgrades.css`, `index.html`, `package.json`, `playwright.config.ts`, `public/_headers`, `src/data/*`, `src/hooks/*`, `src/utils/*`, and more. Nothing unpushed (`origin/main..HEAD` is empty).
+- **Risk for Cam:** two months of design work (2026-08-24 → 2026-09-24) lives only in this working tree, not in the repo. Committing it is the next safe step.
 
 ---
