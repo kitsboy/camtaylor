@@ -783,18 +783,18 @@
 **Decisions:**
 - Porting was **selective**: features and defects only, never the August theme tokens or the rebranded voice, because Cam locked the reviewed Sherpa design this session.
 - Preview copy must be *branched*, never hardcoded — the quality-check guard exists so a public build can never regress into advertising a private preview.
-- `origin/main` is **not** touched. It is a parallel lineage (2026-08-09 → 08-13, "Deal Architect" maturity rebrand) that diverges in 28 files. Local `main` is the published line; it is backed up on the remote as `m3/2026-09-24-publish`. Promoting local `main` to `origin/main` needs an explicit decision from Cam (it is a force-push on a public repo).
+- Local `main` is the published line. `origin/main` was originally a parallel lineage (2026-08-09 → 08-13, "Deal Architect" maturity rebrand) diverging in 28 files; **Cam approved a force-push this session**, so `origin/main` now points at this line. The August commits remain reachable on `m3/2026-09-24-publish` and `origin/talent`.
 
 **Git State:**
-- SHA: `0212943b489a5168dece2e42312cd9f64b0a203f` (branch `main`)
-- `origin/main..HEAD` — 5 commits ahead (`ea82bdf`, `9cbbcc3`, `26401bf`, `63bf10c`, `0212943`); also 11 behind. All five are pushed to remote branch **`m3/2026-09-24-publish`** (nothing unpushed there).
-- `origin/HEAD` points at `origin/talent`, which is why a PR would need its base set by hand.
+- SHA: `5137415b87fcc07ba9a34a5e600ec83be62c6461` (branch `main`)
+- `origin/main` was force-pushed to that SHA — `origin/main..HEAD` is now empty. `m3/2026-09-24-publish` also carries it as a safety copy; anything needed from the August line still lives on that branch and `origin/talent`.
+- **`origin/HEAD` still points at `origin/talent`** — Cam should set the default branch to `main` in GitHub repository settings.
 - Working tree clean; `.env`, `ref/` and `.aider.*` remain ignored and local.
 
 **Open for Cam:**
 1. Review the six seed dispatches and test one real contact-form submission.
 2. Switch `camtaylor.ca` + `www` to the Pages project in the Cloudflare dashboard (see below) and delete the old WordPress records.
-3. Decide whether local `main` replaces `origin/main`.
+3. Set the GitHub default branch to `main` (`origin/HEAD` still points at `talent`).
 
 **DNS switch (dashboard, no wrangler DNS scope):** Workers & Pages → `camtaylor` → Custom domains → **Set up a domain** → add `camtaylor.ca`, then `www`. Cloudflare will offer to create the CNAME/proxy records; accept **only** if it removes the old WordPress `A`/`CNAME` records for the apex and `www`. The live WordPress origin is LiteSpeed/PHP 8.1.34 behind the proxy — its origin records must be deleted, then the hosting cancelled.
 
