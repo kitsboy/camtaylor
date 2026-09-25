@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { LIVE_SIGNAL_SOURCE } from '../data/liveSignal';
 import { readJson } from '../utils/readJson';
+import {
+  LIGHTNING_READING_MAX_AGE,
+  recallReading,
+  rememberReading,
+} from '../utils/readingsCache';
 
 export interface LightningSnapshot {
   at: number;
@@ -36,6 +41,7 @@ function toMillis(added: number | string) {
 export function useLightningSignal() {
   const [status, setStatus] = useState<LightningStatus>('connecting');
   const [samples, setSamples] = useState<LightningSnapshot[]>([]);
+  const [isStale, setIsStale] = useState(false);
   const mounted = useRef(true);
 
   useEffect(() => {
@@ -65,10 +71,22 @@ export function useLightningSignal() {
         .slice(-MAX_SAMPLES);
       setSamples(next);
       setStatus(next.length > 1 ? 'live' : 'offline');
+      setIsStale(false);
+      if (next.length > 1) rememberReading<LightningSnapshot[]>('lightning', next);
     } catch {
       if (!mounted.current) return;
+      // A daily series does not stop being true because one read failed; serve the last
+      // snapshot set this browser received, and let the panel say it is the last one.
+      const cached = recallReading<LightningSnapshot[]>('lightning', LIGHTNING_READING_MAX_AGE);
+      if (cached && cached.value.length > 1) {
+        setSamples(cached.value);
+        setStatus('live');
+        setIsStale(true);
+        return;
+      }
       setSamples([]);
       setStatus('offline');
+      setIsStale(false);
     }
   }, []);
 
@@ -76,5 +94,5 @@ export function useLightningSignal() {
     void refresh();
   }, [refresh]);
 
-  return { status, samples, refresh };
+  return { status, samples, isStale, refresh };
 }

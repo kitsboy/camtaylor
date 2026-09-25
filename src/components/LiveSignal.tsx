@@ -42,7 +42,7 @@ function formatAge(seconds: number) {
 }
 
 export const LiveSignal: React.FC = () => {
-  const { status, blocks, fees, mempool, refresh } = useLiveBitcoinSignal();
+  const { status, blocks, fees, mempool, updatedAt, isStale, refresh } = useLiveBitcoinSignal();
   const lightning = useLightningSignal();
   const price = usePriceSignal();
   const [quote, setQuote] = useState<PriceQuote>('USD');
@@ -105,12 +105,44 @@ export const LiveSignal: React.FC = () => {
             <h2 className="section-title">{LIVE_SIGNAL_COPY.title}</h2>
             <p className="live-subtitle">{LIVE_SIGNAL_COPY.subtitle}</p>
           </div>
-          <div className={`live-state live-state--${status}`} aria-live="polite">
+          <div
+            className={`live-state live-state--${isStale || lightning.isStale || price.isStale ? 'stale' : status}`}
+            aria-live="polite"
+          >
             <span className="live-state-dot" aria-hidden="true" />
-            {status === 'live' ? 'LIVE' : status === 'connecting' ? 'CONNECTING' : 'OFFLINE'}
+            {isStale || lightning.isStale || price.isStale
+              ? 'LAST GOOD'
+              : status === 'live'
+                ? 'LIVE'
+                : status === 'connecting'
+                  ? 'CONNECTING'
+                  : 'OFFLINE'}
             <small>{time} PT</small>
           </div>
         </div>
+
+        {/*
+          A dropped read used to blank the panel and print "offline", which blames the
+          reader's connection for what is often a blocked request — and throws away a
+          reading the browser had in hand a minute earlier. The reading is kept, with the
+          time it was actually received, and this says which panels are showing it.
+        */}
+        {isStale || lightning.isStale || price.isStale ? (
+          <p className="live-stale" role="status">
+            <RefreshCw size={13} aria-hidden="true" />
+            {[
+              isStale ? 'the chain reading' : null,
+              lightning.isStale ? 'Lightning capacity' : null,
+              price.isStale ? 'the price series' : null,
+            ]
+              .filter(Boolean)
+              .join(', ')}
+            {' '}
+            {isStale && updatedAt
+              ? `could not be read again — showing the last reading this browser received, ${new Date(updatedAt).toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Vancouver' })} PT.`
+              : 'could not be read again — showing the last reading this browser received.'}
+          </p>
+        ) : null}
 
         {/*
           Three instruments, 1,182px of a 390px phone stacked on top of each

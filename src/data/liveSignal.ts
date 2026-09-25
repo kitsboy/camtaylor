@@ -45,7 +45,7 @@ export const LIVE_SIGNAL_COPY = {
   kicker: 'LIVE SIGNAL / BITCOIN ROUTE',
   title: 'Live from the mempool.',
   subtitle:
-    'Raw readings straight off the Bitcoin network, pulled in the browser from a public API. No key, no cache, no smoothing.',
+    'Raw readings straight off the Bitcoin network, pulled in the browser from a public API. No key, no smoothing. If a read fails, the panel says so and shows the last reading it did receive — with that reading\u2019s own timestamp, never as if it were current.',
   chartLabel: 'Transactions per block',
   note: `Read live from the ${LIVE_SIGNAL_SOURCE.name} public API. If the read fails, this panel says so rather than showing a guess. Readings, not advice.`,
   offline: 'Live signal offline — this browser could not reach the public API.',

@@ -854,6 +854,9 @@ body {
 .live-state-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--acid); box-shadow: 0 0 10px var(--acid); }
 .live-state--live .live-state-dot { animation: live-pulse 2.6s ease-in-out infinite; }
 .live-state--connecting .live-state-dot { background: #e9d15a; box-shadow: 0 0 10px #e9d15a; }
+.live-state--stale { color: rgba(255, 255, 255, .88); border-color: rgba(233, 209, 90, .45); }
+.live-state--stale .live-state-dot { background: #e9d15a; box-shadow: 0 0 10px #e9d15a; }
+.live-stale { display: flex; align-items: center; gap: 8px; margin: -6px 0 18px; padding: 9px 12px; border: 1px solid rgba(233, 209, 90, .3); border-radius: 8px; background: rgba(233, 209, 90, .07); color: rgba(255, 255, 255, .88); font-size: var(--fs-caption); line-height: 1.5; }
 .live-state--offline { color: rgba(255, 255, 255, .72); }
 .live-state--offline .live-state-dot { background: var(--coral); box-shadow: 0 0 10px var(--coral); }
 @keyframes live-pulse { 50% { opacity: .3; } }

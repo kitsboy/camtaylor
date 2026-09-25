@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { LIVE_SIGNAL_SOURCE } from '../data/liveSignal';
 import { readJson } from '../utils/readJson';
+import { PRICE_READING_MAX_AGE, recallReading, rememberReading } from '../utils/readingsCache';
 
 export interface PriceSample {
   at: number;
@@ -30,6 +31,7 @@ export function usePriceSignal() {
   const [status, setStatus] = useState<PriceStatus>('connecting');
   const [samples, setSamples] = useState<PriceSample[]>([]);
   const [cadRate, setCadRate] = useState<number | null>(null);
+  const [isStale, setIsStale] = useState(false);
   const mounted = useRef(true);
 
   useEffect(() => {
@@ -66,15 +68,27 @@ export function usePriceSignal() {
         .slice(-WINDOW_HOURS);
       setSamples(next);
       setStatus(next.length > 1 ? 'live' : 'offline');
-    } else {
-      setSamples([]);
-      setStatus('offline');
+      setIsStale(false);
+      rememberReading<PriceSample[]>('price', next);
+      return;
     }
+
+    const cached = recallReading<PriceSample[]>('price', PRICE_READING_MAX_AGE);
+    if (cached && cached.value.length > 1) {
+      setSamples(cached.value);
+      setStatus('live');
+      setIsStale(true);
+      return;
+    }
+
+    setSamples([]);
+    setStatus('offline');
+    setIsStale(false);
   }, []);
 
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
-  return { status, samples, cadRate, refresh };
+  return { status, samples, cadRate, isStale, refresh };
 }
