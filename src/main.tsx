@@ -18,6 +18,28 @@ import App from './App.tsx';
 import { validateSiteConfig } from './data/site';
 import { initAnalytics } from './utils/analytics';
 
+declare global {
+  interface Window {
+    __CAMTAYLOR_SENTRY__?: any;
+  }
+}
+
+// Client-side Sentry (wired-but-off): dormant until VITE_SENTRY_DSN is set.
+// Dynamic import keeps @sentry/react out of the first-paint bundle.
+if (import.meta.env.VITE_SENTRY_DSN) {
+  import('@sentry/react').then((Sentry) => {
+    window.__CAMTAYLOR_SENTRY__ = Sentry;
+    Sentry.init({
+      dsn: import.meta.env.VITE_SENTRY_DSN,
+      integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
+      tracesSampleRate: 0.3,
+      replaysSessionSampleRate: 0.1,
+      replaysOnErrorSampleRate: 1.0,
+      environment: import.meta.env.MODE,
+    });
+  });
+}
+
 if (import.meta.env.DEV) {
   const configErrors = validateSiteConfig();
   if (configErrors.length > 0) console.warn('Site configuration warnings:', configErrors);
