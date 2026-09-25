@@ -1417,15 +1417,65 @@ body {
 @media (max-width: 768px) {
   .nav-brand { font-size: 1rem; }
   .brand-dot { letter-spacing: .14em; }
-  .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; padding: 16px; }
   .title-role { font-size: clamp(2.4rem, 13vw, 3.1rem); }
   .title-name { letter-spacing: .28em; }
   .title-tagline { max-width: none; }
+
+  /* ── Phone hero ────────────────────────────────────────────────────────
+     The hero is 1.6 screens of a 390px phone, and the first screen is the one
+     that has to do the work, so the pitch gets it and the dashboard chrome
+     stops costing rows. Every value here is a measurement — the before/after
+     table is in `docs/KIMI-HANDOFF.md`.
+
+     These belong in this file rather than `mobile.css` because `.hero-shell`,
+     `.hero-description`, `.hero-intelligence-strip`, `.hero-metrics` and
+     `.metric-*` are all redefined unscoped further up this file, and this file
+     loads after `mobile.css` — a phone rule written there loses the tie and
+     never applies. (That is already true of `mobile.css`'s `.hero-shell`
+     padding today.) */
+  .hero-shell { padding: 18px 16px; }
+  .hero-card-meta { margin-bottom: 12px; }
+  .hero-route-status { padding: 8px 10px; }
+  .hero-description { margin-bottom: 18px; }
+
+  /* Three full-width stacked buttons is 164px of the screen for two places the
+     reader can go later. The primary keeps a row to itself; the two secondaries
+     share one and keep their 48px target. */
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .hero-actions .btn-primary { grid-column: 1 / -1; }
+
+  /* One line per metric, label and value together. The dividers are hidden
+     because in a grid they are grid items too: three metrics and two dividers
+     in a single column is five rows, and two of those rows held nothing but a
+     1px rule and the gaps around it. */
+  .hero-metrics { grid-template-columns: 1fr; gap: 0; padding: 12px 16px; }
+  .metric-divider { display: none; }
+  .metric-label { margin-bottom: 0; }
+  .metric-item {
+    display: flex;
+    /* `index.css` stacks the label over the value; on a phone they share a row. */
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2px 12px;
+    padding: 5px 0;
+  }
+  .metric-item + .metric-item { border-top: 1px solid var(--line-bright); }
+
+  /* 16/9 is 181px of an 844px screen for a poster. 21/9 crops to 138 and still
+     shows the frame label, the play button and the shine. The poster is
+     `object-fit: cover`, so it crops rather than distorts. */
+  .hero-video-viewport { aspect-ratio: 21 / 9; }
 }
 
 @media (max-width: 700px) {
   .hero-card-meta span { padding: 5px 8px; font-size: var(--fs-2xs); letter-spacing: .12em; }
-  .hero-metrics { padding: 14px; }
 }
 
 @media (max-width: 560px) {
@@ -1435,11 +1485,20 @@ body {
   .brand-dot { padding: 3px 7px; font-size: var(--fs-2xs); letter-spacing: .1em; }
 }
 
-/* The route strip stacks on phones so its labels can breathe and wrap. */
+/* The route strip is one row on a phone. The twelve bars are the strip's
+   decoration — `aria-hidden`, and their animation is already parked — and they
+   are what pushed the label and the value onto rows of their own: 26px of bars
+   plus gaps, for a reading nobody does on a phone. */
 @media (max-width: 480px) {
-  .hero-intelligence-strip { grid-template-columns: 1fr; gap: 10px; }
+  .hero-intelligence-strip {
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 4px 0 16px;
+    padding: 8px 10px;
+  }
   .intelligence-label { white-space: normal; }
-  .intelligence-bars { grid-column: 1 / -1; grid-row: auto; }
+  .intelligence-bars { display: none; }
 }
 
 @media (max-width: 430px) {
@@ -1447,7 +1506,6 @@ body {
   .nav-actions .theme-toggle { display: none; }
   /* The hero states "Sherpa." at full size, so the chip can step out here. */
   .brand-dot { display: none; }
-  .hero-metrics { grid-template-columns: 1fr; }
   .title-name::after { display: none; }
   .title-role { font-size: 2.2rem; }
 }
