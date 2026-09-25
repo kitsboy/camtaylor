@@ -10,6 +10,7 @@
     "lint": "oxlint",
     "quality": "node scripts/quality-check.mjs",
     "cascade": "node scripts/cascade-check.mjs",
+    "og": "node --experimental-strip-types scripts/generate-og.mjs",
     "preview": "vite preview",
     "test": "playwright test",
     "build:live": "VITE_PRIVATE_PREVIEW=false npm run build",

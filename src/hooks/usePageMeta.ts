@@ -30,6 +30,10 @@ export function usePageMeta({
     setMeta('property', 'og:url', `${SITE.url}${path}`);
     setMeta('name', 'twitter:title', fullTitle);
     setMeta('name', 'twitter:description', description);
+    // One card serves every page, so its alt text has to be the page's own or a
+    // screen reader reads the homepage's sentence over a dispatch's link.
+    setMeta('property', 'og:image:alt', `${fullTitle} — ${description}`);
+    setMeta('name', 'twitter:image:alt', `${fullTitle} — ${description}`);
 
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonical) {

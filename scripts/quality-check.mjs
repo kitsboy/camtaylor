@@ -18,6 +18,45 @@ for (const token of ['<title>', 'name="description"', 'rel="canonical"', 'applic
 }
 if (index.includes('analytics.giveabit.io/script.js')) failures.push('Analytics must be runtime-gated, not hard-coded in index.html');
 
+// ── Share card ────────────────────────────────────────────────────────────────
+// The card is generated (`npm run og`), so it is the one asset nobody looks at
+// while designing a page — and the one most people see first. A wrong size is
+// silently letterboxed or cropped by every unfurler, and a meta tag that points
+// at a file the build does not ship means no card at all, so both are checked.
+const CARD = { width: 1200, height: 630, path: '/og-image.png' };
+const CARD_FILE = `public${CARD.path}`;
+if (existsSync(CARD_FILE)) {
+  // PNG puts the size in the IHDR chunk: 8 bytes of signature, 4 of length, 4 of
+  // type, then width and height as big-endian uint32. No decoder needed.
+  const header = readFileSync(CARD_FILE).subarray(0, 24);
+  const isPng = header.subarray(1, 4).toString('ascii') === 'PNG';
+  if (!isPng) {
+    failures.push(`${CARD_FILE} is not a PNG, and every unfurler keys on the declared type`);
+  } else {
+    const width = header.readUInt32BE(16);
+    const height = header.readUInt32BE(20);
+    if (width !== CARD.width || height !== CARD.height) {
+      failures.push(
+        `${CARD_FILE} is ${width}x${height}; share cards are ${CARD.width}x${CARD.height} and every platform crops or letterboxes the rest — run \`npm run og\``,
+      );
+    }
+  }
+}
+for (const token of [
+  `property="og:image" content="https://camtaylor.ca${CARD.path}"`,
+  `name="twitter:image" content="https://camtaylor.ca${CARD.path}"`,
+  `property="og:image:width" content="${CARD.width}"`,
+  `property="og:image:height" content="${CARD.height}"`,
+  'property="og:image:alt"',
+  'name="twitter:image:alt"',
+  'name="twitter:card" content="summary_large_image"',
+]) {
+  if (!index.includes(token)) failures.push(`The share card is not declared in index.html: ${token}`);
+}
+if (!index.includes('name="twitter:site"')) {
+  failures.push('Missing metadata: name="twitter:site" — an unowned card is credited to nobody');
+}
+
 const envExample = readFileSync('.env.example', 'utf8');
 if (!envExample.includes('VITE_PRIVATE_PREVIEW=true')) failures.push('Private preview must default to true');
 
@@ -88,5 +127,5 @@ if (failures.length) {
   process.exit(1);
 }
 console.log(
-  `✓ Quality check passed (${requiredFiles.length} assets, metadata, privacy gate, type-scale floor, cascade)`,
+  `✓ Quality check passed (${requiredFiles.length} assets, ${CARD.width}x${CARD.height} share card, metadata, privacy gate, type-scale floor, cascade)`,
 );
