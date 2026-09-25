@@ -1,9 +1,10 @@
 # Latest update
 
-**Session:** 2026-09-25 (M3 / Buffy) · **Branch:** `main` @ `73d0b5c` (+ this handoff) · **Deploy:** `npm run deploy:live` from `main`
+**Session:** 2026-09-25 (M3 / Buffy) · **Branch:** `main` — push = deploy
 
-Kimi owns the camtaylor deployment. This session touched no routing, no `_redirects`, no endpoint
-and no mailbox — it is the contact form's own address, plus a question for Kimi in
+Since `41b4bfa` **push = deploy** — Cloudflare Pages builds `main` from Git, so everything committed
+here is already published. This session touched no routing, no `_redirects`, no endpoint and no
+mailbox: it is the contact form's own address, plus ten numbered questions for Kimi in
 `docs/KIMI-HANDOFF.md`.
 
 ## The ask: make the contact form's email work, to `hello@giveabit.io`, with no spam
@@ -23,10 +24,10 @@ a fourth:
 | the endpoint | `VITE_FORMSPREE_FORM_ID` → **`xykqodnk`** | unknown |
 
 **`xykqodnk` is the value in `.env.example`, `README.md`, `docs/DEPLOYMENT.md` and both CI jobs, and
-it is the fallback compiled into `src/data/site.ts`.** If it is the scaffold's placeholder — which
-the file names suggest, since it is hard-coded as a fallback and used in CI — then the form accepts a
-visitor's message and delivers it nowhere. **Question 1 to Kimi** is whether it is live, and if not,
-the real ID.
+it is the fallback compiled into `src/data/site.ts` — and the published production bundle, which is
+how I checked it (see below).** The form is not merely pointing at a placeholder: in the live build
+its submit button is disabled, because production has been built as a private preview the whole
+time.
 
 ## What landed: `73d0b5c`
 
@@ -43,6 +44,23 @@ the real ID.
 - **A test on the rendered page.** `tests/smoke.spec.ts` asserts the delivery note names
   `hello@giveabit.io` and **not** `cam@camtaylor.ca`. Canaried: restoring the old copy fails at
   line 436.
+
+## The live bundle says the form has never worked
+
+Probed read-only — Chromium on `https://camtaylor.ca`, collect the `/assets/*.js` responses, search
+them. Both answers are in the published build, and neither is a guess:
+
+1. **The published `index-*.js` contains `xykqodnk` and no other Formspree endpoint.** Vite only
+   folds that fallback into the bundle when `VITE_FORMSPREE_FORM_ID` was undefined at build time, so
+   the live form is posting to the placeholder. **Nothing sent from camtaylor.ca has been delivered
+   anywhere.**
+2. **Production is built as a private preview.** The live page shows *"Private preview: message
+   delivery is disabled until launch approval"*, the submit button is **disabled**, and the delivery
+   note still says *"…once camtaylor.ca goes public"* — on a domain that is already public.
+
+So the fix is **two Cloudflare Pages production variables, not one**: a live
+`VITE_FORMSPREE_FORM_ID`, and `VITE_PRIVATE_PREVIEW=false`. Even with a working endpoint, the form
+stays disabled until the second one is set. Both are asked for in the handoff, together with the ID.
 
 ## What is still blocked on Kimi
 

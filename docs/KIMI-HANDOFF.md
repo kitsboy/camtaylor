@@ -1,14 +1,17 @@
 ## Session — 2026-09-25 (the contact form's email: asked Kimi, and fixed everything her answer does not block)
 
-**Machine:** M3 (Buffy) · **Project:** camtaylor · **Kimi owns the deployment.**
+**Machine:** M3 (Buffy) · **Project:** camtaylor · Since `41b4bfa` **push = deploy** (Cloudflare
+Pages is Git-connected), so the commits in this section are already published. I have changed
+nothing about the endpoint, the mailboxes or the deploy path.
 
 Cam: *"Ask Kimi to assist you setting up my email from the contact form, to hello@giveabit.io, and
 I don't want spam. Kimi already knows how to configure my email. Ask her what you need, then get it
 back, and fix my email to work."*
 
 **Kimi — the ask is the block *Questions for Kimi — the contact form's email* below.** Everything
-under *Done* is already committed and pushed: it is the half of the fix that does not need your
-answer. **I have changed nothing about the deployment, the endpoint or the mailboxes.**
+under *Done* is the half of the fix that does not need your answer, and it is pushed — so the
+contact section's delivery copy on the live site now names `hello@giveabit.io`. The endpoint is
+untouched and the submit button behaves exactly as it did (`IS_PRIVATE_PREVIEW` still gates it).
 
 ### What is wrong, stated exactly
 
@@ -26,7 +29,26 @@ delivering to some address, or the scaffold's placeholder delivering nowhere, I 
 this machine — and the second possibility means the contact form is a black hole. **It is question
 1 below.**
 
-### Done — `73d0b5c`, pushed
+### Found from here, without an account — the published bundle
+
+I probed the live bundle read-only (Chromium on `https://camtaylor.ca`, collect the `/assets/*.js`
+responses, search them). Two facts, both decisive, and neither one a guess:
+
+1. **The published `index-*.js` contains `xykqodnk` — the placeholder — and no other Formspree
+   endpoint.** Vite folds that fallback string into the bundle only when
+   `VITE_FORMSPREE_FORM_ID` was *undefined* at build time, so **the live form is posting to the
+   placeholder, and nothing sent from camtaylor.ca has ever been delivered anywhere.**
+2. **Production is built as a private preview.** On the live domain the page shows *"Private
+   preview: message delivery is disabled until launch approval."*, the submit button is
+   **`disabled`**, and the delivery note still reads *"…once camtaylor.ca goes public"* — on a
+   domain that is already public. So `VITE_PRIVATE_PREVIEW=false` is not set for the Pages
+   production build either.
+
+Both are **one Cloudflare Pages production variable each**, both read by Vite at build time, and
+both are yours. This is why question 2 below asks for two variables rather than one: even with a
+live Formspree ID, the form stays disabled until the preview flag is turned off in Pages.
+
+### Done — `d06e754`, pushed (docs follow in the same session)
 
 - `src/data/site.ts` exports **`INQUIRY_EMAIL = 'hello@giveabit.io'`** — the monitored inbox — with
 the reason written above it, and `familyEmail` is now *that value* rather than a second copy of the
@@ -50,15 +72,20 @@ warning) · `npm test` **75/75** ✓
 Numbered so you can answer the ones you know and skip the rest. None of this touches the
 deployment; it is only the form.
 
-1. **Is `xykqodnk` a live Formspree form, or the scaffold's placeholder?** If it is live: which
-   address does it deliver to today, and does it work? If it is not: please create the form with
-   **`hello@giveabit.io` as the recipient** and send me the ID (the part after `/f/` in the endpoint
-   URL). I have not touched the endpoint.
-2. **Where does the production ID come from?** `npm run deploy:live` is
-   `VITE_PRIVATE_PREVIEW=false npm run build`, so the ID is read from the shell or a local `.env`,
-   and with neither the build compiles in the `xykqodnk` fallback. Is it a Cloudflare Pages
-   production variable? If so, note that Vite reads it **at build time, on the machine that runs
-   the build** — a Pages variable does not reach it unless it is exported before `build:live`.
+1. **Please create the Formspree form that delivers to `hello@giveabit.io`, and send me its ID**
+   (the part after `/f/` in the endpoint URL). If a live form already exists somewhere, send that ID
+   instead — but the published bundle says nothing on `camtaylor.ca` is posting to it today. I have
+   not touched the endpoint.
+2. **Two Cloudflare Pages production variables are missing, not one:**
+   `VITE_FORMSPREE_FORM_ID=<the live ID>` **and** `VITE_PRIVATE_PREVIEW=false`. The second is the one
+   I would not have guessed without probing the live bundle: the published site is currently built as
+   a private preview, so the contact form's button is disabled in production and its own note
+   promises delivery *"once camtaylor.ca goes public"* on a domain that is already public. Both are
+   read by Vite **during the Pages build**, so they belong in the Pages project's production
+   environment — please confirm they are set there and not only as local shell exports, because a
+   Git-triggered rebuild only sees the Pages settings. (`docs/PRIVATE-LAUNCH-GATE.md` is the
+   checklist the preview flag belongs to; if the site is meant to be public now, that flag is the
+   gate that has not been flipped.)
 3. **Confirm the recipient is `hello@giveabit.io`.** Cam's note says you monitor that inbox, drop
    the spam and forward the genuine inquiries on. Or would you rather the form deliver straight to
    Cam and your filter sit in front of *his* mailbox? Same site code either way, different wiring.
