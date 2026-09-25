@@ -310,9 +310,9 @@ one of them caught my own privacy-page wording before it was trusted.
 
 `79e80db` analytics: one loader, the host gate, the CSP, the docs that claimed otherwise · `5fa1cbe`
 docs: this section · `467ff0c` the live-form probe that could not report success · `476817a` one
-address of record + the subject prefix · `a2362fd` the opt-in live test · `8d4cac0` the docs that
-close the email chain. All pushed, tree clean. (The SHAs differ from the first rebase: Kimi pushed
-five more commits while this was being written, so these were replayed onto them.)
+address of record + the subject prefix · `a2362fd` the opt-in live test — all pushed onto Kimi's five,
+tree clean. This section's own commits are the two after them and are deliberately unnamed: a docs
+commit that names itself goes stale the moment it is amended, which is what happened twice here.
 (`public/build-meta.json` is untracked and Kimi's; it is left alone.)
 
 ---
