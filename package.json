@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "quality": "node scripts/quality-check.mjs",
+    "check:live-form": "node scripts/check-live-form.mjs",
     "cascade": "node scripts/cascade-check.mjs",
     "og": "node --experimental-strip-types scripts/generate-og.mjs",
     "preview": "vite preview",

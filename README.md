@@ -24,6 +24,7 @@ npm run dev            # http://localhost:5173
 | `npm test` | Playwright smoke tests |
 | `npm run lint` | Oxlint |
 | `npm run quality` | Metadata / privacy / asset gate |
+| `npm run check:live-form` | Read the live site's bundle and form state: which Formspree endpoint production actually posts to, and whether the form is switched on. Sends nothing |
 | `npm run deploy` | Build + deploy current state to Cloudflare Pages (`camtaylor`) |
 | `npm run deploy:live` | Same with the private-preview flag off |
 

@@ -31,8 +31,22 @@ this machine — and the second possibility means the contact form is a black ho
 
 ### Found from here, without an account — the published bundle
 
-I probed the live bundle read-only (Chromium on `https://camtaylor.ca`, collect the `/assets/*.js`
-responses, search them). Two facts, both decisive, and neither one a guess:
+**It is now a command you can run: `npm run check:live-form`** (`scripts/check-live-form.mjs`). It
+launches Chromium against `https://camtaylor.ca`, reads the `/assets/*.js` responses and searches
+them for a Formspree endpoint, then reads the form's own rendered state. It sends nothing, submits
+nothing, touches no account, and **exits 1 while the form is broken and 0 when it is fixed** — so it
+is the verification step for questions 1 and 2 below. Not in CI: it needs the live site.
+
+It reports two facts, both decisive, and neither one a guess:
+
+```
+$ npm run check:live-form
+✗ the published bundle contains the placeholder form ID "xykqodnk" — Vite only folds that in when
+  VITE_FORMSPREE_FORM_ID was unset at build time, so nothing submitted on the live site is delivered
+  anywhere
+✗ the live submit button is disabled — production is built with the private preview on, so set
+  VITE_PRIVATE_PREVIEW=false in the Cloudflare Pages production environment
+```
 
 1. **The published `index-*.js` contains `xykqodnk` — the placeholder — and no other Formspree
    endpoint.** Vite folds that fallback string into the bundle only when
@@ -48,7 +62,7 @@ Both are **one Cloudflare Pages production variable each**, both read by Vite at
 both are yours. This is why question 2 below asks for two variables rather than one: even with a
 live Formspree ID, the form stays disabled until the preview flag is turned off in Pages.
 
-### Done — `d06e754`, pushed (docs follow in the same session)
+### Done — `d06e754`, pushed, and **verified on the live site**
 
 - `src/data/site.ts` exports **`INQUIRY_EMAIL = 'hello@giveabit.io'`** — the monitored inbox — with
 the reason written above it, and `familyEmail` is now *that value* rather than a second copy of the
@@ -63,6 +77,16 @@ being it, or if `.env.example` — the file a deployer actually reads — stops 
 Canaried: breaking both at once printed both failures, one per line.
 - `tests/smoke.spec.ts` asserts the rendered delivery note names `hello@giveabit.io` and **not**
 `cam@camtaylor.ca`. Canaried: restoring the old copy fails at line 436.
+- **`scripts/check-live-form.mjs` + `npm run check:live-form`** — the live-bundle probe above, as a
+repeatable instrument rather than a throwaway, because the two things it checks (which endpoint
+production posts to, whether the form is switched on) are exactly what your two Pages variables
+change.
+
+**Live verification (push = deploy, so this is step 4 of the protocol):** after the push, the
+published bundle changed (`index-LgbnQoN7.js` → `index-BzAOAjTz.js`) and the live delivery note now
+reads *"…will be delivered to **hello@giveabit.io** through Formspree…"* — the copy change is in
+production. The placeholder and the disabled button are unchanged, which is what
+`npm run check:live-form` exists to watch.
 
 `npm run quality` ✓ · `npx tsc -b` ✓ · `npx oxlint` 0 errors (1 pre-existing `ThemeContext`
 warning) · `npm test` **75/75** ✓

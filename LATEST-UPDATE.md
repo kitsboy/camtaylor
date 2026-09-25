@@ -62,6 +62,10 @@ So the fix is **two Cloudflare Pages production variables, not one**: a live
 `VITE_FORMSPREE_FORM_ID`, and `VITE_PRIVATE_PREVIEW=false`. Even with a working endpoint, the form
 stays disabled until the second one is set. Both are asked for in the handoff, together with the ID.
 
+It is repeatable: **`npm run check:live-form`** reads the live bundle and the form's rendered state,
+sends nothing, exits 1 while the form is broken and 0 when it is fixed. It is the verification step
+after the two variables are set (and it is not in CI, because it needs the live site).
+
 ## What is still blocked on Kimi
 
 Three questions decide the rest: **(1)** whether `xykqodnk` is live or a placeholder — and the real
@@ -122,3 +126,8 @@ Each one is something measured on this build, not a guess.
 `npm run quality` ✓ (4 assets, 1200×630 share card, metadata, privacy gate, type-scale floor,
 cascade, form inbox) · `npx tsc -b` ✓ · `npx oxlint` 0 errors / 1 pre-existing `ThemeContext`
 warning · **`npm test` 75/75** ✓. Both new guards were canaried against the bug they exist for.
+
+**Live:** push = deploy, and the push was verified — the published bundle changed
+(`index-LgbnQoN7.js` → `index-BzAOAjTz.js`) and the live delivery note now names
+`hello@giveabit.io`. `npm run check:live-form` still fails, correctly, on the endpoint and the
+disabled button.
