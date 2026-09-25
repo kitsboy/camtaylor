@@ -115,7 +115,9 @@
 
   .nav-brand { min-height: var(--touch-min); }
 
-  /* The bottom bar's six items measured 23–40px wide. */
+  /* The route bar holds six items at this floor — ten was 440px of targets
+     inside a 320px viewport, which is how Connect ended up off the screen.
+     `device-qa.spec.ts` measures the bar itself now, not just the buttons. */
   .mobile-quick-nav-btn { min-width: var(--touch-min); }
 
   /* The family spectrum was ten links in a 92px strip, ~21px wide each. Two

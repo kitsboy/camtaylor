@@ -9,7 +9,11 @@
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
   --nav-height: 64px;
-  --mobile-nav-height: 62px;
+  /* The measured height of the route bar: 2px top padding + a 46px button +
+     4px bottom padding. It has to be real, because it is the offset for the
+     back-to-top button, the footer's clearance and every section's
+     scroll-margin. It sat at 62px while the bar was 10 items wide and
+     overflowing — a number nothing had checked against the element. */   --mobile-nav-height: 53px;
   --section-pad-mobile: 48px;
   --touch-min: 44px;
 }
@@ -84,23 +88,6 @@ a,
 }
 
 /* 21–30: Navbar mobile */
-.nav-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 99;
-  background: rgba(10, 9, 8, 0.45);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border: none;
-  cursor: pointer;
-  animation: fade-in 0.2s ease;
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
 .navbar {
   padding-top: calc(8px + var(--safe-top));
   padding-left: max(12px, var(--safe-left));
@@ -108,18 +95,15 @@ a,
 }
 
 @media (min-width: 769px) {
-  .nav-mobile-menu,
-  .nav-backdrop {
+  .nav-mobile-menu {
     display: none !important;
   }
 }
 
-@media (max-width: 768px) {
-  .nav-mobile-menu {
-    display: flex;
-  }
-}
-
+/* The route sheet: a full-height panel, not a dropdown. Twelve stops in three
+   legs is roughly a thousand pixels of content on a screen that is 844 tall,
+   so it takes the viewport and scrolls itself rather than floating over the
+   hero as a list that runs off the bottom. */
 .nav-mobile-menu {
   transform: translateY(-8px);
   opacity: 0;
@@ -129,39 +113,178 @@ a,
   overflow: hidden;
 }
 
-.nav-mobile-menu--open {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
-  max-height: 80vh;
-  overflow-y: auto;
+@media (max-width: 768px) {
+  /* The masthead floats over the open sheet, so it has to out-stack it —
+     otherwise the sheet's background paints over the close button. */
+  .nav-container { z-index: 2; }
+
+  .nav-mobile-menu {
+    display: flex;
+    flex-direction: column;
+    /* The sheet is a child of `.navbar`, so it stacks inside the navbar's own
+       context: below `.nav-container` (raised to z-index 2 above) so the brand
+       and the close button stay clickable, and above everything else because
+       the navbar itself sits at z-index 100 over the route bar at 90. */
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    margin: 0;
+    padding: calc(var(--nav-height) + var(--safe-top) + 10px) 16px
+      calc(var(--mobile-nav-height) + var(--safe-bottom) + 14px);
+    border: 0;
+    border-radius: 0;
+    /* Opaque and themed: the sheet is a page you stand on, not a panel you see
+       through, so it reads the same in light and night without a second
+       rule. */
+    background: var(--bg);
+    box-shadow: none;
+    /* The sheet scrolls; the page behind it must not. */
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-mobile-menu--open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+    max-height: 100%;
+    overflow-y: auto;
+  }
+
 }
 
+.nav-mobile-head {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 2px 12px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.nav-mobile-kicker {
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: var(--fs-caption);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.nav-mobile-note {
+  color: var(--text-muted);
+  font-size: var(--fs-2xs);
+}
+
+.nav-mobile-leg { padding: 14px 0 2px; }
+
+.nav-mobile-leg-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: var(--fs-micro);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.nav-mobile-leg-index {
+  padding: 3px 8px;
+  color: var(--ink);
+  background: var(--acid);
+  border-radius: 999px;
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.1em;
+}
+
+.nav-mobile-leg-note {
+  flex: 1 1 100%;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.nav-mobile-stops {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Every stop is a row a thumb can read and hit: index, camp, and what the
+   camp actually is. 56px tall, well past the 44px floor. The surface is a
+   token, not a translucent white — a white wash reads as a lit card in the
+   light theme and as a pale slab under white text in the night one. */
 .nav-mobile-link {
-  min-height: var(--touch-min);
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
-  position: relative;
+  gap: 11px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 11px;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--glass-border);
+  border-radius: 11px;
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.18s var(--ease-out), border-color 0.18s var(--ease-out);
 }
 
-.nav-mobile-indicator {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: transparent;
-  transition: var(--transition-fast);
+.nav-mobile-link:active { background: rgba(215, 255, 85, 0.26); }
+
+.nav-mobile-index {
+  flex: 0 0 auto;
+  width: 24px;
+  color: var(--text-muted);
+  font-family: var(--font-heading);
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
 }
 
-.nav-mobile-link[aria-current="true"] .nav-mobile-indicator {
-  background: var(--green);
-  box-shadow: 0 0 6px var(--green-light);
+.nav-mobile-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
+.nav-mobile-camp {
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: var(--fs-body);
+  font-weight: 700;
+}
+
+.nav-mobile-meta { color: var(--text-muted); font-size: var(--fs-2xs); }
+
+.nav-mobile-go { flex: 0 0 auto; color: var(--text-muted); }
+
+/* The camp you are standing on is marked with acid, not with a background that
+   has to stay legible under two themes: a rail down the near edge, an acid
+   border, and the label untouched. */
 .nav-mobile-link[aria-current="true"] {
-  font-weight: 600;
-  padding-left: 4px;
+  border-color: var(--acid);
+  box-shadow: inset 3px 0 0 var(--acid);
 }
+
+.nav-mobile-link[aria-current="true"] .nav-mobile-camp { color: var(--text-primary); }
+.nav-mobile-link[aria-current="true"] .nav-mobile-go { color: var(--acid); }
 
 .nav-mobile-footer {
   display: flex;
@@ -517,7 +640,7 @@ a,
   }
 }
 
-/* 76–85: Bottom quick nav & sticky CTA */
+/* 76–85: the route bar — the phone's navigation, and the bottom of the stack */
 .mobile-quick-nav {
   display: none;
 }
@@ -530,68 +653,107 @@ a,
     left: 0;
     right: 0;
     z-index: 90;
+    align-items: stretch;
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid var(--glass-border);
-    padding: 6px 4px calc(6px + var(--safe-bottom));
-    justify-content: space-around;
+    padding: 2px 2px calc(4px + var(--safe-bottom));
     box-shadow: 0 -8px 24px rgba(26, 23, 18, 0.08);
   }
 
+  /* The active items say which camp you are standing on. This says where you
+     are on the whole line, which six labels alone cannot. */
+  .mobile-quick-nav-progress {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--acid), var(--cyan));
+    transform-origin: left center;
+  }
+
+  /* Six items, each at the 44px floor, sharing the leftover width. Ten items at
+     this floor need 440px — more than the whole viewport at 320–430px, which
+     is how Connect ended up off the right edge of the screen. */
   .mobile-quick-nav-btn {
-    flex: 1;
+    position: relative;
+    flex: 1 1 0;
+    min-width: var(--touch-min);
+    min-height: var(--touch-min);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 1px 5px;
     background: none;
     border: none;
-    color: var(--text-muted);
+    border-radius: 12px;
+    /* `--text-secondary`, not `--text-muted`: at 11px the muted token is
+     4.4:1 on the night bar, and these are navigation, not captions. */
+    color: var(--text-secondary);
     font-family: var(--font-heading);
     font-size: var(--fs-2xs);
     font-weight: 600;
-    letter-spacing: 0.02em;
-    padding: 6px 2px;
-    min-height: var(--touch-min);
+    letter-spacing: 0;
     cursor: pointer;
     transition: var(--transition-fast);
-    border-radius: 8px;
-  }
-
-  .mobile-quick-nav-btn.active {
-    color: var(--green);
-    background: rgba(30, 69, 52, 0.06);
   }
 
   .mobile-quick-nav-btn span {
-    max-width: 56px;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .sticky-cta {
-    bottom: calc(var(--mobile-nav-height) + var(--safe-bottom) + 8px);
-    transition: transform 0.3s var(--ease-out), opacity 0.3s ease;
+  /* `--text-primary`, not `--green`. Green is a fixed token, so as an active
+     label colour it measured 7.7:1 on the light bar and 1.6:1 on the night
+     one — the active camp was nearly invisible in the dark theme. */
+  .mobile-quick-nav-btn.active {
+    color: var(--text-primary);
+    background: rgba(30, 69, 52, 0.07);
   }
 
-  .sticky-cta--hidden {
-    transform: translateY(120%);
-    opacity: 0;
-    pointer-events: none;
+  /* The camp you are standing on gets the same lit edge the desktop nav uses
+     for its active link. */
+  .mobile-quick-nav-btn.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 26px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--acid), var(--cyan));
+    transform: translateX(-50%);
   }
 
-  .sticky-cta-btn {
-    width: calc(100% - 32px);
-    max-width: 400px;
-    margin: 0 auto;
-    display: flex;
-    min-height: 50px;
-    border-radius: 14px;
-    font-size: var(--fs-body);
-    box-shadow: 0 8px 28px rgba(30, 69, 52, 0.35);
+  .mobile-quick-nav-btn:active { transform: scale(0.96); }
+
+  /* Connect is the bar's call to action, which is why the floating pill is off
+     on a phone: two CTAs for one action is one too many, and this one does not
+     depend on which way you last scrolled. */
+  .mobile-quick-nav-btn--cta {
+    color: var(--ink);
+    background: var(--acid);
+    font-weight: 700;
+    box-shadow: inset 0 0 0 1px rgba(11, 17, 20, 0.16);
   }
+
+  .mobile-quick-nav-btn--cta.active { color: var(--ink); background: var(--acid); }
+
+  /* Parked, not deleted. The bar's Connect item is now a permanent acid
+     control, so the scroll-direction pill was a second CTA for the same action
+     in the same strip of screen — and the third fixed layer competing for it,
+     with the back-to-top button. Note the pill was only ever a phone element:
+     `index.css` turns it on inside this same media query.
+
+     To bring it back, delete this one line and drop the `--cta` class from
+     `MobileQuickNav`'s last item so the two are not the same door twice. */
+  .sticky-cta { display: none; }
 
   .footer {
     padding-bottom: calc(80px + var(--mobile-nav-height) + var(--safe-bottom));
@@ -608,7 +770,9 @@ a,
     display: flex;
     position: fixed;
     right: calc(16px + var(--safe-right));
-    bottom: calc(var(--mobile-nav-height) + var(--safe-bottom) + 72px);
+    /* Clear of the route bar. It used to be offset for a floating CTA that no
+       longer exists on a phone. */
+    bottom: calc(var(--mobile-nav-height) + var(--safe-bottom) + 12px);
     z-index: 85;
     width: 44px;
     height: 44px;

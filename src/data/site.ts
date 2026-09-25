@@ -59,9 +59,54 @@ export const NAV_ITEMS = [
   { id: 'contact', label: 'Connect', mobileLabel: 'Connect' },
 ] as const;
 
+/**
+ * The six camps a thumb gets without opening anything: identity, the offering,
+ * what is shipping, the receipts, the story, the door.
+ *
+ * Six is arithmetic, not taste. Every item carries a 44px target, and
+ * `floor(320 / 44) = 7` — so seven is the ceiling on the narrowest phone the
+ * site supports and six leaves the slack. This list held ten, which is how the
+ * bar ended up 440px wide inside a 320px viewport, with Connect pushed off the
+ * screen entirely. Ten was never a "quick" nav in the first place.
+ * `tests/device-qa.spec.ts` now measures the bar itself, not just its buttons.
+ */
 export const MOBILE_QUICK_NAV = NAV_ITEMS.filter((item) =>
-  ['about', 'agents', 'family', 'proof', 'expeditions', 'manifesto', 'services', 'testimonials', 'ventures', 'contact'].includes(item.id),
+  ['about', 'services', 'ventures', 'proof', 'expeditions', 'contact'].includes(item.id),
 );
+
+export interface RouteLeg {
+  id: string;
+  name: string;
+  note: string;
+  ids: readonly string[];
+}
+
+/**
+ * The same twelve waypoints the route sheet and the desktop rail use, grouped
+ * into three legs so the phone menu reads as one ascent instead of a flat list
+ * of twelve labels. The camps and altitudes come from `waypoints.ts`; nothing
+ * here is invented twice.
+ */
+export const ROUTE_LEGS: RouteLeg[] = [
+  {
+    id: 'lower',
+    name: 'Lower route',
+    note: 'Who is holding the rope',
+    ids: ['about', 'agents', 'family'],
+  },
+  {
+    id: 'upper',
+    name: 'Upper route',
+    note: 'What is actually true',
+    ids: ['proof', 'signal', 'expeditions', 'manifesto'],
+  },
+  {
+    id: 'summit',
+    name: 'Summit push',
+    note: 'What is on offer',
+    ids: ['services', 'testimonials', 'ventures', 'kit', 'contact'],
+  },
+];
 
 export const IS_PRIVATE_PREVIEW = import.meta.env.VITE_PRIVATE_PREVIEW !== 'false';
 

@@ -223,3 +223,203 @@ test('dispatch timeline stays legible at 390px', async ({ page }) => {
   await expect(log).toBeVisible();
   await expect(log.locator('.log-entry').first()).toBeVisible();
 });
+
+const BAR_WIDTHS = [320, 360, 390, 430];
+
+/**
+ * The bar is `display: none` above 768px, so the pixel audit in
+ * `contrast.spec.ts` never sees it — and that blind spot was hiding a real
+ * fault: the active label was drawn in `--green`, a fixed token that does not
+ * flip with the theme, which is 7.7:1 on the light bar and **1.6:1** on the
+ * night one. The camp you are standing on was nearly invisible in the dark.
+ *
+ * This composes the tokens the way the browser does rather than rastering a
+ * 23,000px page at a phone width, so it is cheap enough to run per theme.
+ */
+test('the route bar stays legible in both themes', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('.mobile-quick-nav')).toBeVisible();
+  await page.waitForTimeout(600);
+
+  for (const theme of ['warm', 'night'] as const) {
+    // Set the theme, then let it settle before reading anything. A theme flip
+    // does not land in one frame: the tokens resolve immediately, the bar's
+    // own background repaints on the next one, and the button's colour
+    // transitions. Measure inside that window and the guard reads a
+    // half-switched bar — warm ink on the warm background, which passes, which
+    // is exactly how this check can be green while the night theme is broken.
+    await page.evaluate((activeTheme: string) => {
+      document.documentElement.dataset.theme = activeTheme;
+    }, theme);
+    await page.waitForTimeout(450);
+
+    const measured = await page.evaluate(() => {
+      interface Rgb { r: number; g: number; b: number; a: number }
+      const parse = (colour: string): Rgb => {
+        const hex = colour.trim().match(/^#([0-9a-f]{6})$/i);
+        if (hex) {
+          const n = parseInt(hex[1], 16);
+          return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255, a: 1 };
+        }
+        const n = (colour.match(/[\d.]+/g) ?? ['0', '0', '0']).map(Number);
+        return { r: n[0], g: n[1], b: n[2], a: n.length > 3 ? n[3] : 1 };
+      };
+      const channel = (v: number) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      };
+      const luminance = (c: Rgb) => 0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b);
+      const over = (fg: Rgb, bg: Rgb): Rgb => ({
+        r: fg.r * fg.a + bg.r * (1 - fg.a),
+        g: fg.g * fg.a + bg.g * (1 - fg.a),
+        b: fg.b * fg.a + bg.b * (1 - fg.a),
+        a: 1,
+      });
+      const ratio = (a: Rgb, b: Rgb) => {
+        const l1 = luminance(a);
+        const l2 = luminance(b);
+        return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+      };
+      // Walk up until something is opaque — the bar itself is translucent
+      // glass. Nothing in the chain is opaque here (body and html compute to
+      // transparent, the page is painted by `--bg`), so the walk bottoms out
+      // on the page backdrop.
+      const pageBackground = parse(
+        getComputedStyle(document.documentElement).getPropertyValue('--bg'),
+      );
+      const backdrop = (el: Element): Rgb => {
+        let acc: Rgb | null = null;
+        let node: Element | null = el;
+        while (node && node !== document.documentElement) {
+          const colour = parse(getComputedStyle(node).backgroundColor);
+          if (colour.a > 0) acc = acc ? over(acc, colour) : colour;
+          if (acc && acc.a === 1) return acc;
+          node = node.parentElement;
+        }
+        return acc ? over(acc, pageBackground) : pageBackground;
+      };
+
+      const rows = [...document.querySelectorAll<HTMLElement>('.mobile-quick-nav-btn span')].map(
+        (label) => {
+          const bg = backdrop(label);
+          const fg = over(parse(getComputedStyle(label).color), bg);
+          return {
+            label: label.textContent ?? '',
+            active: Boolean(label.closest('.active')),
+            ink: getComputedStyle(label).color,
+            behind: `rgb(${Math.round(bg.r)}, ${Math.round(bg.g)}, ${Math.round(bg.b)})`,
+            ratio: Math.round(ratio(fg, bg) * 100) / 100,
+          };
+        },
+      );
+
+      return { theme: document.documentElement.dataset.theme, rows };
+    });
+
+    const offenders = measured.rows.filter((row) => row.ratio < 4.5);
+    expect(measured.theme, 'the theme did not stick').toBe(theme);
+    expect(offenders, `${theme} theme, under 4.5:1:\n${JSON.stringify(measured.rows, null, 1)}`).toEqual(
+      [],
+    );
+    expect(measured.rows).toHaveLength(6);
+  }
+});
+
+/**
+ * A fixed bar is invisible to every guard this suite already had.
+ *
+ * It contributes nothing to `document.scrollingElement.scrollWidth` (the
+ * overflow test above still reads exactly the viewport width), and a 44px sweep
+ * passes while the row overflows, because each *button* is 44px — it is the row
+ * that is wrong. The bar held ten items, which is 440px of targets: at 390px
+ * the last two, Ventures and Connect, sat entirely off the right edge of the
+ * screen with all of it green. Connect is the bar's call to action, so the one
+ * control that mattered was the one you could not press.
+ *
+ * So measure the bar itself, its right edge, and its labels.
+ */
+for (const width of BAR_WIDTHS) {
+  test(`the route bar fits inside a ${width}px phone`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/');
+    await expect(page.locator('.mobile-quick-nav')).toBeVisible();
+    await page.waitForTimeout(600);
+
+    const bar = await page.evaluate(() => {
+      const nav = document.querySelector('.mobile-quick-nav') as HTMLElement;
+      const items = [...nav.querySelectorAll<HTMLElement>('.mobile-quick-nav-btn')].map((btn) => {
+        const box = btn.getBoundingClientRect();
+        const label = btn.querySelector('span') as HTMLElement;
+        return {
+          name: btn.getAttribute('aria-label') ?? '',
+          width: Math.round(box.width),
+          overshoot: Math.round(box.right - window.innerWidth),
+          clipped: label.scrollWidth > label.clientWidth + 1,
+        };
+      });
+      return { rowOverflow: nav.scrollWidth - nav.clientWidth, items };
+    });
+
+    expect(bar.rowOverflow, `the bar overflows itself: ${JSON.stringify(bar.items)}`).toBeLessThanOrEqual(0);
+
+    const offscreen = bar.items.filter((item) => item.overshoot > 0);
+    expect(offscreen, `past the right edge: ${JSON.stringify(offscreen)}`).toEqual([]);
+
+    const clipped = bar.items.filter((item) => item.clipped);
+    expect(clipped, `label truncated: ${JSON.stringify(clipped)}`).toEqual([]);
+
+    expect(bar.items).toHaveLength(6);
+    expect(bar.items[bar.items.length - 1].name).toBe('Connect');
+  });
+}
+
+/**
+ * The route sheet menu is the only surface carrying all twelve camps, so it has
+ * to be reachable, scrollable and closable. Two ways it was not:
+ *
+ *  - the sheet is a child of `.navbar`, so its z-index stacks inside the
+ *    navbar's own context and it painted over the masthead, burying the button
+ *    that closes it;
+ *  - the body scroll lock set `touch-action: none` on `<body>`, which the
+ *    browser intersects with the ancestors of whatever you touch, so a sheet
+ *    taller than the screen could not be swiped at all.
+ */
+test('the route sheet menu carries all twelve camps in three legs', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+
+  await page.getByRole('button', { name: 'Open menu' }).click();
+  const menu = page.locator('#mobile-nav-menu');
+  await expect(menu).toHaveClass(/nav-mobile-menu--open/);
+
+  const stops = menu.locator('.nav-mobile-link');
+  await expect(stops).toHaveCount(12);
+  await expect(menu.locator('.nav-mobile-leg')).toHaveCount(3);
+  await expect(stops.first()).toContainText('Base Camp');
+  await expect(stops.last()).toContainText('Summit');
+
+  const sheet = await menu.evaluate((el) => ({
+    scrollable: el.scrollHeight > el.clientHeight,
+    bodyTouchAction: getComputedStyle(document.body).touchAction,
+  }));
+  expect(sheet.scrollable, 'twelve stops have to fit somewhere').toBe(true);
+  expect(sheet.bodyTouchAction, 'a locked body must not lock the overlay too').not.toBe('none');
+
+  // The sheet scrolls under the masthead, so the masthead must out-stack it.
+  const mastheadOnTop = await page.evaluate(() => {
+    const pill = (document.querySelector('.nav-container') as HTMLElement).getBoundingClientRect();
+    const hit = document.elementFromPoint(window.innerWidth / 2, pill.top + pill.height / 2);
+    return Boolean(hit && hit.closest('.nav-container'));
+  });
+  expect(mastheadOnTop, 'the sheet is painting over the masthead').toBe(true);
+
+  await menu.getByRole('button', { name: 'Ventures' }).click();
+  await expect(page.locator('#ventures')).toBeInViewport({ timeout: 20000 });
+  await expect(menu).not.toHaveClass(/nav-mobile-menu--open/);
+
+  await page.getByRole('button', { name: 'Open menu' }).click();
+  await expect(menu).toHaveClass(/nav-mobile-menu--open/);
+  await page.locator('.nav-menu-btn').click();
+  await expect(menu).not.toHaveClass(/nav-mobile-menu--open/);
+});
