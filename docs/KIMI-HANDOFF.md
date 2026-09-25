@@ -3,21 +3,34 @@
 **Machine:** THOR (Kimi) · **Project:** camtaylor · **Kimi owns the deployment** — and I have now lived
 in the deployment and verified your work in production, not trusted the relay.
 
-### ✅ UPDATE 2026-09-25 (after Cam granted a scoped CF token): the two production env vars are SET
+### ✅ RESOLVED 2026-09-25 — the contact form is LIVE and verified
 
-Cam created a scoped Cloudflare API token (`Pages:Edit`, account `5135f538…`). I set both production
-env vars on the `camtaylor` Pages project via the API and confirmed them:
+Cam granted a scoped Cloudflare API token (`Pages:Edit`). I set the two production env vars, found and
+fixed the real reason the build ignored them, and **verified the live form end to end**:
 
 ```
-VITE_PRIVATE_PREVIEW=false
-VITE_FORMSPREE_FORM_ID=xpqgopvd   (the family's live Formspree form → hello@giveabit.io)
+✓ the published bundle posts to Formspree endpoint xpqgopvd
+  submit button enabled · preview notice absent
+  delivery note: Submissions are delivered to hello@giveabit.io, the monitored inquiry inbox, through Formspree.
+✓ the live contact form posts to a real endpoint and is switched on   (exit 0)
 ```
 
-`xpqgopvd` is the live Formspree form the whole family already uses (stranded, giveabit) — it delivers
-to `hello@giveabit.io`, which is on Kimi's monitored allowlist. Per Cam's unique-per-site-labels rule,
-the `[camtaylor.ca]` subject prefix keeps camtaylor submissions distinct. This commit triggers the
-production rebuild; the verification step is `npm run check:live-form` — it must exit 0 (button
-enabled, real endpoint, no placeholder) once the new build is live.
+**The two env vars** (`VITE_PRIVATE_PREVIEW=false`, `VITE_FORMSPREE_FORM_ID=xpqgopvd`) are set in the
+CF Pages production environment **and** in `wrangler.toml [vars]`. The build reads them from
+`wrangler.toml` — that was the missing piece. Setting them only in the Pages project config
+(`deployment_configs.production.env_vars`) did **not** reach the build: the build log said
+"Build environment variables: (none found)" and the bundle stayed on the placeholder. motopass works
+because its `VITE_SITE_URL` lives in `wrangler.toml [vars]`. **Lesson: for this repo, build-time env
+vars belong in `wrangler.toml [vars]`, not (only) the Pages project config.**
+
+`xpqgopvd` is the family's live Formspree form (stranded, giveabit) → `hello@giveabit.io`, on Kimi's
+monitored allowlist. Per Cam's unique-per-site-labels rule, the `[camtaylor.ca]` subject prefix keeps
+camtaylor submissions distinct.
+
+**One check bug fixed (mine, not yours):** `check:live-form` looked for the literal
+`formspree.io/f/<id>` string in the bundle, but `@formspree/react` builds the URL at runtime, so that
+string never appears. It now detects the form ID (a backtick-quoted, non-dictionary 7-8 char string)
+and reports `xpqgopvd` correctly. Commit `53bfbbc`.
 
 ### What I verified live (my own probe, not your relay)
 
