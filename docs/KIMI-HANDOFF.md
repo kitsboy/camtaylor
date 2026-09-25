@@ -1,3 +1,150 @@
+## Session — 2026-09-25 (the four follow-ups: the layout stops lying, the instrument stops lying, one door at a time, and a shorter phone page)
+
+**Machine:** M3 (Buffy) · **Project:** camtaylor
+
+Cam: *"Let's do the suggested follow ups, all of them please, in batches, commit and push every time."*
+Four batches, four commits, each pushed on its own. Two of the four turned out to be **the same kind of
+finding**: a check that reported green while the thing it guards was wrong.
+
+### Batch 1 — `9f17368` the crutch under the layout, removed
+
+`body { overflow-x: hidden }` is gone. It was there because the page overflowed, and it worked by
+suppressing the scrollbar rather than the overflow — so **anything that overflowed next would be
+invisible too**, and the overflow guard only ran at 320 and 390px.
+
+What it was actually hiding, now pinned down: **one decorative tint in the hero, bleeding 105–124px
+past the right edge at 900–1280px.** Nothing else. My earlier note said "74–164px of overflow" and
+implied it was spread across the page; the honest version is that the *width* was that one tint and
+the page content never exceeded the viewport at all. It is bounded at its source now
+(`.glow-field` in `Hero.tsx` / `index.css`) rather than clipped at the body.
+
+One consequence worth knowing, verified in the browser: with `overflow-x: hidden` on `<body>`, the
+computed `overflow-y` on body becomes **`auto`** — the rule was also silently making `<body>` a
+second scroll container. Removing it leaves `<body>` as plain `visible`, with `document.scrollingElement`
+still `<html>` either way.
+
+**The guard now runs at `1440, 1280, 1024, 900, 768, 430, 390, 320`.** Two exclusions, both
+deliberate and both documented in the test: anything inside an `overflow: hidden` ancestor (clipped on
+purpose — the hero contour art, the ticker marquee), and `position: fixed` (which cannot extend the
+document; the route bar has its own guard that measures the bar itself). A **left** bleed is allowed:
+the about photo's offset and the contact honeypot both sit outside the left edge and cannot make a
+page scroll sideways. Measured `over=0` at every width from 320→1920, and on the field guide, the 2026
+page, a venture route and the 404.
+
+### Batch 2 — `0cfdb74` the contrast instrument, two ways it could lie
+
+`tests/contrast.spec.ts` is a pixel-sampling WCAG AA guard, and it had two faults, one loud and one
+silent.
+
+**1. It could sample the ink as the backdrop.** The backdrop for a text run was the most common pixel
+*inside the element's own box*, read from a raster with the text still painted. That is only sound
+while the background dominates the box. With a tight line-height the box is almost entirely glyph, so
+the probe compared the ink with itself and reported **1:1** for text that was really 4.5:1 — which is
+how `span.waypoint-camp` produced a false failure in the type-system session. In reverse, a blend
+nobody ever sees is a **silent pass** over a label that is genuinely failing. The text is now blanked
+in the raster before it is taken, so the pixels inside the box *are* the background; the sampler
+buckets a 24×8 grid across the box and takes the modal colour.
+
+**2. It could measure a frame mid-flip.** A theme change is not one frame: tokens resolve, the
+background repaints, the text colour transitions. The audit now settles before it reads. This is the
+same class of fault as the mobile bar guard last session, where a half-switched bar read as
+warm-ink-on-warm-background and passed.
+
+Runtime for the contrast file went **46s → 17.7s**. Both fixes are falsified by the instrument's own
+regression test, at the bottom of the file: a 40px glyph clipped to a 26px box, `#767676` on white,
+asserting the **number** (4.54:1, ±0.15) and that the backdrop reads `rgb(255, 255, 255)`. With the
+blanking removed it fails on ink-against-ink. Worth recording: my first version of that fixture
+**passed**, which proved nothing — it was not ink-dominated. A fixture that cannot fail is the same
+problem as a guard that cannot fail.
+
+### Batch 3 — `308572a` the pill, restored without a second front door
+
+The "Start a conversation" pill is back on phones (it was only ever a phone element, so parking it in
+the previous session removed a conversion surface). With Connect now permanent in the route bar, the
+two were the same door in the same strip, so **exactly one is lit at a time**: `StickyCta` publishes
+which lane is showing on `<html data-cta="pill|bar">`, and the bar's Connect only carries the acid
+treatment while the pill is away. Scrolling down hands the call to the bar; scrolling up hands it back
+to the pill. The 44px floor and reduced-motion rules still hold for both.
+
+### Batch 4 — `2b8ec90` the phone page, shorter rather than just navigable
+
+The route sheet made the page *navigable*, not shorter: it was still **23,166px ≈ 27 screens**, and the
+length was spread across four sections rather than sitting in one place, so no single rewrite
+shortened it.
+
+| 390px | before | after |
+|---|---|---|
+| page height | 23,166px | **19,973px** |
+| screens of scrolling | 27.4 | **23.7** |
+| fully unfolded | — | 23,472px (depth is still there, one tap away) |
+
+A phone now shows the first three items of the long lists — **family routes, agents, the proof links
+and the dispatch timeline** — and holds the rest behind one counted control: *"7 more routes · tap to
+unfold"*. `<details>` does the disclosure, so keyboard and screen readers get it for free, and the
+folded content **stays mounted**, so the list is in the DOM whether or not it is open. Desktop renders
+nothing at all — no wrapper, no `<details>` — and the page is **15,067px, the route-sheet number
+exactly**. (`SectionFold` returns its children straight through when the media query does not match;
+splitting a two-column desktop list at an odd number would leave one card alone in its row.)
+
+**The guard found a bug in the thing it was guarding, on its first run.** `SERVICES` has four areas
+against `shown={3}`, so it was folding exactly one — a tap and a whole control to save one card —
+under a label reading *"1 more areas"*. A fold now needs **two or more** items to exist at all.
+
+Two traps recorded for whoever touches this next:
+
+- **JSX eats the space.** `<span>{count}</span>` on one line and `more {noun} · …` on the next renders
+  as **"7more routes"** — a newline between a tag and the text after it is dropped, not collapsed to a
+  space. `{' '}` makes it explicit; the test's label assertion now catches it.
+- **Reading a reveal mid-animation invents a fault.** The first measurement of the unfolded content
+  found **13 items below full opacity**, worst 0.37, which looks exactly like the stranded cards from
+  `f0fed9d`. After a 3s settle the minimum opacity across every fold is **1** — they were 400ms
+  animations in flight. The test walks the page, then waits, and only then reads.
+
+**A note on the fold's classnames, because it changes what a selector means.** To keep the folded
+items in the layout the section already gave them, the folded body reuses the section's own grid class
+and spans the grid (`grid-column: 1 / -1`). So on a phone `.family-grid`, `.agents-grid`, `.proof-grid`
+and `.log-timeline` each match **twice** — the visible head and the folded body. The real timeline is
+`ol.log-timeline`; the folded body is a `<div>`. `device-qa.spec.ts:266` was scoped to the `ol` for
+this reason. Nothing else in `src/` or `tests/` queries those classes, and the nesting is visually
+seamless (both grids are 2-column at ≤700px, and the folded body is full width inside the span).
+
+### Verification
+
+- `npm run quality` ✓ (4 assets, metadata, privacy gate, type-scale floor)
+- `npx tsc -b` ✓ · `npx eslint .` 0 errors (1 pre-existing `ThemeContext.tsx` fast-refresh warning)
+- **`npx playwright test` — 69/69** (was 66; the three new guards are the phone fold, the desktop
+  no-op, and the fold's label/stranding invariants)
+- Every new guard was canaried before it was trusted: re-inserting the hero tint fails the overflow
+  test; allowing a one-item fold fails with *"1 more area … hides fewer than two items"*; letting the
+  fold render on desktop fails with *"a desktop grew a disclosure"*; removing the raster blanking
+  fails the contrast fixture on ink-against-ink.
+- One correction to my own earlier note: I first measured a **+54px desktop growth** from this work.
+  It is not real — the current build reads **15,067px**, identical to the route-sheet baseline. The
+  "before" table in that comparison was captured with the webfont still settling, which moves section
+  heights by exactly this amount. Proved by injecting `body { overflow-x: hidden }` at runtime: the
+  heights do not change either way.
+
+### Git state
+
+`9f17368` · `0cfdb74` · `308572a` · `2b8ec90` — all four pushed to `origin/main`, `origin/main..HEAD`
+empty, tree clean. (`public/feed.xml` and `public/sitemap.xml` are rewritten by `prebuild` on every
+build and reverted before each commit; they are the only files you should expect to see dirty.)
+
+### Decisions Cam may want to reverse
+
+- The pill/bar lane switch. One line to make both visible at once if the double door is preferred.
+- The fold shows three items before the control. That number is the whole trade: higher means a longer
+  page, lower means a control per section.
+- The fold is phone-only (`(max-width: 768px)`), on the reasoning that 15,067px is fine on a desktop.
+  If the desktop should fold too, it is that one number in `SectionFold`, but the odd-number-split
+  problem becomes real.
+
+### Next
+
+Three proposals are in `LATEST-UPDATE.md` under **Next three UI upgrades**. The short version: the
+phone page is still 23.7 screens, the no-mouse pass on the live build is still unrun, and the fold
+numbers want a look on real hardware.
+
 ## Session — 2026-09-25 (mobile navigation: one bar, one sheet, and a bar that fits)
 
 **Machine:** M3 (Buffy) · **Project:** camtaylor
