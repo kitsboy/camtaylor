@@ -16,6 +16,7 @@ export function VentureRoutePage() {
       ? `${venture.name}: ${venture.role}. ${venture.desc}`
       : 'Venture route not found on camtaylor.ca.',
     path: venture ? `/route/${venture.id}` : '/route',
+    image: venture ? `/og/${venture.id}.jpg` : undefined,
     // A case file is a page about a thing, and a crawler should be able to see where it
     // sits in the site rather than arriving on it as if it were the front door.
     schema: venture

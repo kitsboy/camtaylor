@@ -21,7 +21,8 @@
  * `scripts/quality-check.mjs` gates the result — the file has to exist, be
  * exactly 1200x630, and be declared in `index.html` with matching dimensions.
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { chromium } from '@playwright/test';
 
 const OUT = 'public/og-image.png';
@@ -172,79 +173,248 @@ h1 span { color: ${ACID}; }
 </body></html>`;
 }
 
-const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: WIDTH, height: HEIGHT }, deviceScaleFactor: 1 });
-await page.setContent(card(await waypoints()), { waitUntil: 'load' });
-await page.evaluate(() => document.fonts.ready);
-await page.waitForTimeout(120);
-
-const png = await page.screenshot({ clip: { x: 0, y: 0, width: WIDTH, height: HEIGHT }, type: 'png' });
+/**
+ * Read a rendered card back. A share card is checked by machines and read by eye, and eye is
+ * not available in CI, so this states the things eye would have noticed: that the ground is
+ * dark, that the accent is on it, that the largest type is actually large, and that ink
+ * reaches all four quadrants rather than leaving one of them empty the way the old card did.
+ *
+ * Defined as a named function so it can be handed to `page.evaluate` once per card.
+ */
+function surveyCard(dataUrl) {
+  const image = new Image();
+  return new Promise((resolve) => {
+    image.onload = () => {
+      // Fine enough that a 21px word registers. The first version sampled 24px wide and
+      // averaged every thin stroke into the ground, reporting empty quadrants on a card
+      // with ink in all four; 150 still blended the small right-aligned date on the inner
+      // cards, so the grid is fine enough that a stroke is a stroke.
+      const grid = 300;
+      const canvas = document.createElement('canvas');
+      canvas.width = grid;
+      canvas.height = Math.round((grid * image.height) / image.width);
+      const context = canvas.getContext('2d');
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      const { data } = context.getImageData(0, 0, canvas.width, canvas.height);
+      let dark = 0;
+      let acid = 0;
+      const quadrants = [0, 0, 0, 0];
+      for (let y = 0; y < canvas.height; y++) {
+        for (let x = 0; x < canvas.width; x++) {
+          const i = (y * canvas.width + x) * 4;
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+          if (luminance < 0.25) dark += 1;
+          if (g > 190 && r > 130 && b < 130) acid += 1;
+          const saturated = Math.max(r, g, b) - Math.min(r, g, b) > 60;
+          if (luminance > 0.4 || (saturated && luminance > 0.22)) {
+            quadrants[(y < canvas.height / 2 ? 0 : 2) + (x < canvas.width / 2 ? 0 : 1)] += 1;
+          }
+        }
+      }
+      const total = canvas.width * canvas.height;
+      resolve({
+        dark: dark / total,
+        acid: acid / total,
+        quadrants: quadrants.map((count) => count / total),
+        largest: Math.max(
+          ...[...document.querySelectorAll('h1, p, div')].map((el) => parseFloat(getComputedStyle(el).fontSize)),
+        ),
+      });
+    };
+    image.src = dataUrl;
+  });
+}
 
 /**
- * Read the card back. A share card is checked by machines and read by eye, and
- * eye is not available in CI, so this states the things eye would have noticed:
- * that the ground is dark, that the accent is on it, that the largest type is
- * actually large, and that ink reaches all four quadrants rather than leaving
- * one of them empty the way the old card did.
+ * A card for one page below the homepage: same ground, same rule, same type system, but the
+ * headline is the page's own and the twelve-bar ascent is left off — a dispatch is not an
+ * ascent, and the chart is what the homepage card says about the site as a whole.
+ *
+ * The title is sized by length rather than fixed, because a card is judged at about 40% of
+ * its width and a 100-character dispatch title at 152px would be a smear of four words.
  */
-const survey = await page.evaluate(async (dataUrl) => {
-  const image = new Image();
-  await new Promise((resolve) => { image.onload = resolve; image.src = dataUrl; });
-  // Fine enough that a 27px word registers: the first version sampled 24px wide,
-  // averaged every thin stroke into the ground, and reported empty quadrants on a
-  // card that has ink in all four.
-  const grid = 150;
-  const canvas = document.createElement('canvas');
-  canvas.width = grid;
-  canvas.height = Math.round((grid * image.height) / image.width);
-  const context = canvas.getContext('2d');
-  context.drawImage(image, 0, 0, canvas.width, canvas.height);
-  const { data } = context.getImageData(0, 0, canvas.width, canvas.height);
-  let dark = 0;
-  let acid = 0;
-  const quadrants = [0, 0, 0, 0];
-  for (let y = 0; y < canvas.height; y++) {
-    for (let x = 0; x < canvas.width; x++) {
-      const i = (y * canvas.width + x) * 4;
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
-      const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-      if (luminance < 0.25) dark += 1;
-      if (g > 190 && r > 130 && b < 130) acid += 1;
-      const saturated = Math.max(r, g, b) - Math.min(r, g, b) > 60;
-      if (luminance > 0.4 || (saturated && luminance > 0.22)) {
-        quadrants[(y < canvas.height / 2 ? 0 : 2) + (x < canvas.width / 2 ? 0 : 1)] += 1;
+function innerCard({ eyebrow, title, tagline, foot }) {
+  const size = title.length >= 80 ? 60 : title.length >= 52 ? 76 : title.length >= 30 ? 96 : 118;
+  return `<!doctype html>
+<html><head><meta charset="utf-8" /><style>
+${fontFaces()}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: ${WIDTH}px; height: ${HEIGHT}px; overflow: hidden; }
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 66px 76px 50px;
+  color: ${PAPER};
+  font-family: OGJakarta, sans-serif;
+  background:
+    radial-gradient(circle at 4% 0%, rgba(7, 205, 196, .26), transparent 46%),
+    radial-gradient(circle at 100% -10%, rgba(106, 43, 255, .34), transparent 50%),
+    radial-gradient(circle at 92% 122%, rgba(255, 61, 15, .14), transparent 48%),
+    linear-gradient(160deg, ${INK_MID}, ${INK} 64%);
+}
+body::before { content: ''; position: absolute; inset: 0 0 auto; height: 8px; background: linear-gradient(90deg, ${ACID}, ${CYAN} 38%, ${VIOLET} 70%, ${CORAL}); }
+body::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, .05) 1px, transparent 1px), linear-gradient(to right, rgba(255, 255, 255, .04) 1px, transparent 1px);
+  background-size: 100% 25%, 8.333% 100%;
+}
+/* min-height 0 and the clip matter: without them a long summary grows the flex child and
+   pushes the footer bar off the 630px frame — two cards rendered with no domain on them. */
+.copy { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 34px; flex: 1 1 auto; justify-content: center; min-height: 0; overflow: hidden; }
+.eyebrow { display: flex; align-items: center; gap: 16px; font-weight: 800; font-size: 23px; letter-spacing: .32em; text-transform: uppercase; color: #b9dfd5; }
+.eyebrow i { width: 12px; height: 12px; border-radius: 50%; background: ${ACID}; box-shadow: 0 0 22px ${ACID}; }
+.eyebrow em { font-style: normal; height: 1px; flex: 0 1 84px; background: linear-gradient(90deg, rgba(247, 251, 245, .55), rgba(247, 251, 245, 0)); }
+h1 { font-family: OGOutfit, sans-serif; font-weight: 900; font-size: ${size}px; line-height: .96; letter-spacing: -.035em; max-width: 1000px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+h1 span { color: ${ACID}; }
+.tagline { padding-left: 26px; border-left: 5px solid ${ACID}; max-width: 900px; font-weight: 600; font-size: 33px; line-height: 1.34; color: #cddedb; text-wrap: pretty; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.bottom { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 32px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, .18); }
+.domain { align-self: center; padding: 9px 20px; border-radius: 999px; background: ${ACID}; color: ${INK}; font-family: OGOutfit, sans-serif; font-weight: 800; font-size: 26px; letter-spacing: .03em; }
+.foot { font-weight: 700; font-size: 21px; letter-spacing: .14em; text-transform: uppercase; color: rgba(247, 251, 245, .66); text-align: right; }
+</style></head>
+<body>
+  <div class="copy">
+    <div class="eyebrow"><i></i>${eyebrow}<em></em></div>
+    <h1>${title}<span>.</span></h1>
+    <p class="tagline">${tagline}</p>
+  </div>
+  <div class="bottom">
+    <div class="domain">camtaylor.ca</div>
+    <div class="foot">${foot}</div>
+  </div>
+</body></html>`;
+}
+
+/** Dispatch frontmatter, parsed with the same plain rules `src/utils/dispatches.ts` uses. */
+function dispatches() {
+  const dir = 'src/content/dispatches';
+  return readdirSync(dir)
+    .filter((file) => file.endsWith('.md'))
+    .map((file) => {
+      const raw = readFileSync(join(dir, file), 'utf8');
+      const match = /^---\r?\n([\s\S]*?)\r?\n---/.exec(raw.trim());
+      if (!match) return null;
+      const fields = {};
+      for (const line of match[1].split(/\r?\n/)) {
+        const at = line.indexOf(':');
+        if (at > -1) fields[line.slice(0, at).trim().toLowerCase()] = line.slice(at + 1).trim().replace(/^["']|["']$/g, '');
       }
-    }
+      if (!fields.title || !fields.date) return null;
+      if (/^true$/i.test(fields.draft ?? '')) return null;
+      return {
+        slug: fields.slug || file.replace(/\.md$/, '').replace(/^\d{4}-\d{2}-\d{2}-/, ''),
+        title: fields.title,
+        date: fields.date,
+        terrain: fields.terrain || 'Field notes',
+        summary: fields.summary || '',
+      };
+    })
+    .filter(Boolean);
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+async function ventures() {
+  const module = await import('../src/data/ventures.ts');
+  return module.VENTURES;
+}
+
+async function subjects() {
+  const list = [{ out: OUT, html: card(await waypoints()), home: true }];
+  for (const dispatch of dispatches()) {
+    list.push({
+      out: `public/og/${dispatch.slug}.jpg`,
+      home: false,
+      html: innerCard({
+        eyebrow: `Expedition log · ${dispatch.terrain}`,
+        title: escapeHtml(dispatch.title),
+        tagline: escapeHtml(dispatch.summary),
+        foot: escapeHtml(dispatch.date),
+      }),
+    });
   }
-  const total = canvas.width * canvas.height;
-  return {
-    dark: dark / total,
-    acid: acid / total,
-    quadrants: quadrants.map((count) => count / total),
-    largest: Math.max(...[...document.querySelectorAll('h1, p, div')].map((el) => parseFloat(getComputedStyle(el).fontSize))),
-  };
-}, `data:image/png;base64,${png.toString('base64')}`);
+  for (const venture of await ventures()) {
+    list.push({
+      out: `public/og/${venture.id}.jpg`,
+      home: false,
+      html: innerCard({
+        eyebrow: 'Venture route',
+        title: escapeHtml(venture.name),
+        tagline: escapeHtml(`${venture.role}. ${venture.desc}`),
+        foot: 'Deal architecture · Capital syndication',
+      }),
+    });
+  }
+  return list;
+}
 
-await browser.close();
-writeFileSync(OUT, png);
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: WIDTH, height: HEIGHT }, deviceScaleFactor: 1 });
+mkdirSync('public/og', { recursive: true });
 
+let png = null;
+let survey = null;
 const complaints = [];
-if (survey.dark < 0.6) complaints.push(`the ground is only ${(survey.dark * 100).toFixed(0)}% dark`);
-if (survey.acid < 0.002) complaints.push('the acid accent is missing');
-if (survey.largest < 140) complaints.push(`the largest type is ${survey.largest}px, not the 152px focal point`);
-survey.quadrants.forEach((share, index) => {
-  const where = ['top left', 'top right', 'bottom left', 'bottom right'][index];
-  if (share < 0.008) complaints.push(`nothing left a mark in the ${where} quadrant`);
-});
 
-console.log(`${OUT}: ${WIDTH}x${HEIGHT}, ${(png.length / 1024).toFixed(1)} kB`);
+for (const subject of await subjects()) {
+  await page.setContent(subject.html, { waitUntil: 'load' });
+  await page.evaluate(() => document.fonts.ready);
+  await page.waitForTimeout(120);
+  // The homepage card stays a PNG so the type declared in `index.html` and read by the
+  // quality gate is unchanged; the per-page cards are JPEG, because fifteen cards at the
+  // PNG weight of a gradient-heavy 1200x630 frame is five and a half megabytes of repo for
+  // images that are only ever fetched one at a time.
+  const shot = await page.screenshot({
+    clip: { x: 0, y: 0, width: WIDTH, height: HEIGHT },
+    type: subject.home ? 'png' : 'jpeg',
+    quality: subject.home ? undefined : 82,
+  });
+  const measured = await page.evaluate(surveyCard, `data:image/png;base64,${shot.toString('base64')}`);
+  writeFileSync(subject.out, shot);
+  if (process.env.OG_DEBUG) {
+    console.log(
+      'DEBUG',
+      subject.out,
+      JSON.stringify(
+        await page.evaluate(() => {
+          const box = (selector) => {
+            const el = document.querySelector(selector);
+            if (!el) return null;
+            const rect = el.getBoundingClientRect();
+            return { text: (el.textContent ?? '').trim().slice(0, 28), x: Math.round(rect.x), y: Math.round(rect.y), w: Math.round(rect.width), h: Math.round(rect.height) };
+          };
+          return { foot: box('.foot'), bottom: box('.bottom'), h1: box('h1') };
+        }),
+      ),
+    );
+  }
+  console.log(
+    `${subject.out}: ${(shot.length / 1024).toFixed(1)} kB · ground ${(measured.dark * 100).toFixed(0)}% dark · accent ${(measured.acid * 100).toFixed(1)}% · type ${measured.largest}px`,
+  );
+
+  if (measured.dark < (subject.home ? 0.6 : 0.5)) complaints.push(`${subject.out}: the ground is only ${(measured.dark * 100).toFixed(0)}% dark`);
+  if (measured.acid < 0.002) complaints.push(`${subject.out}: the acid accent is missing`);
+  if (measured.largest < (subject.home ? 140 : 55)) complaints.push(`${subject.out}: the largest type is ${measured.largest}px`);
+  measured.quadrants.forEach((share, index) => {
+    const where = ['top left', 'top right', 'bottom left', 'bottom right'][index];
+    if (share < 0.006) complaints.push(`${subject.out}: nothing left a mark in the ${where} quadrant`);
+  });
+  survey = measured;
+  if (subject.home) png = shot;
+}
+await browser.close();
+if (!png) {
+  console.error('the homepage card was not rendered');
+  process.exit(1);
+}
+
 console.log(
-  `  ground ${(survey.dark * 100).toFixed(0)}% dark, accent ${(survey.acid * 100).toFixed(1)}% of the card, largest type ${survey.largest}px`,
-);
-console.log(
-  `  ink by quadrant: ${survey.quadrants.map((share, index) => `${['TL', 'TR', 'BL', 'BR'][index]} ${(share * 100).toFixed(1)}%`).join(', ')}`,
+  `  homepage card ${WIDTH}x${HEIGHT}, ink by quadrant: ${survey.quadrants.map((share, index) => `${['TL', 'TR', 'BL', 'BR'][index]} ${(share * 100).toFixed(1)}%`).join(', ')}`,
 );
 if (complaints.length) {
   console.error(complaints.map((complaint) => `✗ ${complaint}`).join('\n'));

@@ -21,6 +21,7 @@ export function DispatchPage() {
       ? dispatch.summary
       : 'That dispatch is not in the expedition log on camtaylor.ca.',
     path: dispatch ? `/dispatch/${dispatch.slug}` : '/dispatch',
+    image: dispatch ? `/og/${dispatch.slug}.jpg` : undefined,
     // A dated, attributed dispatch is an Article to anything reading this page
     // mechanically — it was bare HTML to all of them before.
     schema: dispatch

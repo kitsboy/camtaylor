@@ -39,16 +39,20 @@ export function usePageMeta({
   description,
   path = '/',
   schema,
+  image,
 }: {
   title: string;
   description: string;
   path?: string;
   /** A JSON-LD node for this page (`Article`, `BreadcrumbList`, …), or nothing. */
   schema?: Record<string, unknown>;
+  /** This page's own share card, written by `npm run og`. Defaults to the site card. */
+  image?: string;
 }) {
   // Serialized outside the effect because it is also the dependency: a fresh object
   // literal at every render would otherwise re-run this effect forever.
   const schemaJson = schema ? JSON.stringify(schema) : null;
+  const imagePath = image ?? '/og-image.png';
 
   useEffect(() => {
     const fullTitle = path === '/' ? title : `${title} | ${SITE.name}`;
@@ -58,6 +62,11 @@ export function usePageMeta({
     setMeta('property', 'og:title', fullTitle);
     setMeta('property', 'og:description', description);
     setMeta('property', 'og:url', `${SITE.url}${path}`);
+    // One card used to serve every page: a shared dispatch was indistinguishable from the
+    // homepage in a feed. Each page now points at its own card, generated from its own words.
+    setMeta('property', 'og:image', `${SITE.url}${imagePath}`);
+    setMeta('property', 'og:image:type', imagePath.endsWith('.jpg') ? 'image/jpeg' : 'image/png');
+    setMeta('name', 'twitter:image', `${SITE.url}${imagePath}`);
     setMeta('name', 'twitter:title', fullTitle);
     setMeta('name', 'twitter:description', description);
     // One card serves every page, so its alt text has to be the page's own or a
@@ -80,5 +89,5 @@ export function usePageMeta({
     return () => setPageSchema(null);
     // `schemaJson`, not the object: callers write an object literal at every render, and a
     // fresh identity in this list would rewrite the head on every render.
-  }, [title, description, path, schemaJson]);
+  }, [title, description, path, schemaJson, imagePath]);
 }
