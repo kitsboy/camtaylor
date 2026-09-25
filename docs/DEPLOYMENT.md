@@ -17,7 +17,7 @@ Cloudflare is the only host. There is no Vercel or Netlify config in this repo, 
 | Node version | 22 |
 | SPA routing | `public/_redirects` (`/* /index.html 200`) |
 | Security headers | `public/_headers` |
-| Environment variables | `VITE_PRIVATE_PREVIEW=false` (production), `VITE_FORMSPREE_FORM_ID=xykqodnk` |
+| Environment variables | `VITE_PRIVATE_PREVIEW=false` (production), `VITE_FORMSPREE_FORM_ID=<LIVE ID>` |
 
 `prebuild` regenerates `public/sitemap.xml` and `public/feed.xml` from
 `src/content/dispatches/*.md` on every build — no manual feed edits. It also writes
@@ -51,7 +51,9 @@ npx wrangler login
 1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
 2. Pick `kitsboy/camtaylor`, production branch `main`
 3. Build command `npm run build`, output `dist`
-4. Settings → **Environment variables (Production)**: `VITE_PRIVATE_PREVIEW=false`, `VITE_FORMSPREE_FORM_ID=xykqodnk`
+4. Settings → **Environment variables (Production)**: `VITE_PRIVATE_PREVIEW=false`, `VITE_FORMSPREE_FORM_ID=<LIVE ID>`
+   (replace the `<LIVE ID>` placeholder with the real Formspree endpoint — `xykqodnk` in the old docs was
+   the scaffold placeholder; see `docs/KIMI-HANDOFF.md` top section for the live delivery state).
 5. Every push to `main` then publishes automatically
 
 **Build output dir is pinned in-repo** by `wrangler.toml` (`pages_build_output_dir = "dist"`),

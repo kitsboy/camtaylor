@@ -8,7 +8,12 @@ dashboard because DNS edit is not delegated to the build machine.
 ## Launch decisions (2026-09-24)
 
 - `VITE_PRIVATE_PREVIEW=false` for production builds → preview banner off, contact delivery on.
-- Contact form: Formspree `xykqodnk`, live. **Verify the recipient inbox before sharing the link widely.**
+  **NOTE (2026-09-25, Kimi): this variable is NOT actually set in the Pages production environment today —
+  the live site still builds as a private preview.** It must be set in the dashboard.
+- Contact form: Formspree, target `hello@giveabit.io`. **Live state as of 2026-09-25: NOT delivered** —
+  the Pages production build still has the private preview on and the placeholder form ID. Set
+  `VITE_PRIVATE_PREVIEW=false` and the live `VITE_FORMSPREE_FORM_ID` in the Pages production environment,
+  then confirm with `npm run check:live-form` (must exit 0).
 - Analytics: none shipped. `public/_headers` no longer allows plausible.io or analytics.giveabit.io.
 - Hosting: Cloudflare Pages only. `vercel.json` and `netlify.toml` were deleted.
 - Service worker: network-first for navigations so a deploy is never masked by a stale cache.
