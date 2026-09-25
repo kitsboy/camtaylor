@@ -2,31 +2,33 @@
 
 **Status:** LIVE on Cloudflare Pages. camtaylor.ca + www both serve the Sherpa site.
 
-**Latest (Buffy, type system):** The site had **49 distinct font sizes** and its most common
-homepage text size was **8.8px**; body paragraphs were 11.52px and nav links dropped to 8.32px
-on a laptop. All of it now comes from **one eight-step scale** in `src/index.css` with a
-**12px floor** (11px only for uppercase tracked micro-labels). 244 declarations migrated across
-five stylesheets; nothing under 11px renders anywhere; the nav holds 12px at every width and was
-verified by measurement every 10px from 1440 → 769 with no overflow. A **type-scale guard** in
-`scripts/quality-check.mjs` now fails the build on any sub-floor literal, and was proven
-non-vacuous with a canary file. Also caught a genuine bug class: unstyled `<small>` silently
-inheriting the browser's `0.833em` shrink (`.live-state small` was 9.17px). Full detail,
-measurements and two findings for Kimi in `docs/KIMI-HANDOFF.md`.
+**Latest (Buffy, touch & motion + the route sheet):** Three commits. (1) The ventures carousel
+was **permanently stranding cards at `opacity: 0`** after a fast flick, because each card revealed
+itself and a flick jumped past it — the section now drives the cascade. (2) A full sweep of every
+standalone control at 320/390px found **86 undersized tap targets on a phone, now 0** (the old test
+measured 13 curated selectors at a 40px threshold, which is why 102 of 194 were passing while too
+small); ambient motion is parked by default and reduced motion now neutralises every animation —
+**13 loops were still running, now 0**. (3) A new **route sheet** lists all twelve waypoints below
+the ticker with the active camp marked; reaching Contact from the top of the phone page went from
+**21.5 screens of scrolling to one tap**. Full suite **49/49** green. Detail in `docs/KIMI-HANDOFF.md`.
 
-**Two things flagged, not fixed:**
-1. The contrast guard has a **blind spot** for tight-line-height labels — the probe samples the
-   modal pixel inside the element's own box, so `font: 800 13px/1` read as ink-on-ink. Fixed in
-   the CSS; the instrument still needs a deliberate hardening decision.
-2. **Pre-existing** horizontal overflow on production: `scrollWidth` exceeds the viewport by
-   74–164px at desktop widths, hidden by `body { overflow-x: hidden }`. Verified against the old
-   CSS; the type change reduced it.
+**⚠️ Open — decide before the next deploy:** the phone bottom bar renders **10** buttons at the new
+44px floor, which is **440px wide in a 320–390px viewport**. At 390px the last two — *Ventures* and
+*Connect* — now sit **entirely off-screen**; production today avoids this only by shrinking buttons
+to 22–33px, so this is the trade my touch pass made. Neither existing guard can see it: the bar is
+`position: fixed`, so `document.scrollingElement.scrollWidth` is unaffected (still exactly 320), and
+the 44px sweep passes because each button *is* 44px — the row overflows, not the button. Fix needs a
+**count decision from Cam**: the bar holds 6 items at 320px, so which six of the ten?
+
+**Still true:** the route sheet made the wall *navigable*, not *shorter* — the phone page is still
+23,166px (~27 screens) and every section still dumps its full depth.
+
+**Also flagged, not fixed (from the type-system pass):** the contrast guard has a **blind spot** for
+tight-line-height labels; and production has **pre-existing** horizontal overflow (74–164px at
+desktop widths) hidden by `body { overflow-x: hidden }`, where content is genuinely parked off-screen.
 
 **Ownership — settled:** Kimi owns the camtaylor deployment. Cam + Kimi are the decision pair.
 Buffy is a subordinate coding tool, NOT the boss.
 
 **Deploy:** `npm run deploy:live` from `main` — the only deploy command. Cloudflare Pages project
 `camtaylor`.
-
-**Next:** touch & motion pass (44px target floor, motion budget), then the homepage "wall" —
-25 phone screens in one fixed order. Moving sections onto real routes needs Kimi, since it
-touches published routing, `_redirects` and sitemap/feed generation.

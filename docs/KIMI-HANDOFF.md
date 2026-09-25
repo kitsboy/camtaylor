@@ -1,3 +1,99 @@
+## Session — 2026-09-25 (touch & motion, and breaking the 25-screen wall)
+
+**Machine:** M3 (Buffy) · **Project:** camtaylor
+
+Three commits, each one coherent unit, all pushed. Two of them fix bugs the earlier passes
+had left behind; the third is a new affordance on top.
+
+### Done
+
+**1 — `f0fed9d` the ventures carousel was stranding cards.** The cards hung off a horizontal
+snap scroller and each one revealed itself with its own `whileInView`. A fast flick jumped past
+cards 2–5, so those never entered the viewport while mounted and stayed at `opacity: 0`
+**permanently** — verified by setting `scrollLeft = scrollWidth` and reading cards 2, 3 and 4
+still at `0 / matrix(0.95, …)` afterwards. The section now drives the cascade
+(`staggerChildren: 0.08`) and each card only declares its own visible state. `AltitudeMeter` had
+the same latent bug (`whileInView` → `animate`). 23 insertions, 9 deletions, one file.
+
+**2 — `7e3b60e` every standalone control now clears 44px, and the ambient motion has a budget.**
+The old device test measured a curated list of 13 selectors at a 40px threshold, which is why
+**102 of 194 controls on a phone** were passing while sitting under 44px. Replaced with a full
+sweep of every `a[href]`, `button`, `[role="button"]`, `input`, `select`, `textarea` at 320 and
+390px, skipping only links inside flowing prose (the same carve-out WCAG 2.5.8 makes).
+Found **86 offenders, now 0**. Highlights: `.venture-dot` was an 8×8 dot and is now a 44×44
+control with an 8px dot inside it; the 7 dots wanted 308px inside 288px, so flex-shrink had been
+squeezing them to 41px — now `flex: 0 0 var(--touch-min)` plus `flex-wrap`; `.footer-palette-chart`
+went from a cramped row of 10 to two rows of 5 at `44px` auto-rows; back-to-top, social links,
+the copy-Nostr button and the footer email CTA all reached 44×44. Motion: `intelligence-bars`,
+`glow-orb-cyan` and `hero-video-shine` are parked by default, and the reduced-motion block now
+neutralises every animation instead of naming a few (**13 elements were still looping** — now 0).
+
+**3 — `ead79a5` the route sheet: all twelve waypoints, one tap from the top.** New
+`src/components/RouteSheet.tsx` — an `<ol>` of 12 stops driven by `useScrollSpy`, each with a
+camp, a label, its condition, `aria-current` on the active one, and an `aria-label` of
+the form *"Travel to Base Camp — About, clear"*. It cost **260px desktop / 459px phone** and its
+smallest stop is 51px tall, so it does not reintroduce the target problem. Measured effect:
+reaching Contact from the top of the phone page went from **21.5 screens of scrolling to one
+tap**. The page is now 15,067px desktop / 23,166px phone.
+
+### ⚠️ Open finding for Cam — the phone bottom bar does not fit the phone it is on
+
+This is the one thing in this session that is **not** fixed, and it is a regression I introduced
+in `7e3b60e`, so it should be decided before the next deploy.
+
+`MobileQuickNav` renders **10** buttons in a fixed bottom bar. Measured three ways:
+
+| | min button width | row width | off-screen at 320px | off-screen at 390px |
+|---|---|---|---|---|
+| production today | 22px | fits by shrinking | 2 | 0 (buttons only 33px) |
+| after `7e3b60e` | **44px** | **440px** | **3** | **2 — Ventures and Connect** |
+
+The trade was "too small to hit" for "off the screen". `Connect` is the last item, so on a
+390px phone the only path to the contact section from the bottom bar is now entirely past the
+right edge. It fits only at 768px, where the buttons are 76px each.
+
+**Nothing catches it, and that is the interesting part.** The bar is `position: fixed`, so it
+contributes nothing to `document.scrollingElement.scrollWidth` (still exactly 320 — the existing
+overflow test is green), and `body { overflow-x: hidden }` does not clip fixed elements either.
+The 44px sweep passes because each button *is* 44px — it is the **row** that overflows, not the
+button. Both guards are blind to a fixed bar by construction.
+
+A fix needs a count decision, not just CSS: `floor(320 / 44) = 7`, so the bar holds **6** items
+with slack. Ten items is not a "quick" nav in any case. **Cam's pick of the six** is the only
+thing blocking it; the rest is a one-line filter in `src/data/site.ts` plus a test that measures
+the bar's own `scrollWidth` against its `clientWidth` (which is what both existing guards miss).
+
+### Also still true, worth naming
+
+The route sheet made the wall *navigable*, it did not make it *shorter*. Each section still dumps
+its full depth on a phone: 23,166px / ~27 screens. The route sheet is a map, not a fix.
+
+### Decisions
+
+- Kept the twelve waypoint bands and added a sheet, rather than restructuring the page. The bands
+  are load-bearing in the tests and Cam-reviewed. Putting sections on real routes (`/ventures`,
+  `/services`, `/log`) touches the published routing, `_redirects` and the sitemap/feed
+  generation, which is Kimi's call, not a UI edit.
+- Where the new affordance collided with existing test queries, I made the queries `exact` or
+  scoped them to `.navbar` — rather than renaming a stop to something less accurate.
+- In the reduced-motion block I did **not** use `animation: none`. Several reveals are animations
+  that end at `opacity: 1`, and killing the animation strands them at `opacity: 0`. Instead:
+  `.001ms` duration with `iteration-count: 1`. The one exception is `.route-ticker-rail`, which
+  is forced off with `!important` because it is a continuous rail with no end state.
+- Reused `--touch-min: 44px`, which already existed in `mobile.css` `:root`. Did not define a
+  second one.
+
+### Verification
+
+`npm run quality` ✓ · `npx tsc -b` ✓ · `npm run lint` 0 errors (1 pre-existing `ThemeContext.tsx`
+warning) · `npm test` **49/49** ✓ — full suite run after all three commits.
+
+### Git State
+
+- HEAD: `ead79a5` · `git log --oneline origin/main..HEAD` → empty.
+
+---
+
 ## Session — 2026-09-25 (type system: one scale, a 12px floor, and a guard)
 
 **Machine:** M3 (Buffy) · **Project:** camtaylor
