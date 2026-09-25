@@ -47,8 +47,14 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
 
   return (
     <section className="hero-section" id="hero" ref={sectionRef}>
-      <div className="glow-orb" />
-      <div className="glow-orb-cyan" />
+      {/* Two soft tints that run off the edge on purpose. They are clipped by
+          this layer rather than by `body { overflow-x: hidden }`: clipping them
+          where they are drawn bounds the bleed, so the document cannot end up
+          wider than the viewport with nothing left to notice it. */}
+      <div className="glow-field" aria-hidden="true">
+        <div className="glow-orb" />
+        <div className="glow-orb-cyan" />
+      </div>
 
       <motion.div
         className="hero-shell glass-depth-3"

@@ -68,7 +68,12 @@ body {
   background: var(--bg);
   color: var(--text-primary);
   font-family: var(--font-body);
-  overflow-x: hidden;
+  /* No `overflow-x: hidden` here on purpose. It propagates to the viewport, so
+     it does not clip anything the page can see — it only stops the horizontal
+     scrollbar that a too-wide page earns, which is the one signal that would
+     tell anyone a layout has gone wrong. The bleed it was hiding is bounded at
+     the source instead (see `.glow-field`), and `device-qa.spec.ts` measures
+     the document against the viewport from 320px to 1440px. */
   text-rendering: optimizeLegibility;
 }
 
@@ -648,7 +653,23 @@ img, video {
   100% { opacity: 1; filter: drop-shadow(0 0 3px var(--green-light)); }
 }
 
-/* Glow orbs — subtle warm tints */
+/* Glow orbs — subtle warm tints.
+
+   They bleed past the edge by design, and they used to bleed past the *document*:
+   at 900–1280px the page was genuinely 105–124px wider than the viewport, which
+   `body { overflow-x: hidden }` was covering up. A bleed that big is not a
+   decoration detail, it is a hidden horizontal scrollbar and a guard that can
+   never fail. So the bleed is now bounded where it is drawn, by `.glow-field`.
+   The `float` animation scales the orb by 8%, which is why the overflow varied
+   with the frame rather than being a fixed number. */
+.glow-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
 .glow-orb {
   position: absolute;
   top: 5%;
@@ -658,7 +679,6 @@ img, video {
   border-radius: 50%;
   background: radial-gradient(circle, rgba(30,69,52,0.05) 0%, transparent 70%);
   pointer-events: none;
-  z-index: -1;
   animation: float 28s infinite alternate ease-in-out;
 }
 .glow-orb-cyan {
@@ -670,7 +690,6 @@ img, video {
   border-radius: 50%;
   background: radial-gradient(circle, rgba(184, 135, 42, 0.05) 0%, transparent 70%);
   pointer-events: none;
-  z-index: -1;
   animation: float 34s infinite alternate-reverse ease-in-out;
 }
 @keyframes float {

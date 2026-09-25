@@ -8,17 +8,42 @@ import { test, expect } from '@playwright/test';
 
 const MOBILE_WIDTHS = [320, 390];
 
-for (const width of MOBILE_WIDTHS) {
+/**
+ * The document may never be wider than the viewport — at any width, not just
+ * the two phones.
+ *
+ * This ran at 320 and 390 only, because `body { overflow-x: hidden }` was
+ * covering everything else. That rule propagates to the viewport, so it does
+ * not clip anything the page can see: it only suppresses the scrollbar that a
+ * too-wide page earns. Underneath it, two decorative tints bled 105–124px past
+ * the right edge at 900–1280px — a hidden horizontal scrollbar, and a guard
+ * that could never fail. The bleed is bounded at its source now
+ * (`.glow-field`) and the rule is gone, so this measures the real thing.
+ *
+ * Two exclusions, both deliberate:
+ *   - anything inside an `overflow: hidden` ancestor is clipped on purpose (the
+ *     hero's contour art, the ticker's marquee);
+ *   - `position: fixed` cannot extend the document, and the route bar has its own
+ *     guard that measures the bar itself rather than the page.
+ *
+ * A *left* bleed is fine and used on purpose — the about photo's offset and the
+ * contact form's honeypot both sit outside the left edge, and neither can make
+ * a left-to-right page scroll sideways. The right edge is the one that counts.
+ */
+const OVERFLOW_WIDTHS = [1440, 1280, 1024, 900, 768, 430, 390, 320];
+
+for (const width of OVERFLOW_WIDTHS) {
   test(`no horizontal overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/');
     await expect(page.locator('.hero-route-status')).toBeVisible();
     // Entrance animations and scroll reveals move elements horizontally; let
     // them land before measuring, otherwise the test races a mid-flight frame.
-    await page.waitForTimeout(700);
+    await page.waitForTimeout(900);
 
     const info = await page.evaluate(() => {
       const doc = document.scrollingElement!;
+      const viewport = document.documentElement.clientWidth;
       const clipped = (el: Element) => {
         let p = el.parentElement;
         while (p) {
@@ -27,22 +52,45 @@ for (const width of MOBILE_WIDTHS) {
         }
         return false;
       };
+      const past = (el: Element) => Math.round(el.getBoundingClientRect().right - viewport);
       const widest: string[] = [];
       document.querySelectorAll<HTMLElement>('body *').forEach((el) => {
         const rect = el.getBoundingClientRect();
-        if (rect.width === 0 || rect.right <= doc.clientWidth + 0.5) return;
+        if (rect.width === 0 || rect.height === 0) return;
+        if (past(el) <= 1) return;
+        if (getComputedStyle(el).position === 'fixed') return;
         if (clipped(el)) return;
-        widest.push(`${el.tagName.toLowerCase()}.${String(el.className).slice(0, 50)}`);
+        widest.push(`${el.tagName.toLowerCase()}.${String(el.className).slice(0, 40)} +${past(el)}px`);
       });
-      return {
-        scrollWidth: doc.scrollWidth,
-        clientWidth: doc.clientWidth,
-        widest: widest.slice(0, 5),
-      };
+      return { scrollWidth: doc.scrollWidth, clientWidth: viewport, widest: widest.slice(0, 6) };
     });
 
-    expect(info.scrollWidth, JSON.stringify(info)).toBeLessThanOrEqual(info.clientWidth);
+    expect(
+      info.scrollWidth,
+      `past the right edge: ${JSON.stringify(info.widest)}`,
+    ).toBeLessThanOrEqual(info.clientWidth);
+    expect(info.widest, 'elements past the right edge').toEqual([]);
   });
+}
+
+/**
+ * The rule that was removed was global, so the guard cannot live on one page.
+ */
+for (const path of ['/route/giveabit', '/privacy']) {
+  for (const width of [1280, 390]) {
+    test(`${path} does not overflow at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto(path);
+      await page.waitForTimeout(700);
+
+      const info = await page.evaluate(() => ({
+        scrollWidth: document.scrollingElement!.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+      }));
+
+      expect(info.scrollWidth).toBeLessThanOrEqual(info.clientWidth);
+    });
+  }
 }
 
 /**
