@@ -37,3 +37,7 @@ ref/
 # Scratch files created while probing the live site
 tmp-*.mjs
 tmp-*.pid
+
+# Deployment identity marker — regenerated every build with a build-specific
+# commit sha (prebuild → scripts/generate-static.mjs). Never committed.
+public/build-meta.json

@@ -1,0 +1,69 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# SINGLE-DEPLOYER RULE — read this before editing.
+#
+# Cloudflare Pages is the ONLY deployer for camtaylor.ca: the Pages project
+# "camtaylor" builds this repo through its git integration, on every push to
+# main (that is why no one has to click or run a deploy command). The push IS
+# the deploy.
+#
+# Do NOT add `wrangler pages deploy`, `wrangler deploy`, or any other second
+# deploy step here. Two builders racing for one URL is what produced the
+# "push looks deployed but the old build is still being served" (stale build)
+# class of bug. There is exactly one deployer: Cloudflare Pages.
+#
+# This workflow's job is to VERIFY the deploy, not to perform one: it runs the
+# same live-identity check a human runs (scripts/deploy-check.sh, also bound
+# to `npm run deploy:check`), waits for the live site to serve this exact
+# commit's build-meta.json, and goes red if it never does.
+#
+# This workflow holds no Cloudflare credentials. Nothing here needs a secret
+# except the optional Slack webhook.
+# ─────────────────────────────────────────────────────────────────────────────
+name: camtaylor — verify live deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install
+        run: npm ci || npm install
+
+      # The verifier gate is IDENTITY: the live /build-meta.json must name the
+      # commit this workflow is verifying (Cloudflare Pages writes
+      # CF_PAGES_COMMIT_SHA at build time; the script also accepts the commit
+      # via GITHUB_SHA). A build clock is NOT accepted as proof.
+      - name: Verify the live site is serving this commit
+        run: bash scripts/deploy-check.sh --wait --timeout 900 --interval 20
+
+      - name: Notify on success
+        if: success() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"✅ camtaylor deploy verified live — ${{ github.sha }}\"}" \
+            "$SLACK_WEBHOOK_URL" || true
+
+      - name: Notify on failure
+        if: failure() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"❌ camtaylor deploy NOT verified — the live site is not serving ${{ github.sha }}. Check the Cloudflare Pages build for project camtaylor: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+            "$SLACK_WEBHOOK_URL" || true

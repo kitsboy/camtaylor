@@ -20,7 +20,10 @@ Cloudflare is the only host. There is no Vercel or Netlify config in this repo, 
 | Environment variables | `VITE_PRIVATE_PREVIEW=false` (production), `VITE_FORMSPREE_FORM_ID=xykqodnk` |
 
 `prebuild` regenerates `public/sitemap.xml` and `public/feed.xml` from
-`src/content/dispatches/*.md` on every build — no manual feed edits.
+`src/content/dispatches/*.md` on every build — no manual feed edits. It also writes
+`public/build-meta.json`, the **identity marker**: the commit (`CF_PAGES_COMMIT_SHA`,
+or git HEAD locally) and version the build came from. The deploy verifier uses it to
+prove the live site is serving the pushed commit.
 
 ## Option A — deploy from this machine (fastest)
 
@@ -39,13 +42,33 @@ Authentication is the local wrangler OAuth session (`kitsboy@gmail.com`). If it 
 npx wrangler login
 ```
 
-## Option B — Git-connected builds (no laptop involved)
+> **Prefer Option B.** Cloudflare Pages is wired to this repo, so a plain push to `main`
+> builds and publishes automatically. The manual `npm run deploy:live` path exists only
+> as break-glass; the git integration is the single deployer.
+
+## Option B — Git-connected builds (the real path)
 
 1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
 2. Pick `kitsboy/camtaylor`, production branch `main`
 3. Build command `npm run build`, output `dist`
 4. Settings → **Environment variables (Production)**: `VITE_PRIVATE_PREVIEW=false`, `VITE_FORMSPREE_FORM_ID=xykqodnk`
 5. Every push to `main` then publishes automatically
+
+**Build output dir is pinned in-repo** by `wrangler.toml` (`pages_build_output_dir = "dist"`),
+so Cloudflare always publishes the built site, never the repo root.
+
+## Verifying a deploy (token-free, run by hand or in CI)
+
+```bash
+npm run deploy:check          # one-shot: fail fast if live ≠ pushed
+npm run deploy:check:wait     # wait up to 15 min for Cloudflare to publish
+```
+
+`scripts/deploy-check.sh` requires the **live `/build-meta.json` to name the commit being
+shipped** — an identity gate, not a timestamp — and that the homepage serves a built
+`/assets/` bundle, not the source `/src/main.tsx`. `.github/workflows/deploy.yml` runs it
+on every push to `main` and goes red if a push ever fails to publish. It holds no
+Cloudflare credentials: the push is the deploy, and this check only observes.
 
 ## Attaching the domain (the switch)
 
