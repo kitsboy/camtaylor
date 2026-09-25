@@ -30,23 +30,57 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
     const params = new URLSearchParams(window.location.search);
     return params.get('tier') ?? params.get('service') ?? 'multi-day';
   });
-  const [submittedName, setSubmittedName] = useState('');
+  const [draft, setDraft] = useState({ name: '', email: '', organization: '', message: '' });
   const [referenceId, setReferenceId] = useState('');
   const [started, setStarted] = useState(false);
   const referrer = useReferrer();
 
   const activeTier = DEAL_TIERS.find((t) => t.id === tierId) ?? DEAL_TIERS[1];
+  // `state.errors` is a SubmissionError object (not a list) and null until a submission
+  // fails, so it is the failure flag itself.
+  const failed = !state.succeeded && Boolean(state.errors);
 
   useEffect(() => {
     if (state.succeeded) trackEvent('form_success');
   }, [state.succeeded]);
 
+  useEffect(() => {
+    if (failed) trackEvent('form_error');
+  }, [failed]);
+
+  /**
+   * What a reader gets when the endpoint refuses. The message they just wrote used to be
+   * trapped in a form that could not be submitted and a one-line error they had no way to
+   * act on — so the failure screen carries the whole thing: the same brief, addressed to
+   * the monitored inbox, as a mailto link they can send from their own mail client.
+   */
+  const fallbackMailto = () => {
+    const subject = `New inquiry — ${activeTier.label} (${activeTier.range})`;
+    const body = [
+      `Name: ${draft.name}`,
+      draft.organization && `Organization: ${draft.organization}`,
+      `Email: ${draft.email}`,
+      `Expedition tier: ${activeTier.label} (${activeTier.range})`,
+      referrer && `Referrer: ${referrer}`,
+      '',
+      draft.message,
+    ]
+      .filter(Boolean)
+      .join('\n');
+    return `mailto:${SITE.familyEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     if (IS_PRIVATE_PREVIEW) return;
-    const name = (form.elements.namedItem('name') as HTMLInputElement)?.value ?? '';
-    setSubmittedName(name);
+    const read = (name: string) => (form.elements.namedItem(name) as HTMLInputElement)?.value ?? '';
+    setDraft({
+      name: read('name'),
+      email: read('email'),
+      organization: read('organization'),
+      message: read('message'),
+    });
     setReferenceId(`CT-${Date.now().toString(36).toUpperCase()}`);
     trackEvent('form_submit', { tier: activeTier.label, ref: referrer || 'direct' });
     handleSubmit(e);
@@ -68,7 +102,7 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
         <CheckCircle2 className="success-icon" size={48} />
         <h3 className="success-title">Message received</h3>
         <p className="success-message">
-          Thank you, {submittedName || 'there'}. Your inquiry has been sent to {SITE.familyEmail}. I&apos;ll
+          Thank you, {draft.name || 'there'}. Your inquiry has been sent to {SITE.familyEmail}. I&apos;ll
           review the details and respond if there&apos;s alignment.
         </p>
         <div className="success-details">
@@ -222,6 +256,23 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
         <ValidationError errors={state.errors} className="form-submit-error" />
       </div>
 
+      {failed && (
+        <div className="form-failure">
+          <ShieldAlert size={18} aria-hidden="true" className="form-failure-icon" />
+          <div>
+            <p className="form-failure-title">That did not send — nothing was delivered.</p>
+            <p className="form-failure-note">
+              Try again with the button below, or send the same message straight to{' '}
+              <a href={fallbackMailto()} data-testid="form-failure-mailto">
+                {SITE.familyEmail}
+              </a>
+              . Your name, address, tier and brief are already written into that link, so
+              nothing you typed is lost.
+            </p>
+          </div>
+        </div>
+      )}
+
       {IS_PRIVATE_PREVIEW && (
         <p className="form-preview-notice" role="note">
           Private preview: message delivery is disabled until launch approval.
@@ -235,7 +286,7 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
           </>
         ) : (
           <>
-            <span>Send message</span>
+            <span>{failed ? 'Send again' : 'Send message'}</span>
             <Send size={16} />
           </>
         )}

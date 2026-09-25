@@ -1696,6 +1696,33 @@ img, video {
   font-size: var(--fs-small);
   margin-bottom: 14px;
 }
+/* A submission that could not be delivered. It says what happened, what did *not*
+   happen, and carries the whole brief into a mailto link so the message survives. */
+.form-failure {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: rgba(180, 50, 50, 0.06);
+  border: 1px solid rgba(180, 50, 50, 0.28);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  color: var(--text-primary);
+  font-size: var(--fs-small);
+  line-height: 1.55;
+}
+.form-failure-icon { flex: 0 0 auto; color: #a33; margin-top: 2px; }
+.form-failure-title { margin: 0 0 4px; font-weight: 700; }
+.form-failure-note { margin: 0; color: var(--text-secondary); }
+.form-failure-note a { color: #23675d; font-weight: 700; text-decoration: underline; }
+.form-failure-note a:hover { color: #1b4f47; }
+[data-theme="night"] .form-failure {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+[data-theme="night"] .form-failure-icon { color: #f2d18b; }
+[data-theme="night"] .form-failure-note a { color: #7fd4c8; }
+[data-theme="night"] .form-failure-note a:hover { color: #a7e6dc; }
 .form-honeypot {
   position: absolute;
   left: -9999px;
