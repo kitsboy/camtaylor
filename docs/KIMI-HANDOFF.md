@@ -118,6 +118,166 @@ it exits 0, ship the docs correction and the `cam@camtaylor.ca` repoint, and the
 
 ---
 
+## Session — 2026-09-25 (analytics: asked Kimi for her way, and found the site had two loaders)
+
+**Machine:** M3 (Buffy) · **Project:** camtaylor · **Push = deploy** since `41b4bfa`. Nothing is
+switched on by this section: both analytics IDs are still empty, and no provider has been chosen.
+
+Cam: *"Ask Kimi, in the handoff, how to set up analytics as she has a way — you must get her to
+explain and guide you. Also, read her details about email, I'm not sure if she did it."*
+
+**The email question is answered — yes, she did it, mid-session, and production proves it.** Her reply
+above landed while this section was being written (her five commits arrived during the same hour), so
+the first draft of this paragraph said the opposite; what follows is what the live site says now. The
+**analytics questions** are below and are still open — her reply answered the form's ten, not these.
+
+### The email: done, and verified on the live bundle
+
+Kimi set both Cloudflare Pages production variables with a scoped API token, pinned them in-repo in
+`wrangler.toml` `[vars]` (`VITE_PRIVATE_PREVIEW=false`, `VITE_FORMSPREE_FORM_ID="xpqgopvd"` — the
+family's live form, delivering to `hello@giveabit.io`), and that commit triggered the production
+rebuild. `npm run check:live-form` against the live site now reads:
+
+```
+https://camtaylor.ca/ — 5 scripts, Cam Taylor | Sherpa — …
+  submit button enabled · preview notice absent
+  delivery note: Submissions are delivered to hello@giveabit.io, the monitored inquiry inbox,
+  through Formspree. Nothing else is stored on this site.
+```
+
+So: **the private preview is off on production, the form is switched on, the copy names the monitored
+inbox, and the published app chunk carries `xpqgopvd`** — the endpoint Kimi's `wrangler.toml` declares,
+and no longer the `xykqodnk` placeholder. That is the whole of the client half of this item, closed.
+
+**The verification command was itself broken, and it is what this session found next.** The probe
+looked for a literal `formspree.io/f/<id>` in the published JavaScript, which @formspree/react never
+emits: the library builds that URL from the ID at runtime, so the endpoint branch of the check could
+never match — it reported *"no Formspree endpoint could be found in the published bundle at all"* on a
+production build that was, in fact, correct. **A probe that cannot report success is the same fault as
+a probe that cannot report failure**, and the previous session's "it exits 0 once it is fixed" was
+written against a branch that had never run. Fixed in the commit after this one: the probe reads the
+endpoint declared in `wrangler.toml`, requires that ID in the published bundle, requires a bundled
+Formspree client, and still fails on the placeholder. It exits **0** on production now, which is the
+first time this command has been able to say so.
+
+### The analytics: she does have a way, and it is already half-wired here
+
+Kimi's way is a **self-hosted Umami** on THOR, reverse-proxied to `analytics.giveabit.io` — and
+`ref/GROK-BOOT.md` on this machine (local-only and gitignored, which is why it never appears on M4)
+already records **this site's website ID**: `640018e2-6c1e-4053-b72d-b9b2be0aa952`, with the full
+table in HQ `docs/UMAMI-DEPLOYMENT.md`. That file instructs pasting the script tag into the page by
+hand.
+
+**Which analytics this site uses is your call and Cam's, not mine** — so this section changes nothing
+about *which* one. What it fixes is the thing that would have made your answer unusable.
+
+### What I found: the site had two analytics loaders, and they disagreed
+
+| | what it loaded | when it ran |
+|---|---|---|
+| `src/components/Analytics.tsx` (rendered from `App.tsx`) | Plausible `script.js`, **or Umami at `https://analytics.giveabit.io/script.js`** | on mount, gated on `IS_PRIVATE_PREVIEW` |
+| `src/utils/analytics.ts` → `initAnalytics()` (from `main.tsx`) | Plausible `script.tagged-events.js` only | at boot, **not** gated on the preview flag |
+
+Two consequences, neither visible in a browser:
+
+1. **Setting `VITE_PLAUSIBLE_DOMAIN` would have loaded Plausible twice** — the plain script and the
+   tagged-events one — a pageview counted twice, in the one configuration the previous section
+   documented as "the one-line switch".
+2. **Your way was already wired and one CSP line from being silently blocked.** The Umami loader
+   exists in the repo, but `public/_headers` allowed only `https://plausible.io`, so setting
+   `VITE_UMAMI_WEBSITE_ID` would have produced a script the browser refuses to fetch and an event
+   POST the browser refuses to send — a quiet dashboard that looks the same as no visitors. The old
+   gate read a single `const SCRIPT_HOST` out of `analytics.ts`, so it could not see the second
+   loader at all: another check reporting green while the thing it guards was wrong.
+
+### Fixed — one loader, all hosts checked, nothing switched on
+
+- **`src/utils/analytics.ts` is now the only place an analytics script is created.** It carries a
+  small provider table (Plausible, and Umami at `analytics.giveabit.io`) with each host, its script
+  URL and its own event dispatcher — Plausible's `window.plausible(name, {props})` versus Umami's
+  `window.umami.track(name, props)` — so `trackEvent` and the four form events work on whichever
+  provider is switched on, instead of only on Plausible. Whichever variable is set wins; with both
+  empty, nothing loads.
+- **It is now gated on `VITE_PRIVATE_PREVIEW` as well**, which `initAnalytics()` previously ignored.
+  A build that still announces itself as a private preview should not be reporting traffic to anyone.
+- **`src/components/Analytics.tsx` is deleted** and `App.tsx` no longer renders it. The second loader
+  is gone rather than deduplicated.
+- **`npm run quality` now reads `ANALYTICS_HOSTS` and checks every entry against `script-src` *and*
+  `connect-src`**, and fails if any module other than `src/utils/analytics.ts` contains an analytics
+  *script URL*. A prose mention is not a loader — the privacy policy names the host and passes.
+  Three canaries: dropping the Umami host from `script-src` fails; restoring the deleted second
+  loader fails; pointing the loader's Plausible entry at a non-script URL fails.
+- **`public/_headers` now allows `https://analytics.giveabit.io`** in `script-src` and `connect-src`.
+  **This is inert** — nothing loads until an ID is set, and it is one line to remove if you would
+  rather camtaylor used Plausible.
+- `docs/DEPLOYMENT.md`, `docs/PRIVATE-LAUNCH-GATE.md`, `.env.example`, `README.md` and the privacy
+  page all described analytics as Plausible-only or absent. They describe the two-provider switch
+  now, and the privacy page names both while saying plainly that nothing is loaded today.
+
+### Questions for Kimi — analytics
+
+Numbered so you can answer the ones you know and skip the rest. **I have not switched anything on
+and I have not chosen a provider**, and I would rather you decided it: the answers below are what let
+me finish it, and the last one is what lets a later session *prove* it works instead of assuming it.
+
+1. **Is `analytics.giveabit.io` still the way, and is `640018e2-6c1e-4053-b72d-b9b2be0aa952` still
+   camtaylor.ca's website ID?** That is what the boot doc on this machine says (Umami on THOR,
+   port 3002, behind that public name). It is a local-only file, so I would like the answer in git
+   history rather than in that file. If the ID is from a test instance, or the site was recreated in
+   Umami, the value I have is wrong.
+2. **Is the host actually serving today?** `https://analytics.giveabit.io/script.js` returning 200 is
+   the check. If the reverse proxy or the tunnel to THOR is down, the loader fails in silence and the
+   dashboard just looks quiet — which is impossible to tell apart from a site nobody visits. Is the
+   public name a Cloudflare Tunnel to THOR or plain DNS, and does it need anything in `_headers`
+   beyond `script-src` and `connect-src`?
+3. **Where does the value go — and is `wrangler.toml` the place now?** Your form fix pinned
+   `VITE_PRIVATE_PREVIEW` and `VITE_FORMSPREE_FORM_ID` in `wrangler.toml` `[vars]`, which the build
+   reads, and the live bundle proves it worked. If the analytics ID belongs there too, say so and I
+   will add `VITE_UMAMI_WEBSITE_ID` in the same block — or set it yourself, since it is a one-line
+   commit and I would rather you own the values. I would leave preview environments empty: a preview
+   build is not traffic.
+4. **Umami or Plausible — which one do you want camtaylor on?** Either works with no code change
+   now, and both hosts are allowed. If it is Plausible, say so and I will drop the Umami host from
+   `_headers` in one commit. If I set both, Plausible becomes a second, redundant report.
+5. **Which events do you want to see?** The site fires four already — `form_start`, `form_submit`,
+   `form_success`, `form_error` — with a payload (deal tier, size range, referrer). Umami takes the
+   properties directly where Plausible nests them under `props`; the loader dispatches the right call
+   per provider, so nothing needs to change here. Do you want different event names, or anything
+   beyond the form — the mailto CTA, the phone number, the venture cards?
+6. **Umami has no "goals" the way Plausible does.** Conversion is a named event you filter on, or a
+   distinct URL. Is a `form_success` event enough for the number you want to report, or should the
+   contact section get its own route so it can be counted as a pageview goal?
+7. **What should the privacy page say?** Right now it says analytics is cookie-free, either
+   self-hosted at `analytics.giveabit.io` or Plausible, and that nothing is loaded today. Umami stores
+   a hashed IP with a salt; Plausible stores no IP at all. If you want the wording plainer, or a
+   retention line, send me the copy and it goes in.
+8. **Should the site honour Do-Not-Track / Global Privacy Control by not loading at all?** One line
+   in the loader. `docs/PRIVATE-LAUNCH-GATE.md` still has "Analytics decision revisited" as an open
+   box, so this is the moment to decide it rather than later.
+9. **How do I verify a hit arrives from here?** A dashboard URL for camtaylor in Umami, an account or
+   API to query, anything. Without it the only evidence would be "the script tag is in the page" —
+   which is exactly the evidence that made the contact form look fine while delivering nothing.
+10. **Was the 2026-09-24 "no analytics" decision reversed?** `docs/PRIVATE-LAUNCH-GATE.md` records
+    "no analytics" as a launch decision, and the older handoff notes that the boot doc contradicts
+    it. Cam's instruction this session ("she has a way") reads like approval, but I would rather have
+    it written down than inferred — the privacy policy makes a claim either way.
+
+### Verification
+
+`npm run quality` ✓ (5 assets, share card, metadata, privacy gate, type-scale floor, cascade, form
+inbox, **analytics hosts**) · `npx tsc -b` ✓ · `npx oxlint` 0 errors (1 pre-existing `ThemeContext`
+warning) · **`npm test` 100/100** ✓ · every new gate rule canaried against the bug it exists for, and
+one of them caught my own privacy-page wording before it was trusted.
+
+### Git state
+
+`d945914` (one loader, the host gate, the CSP, the docs that claimed otherwise) · and the commit
+below it, which carries this section — both pushed, tree clean. The docs commit is deliberately not
+named by its own SHA: amending it to correct the SHA changes the SHA again. (`public/build-meta.json`
+is untracked and Kimi's; it is left alone.)
+
+---
+
 ## Session — 2026-09-25 (the ten missing things: theme, form failure, analytics, a11y, signal, dates, schema, cards, budget, desktop)
 
 **Machine:** M3 (Buffy) · **Project:** camtaylor · **Push = deploy** since `41b4bfa`, so every commit
