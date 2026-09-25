@@ -13,6 +13,7 @@ import './styles/mobile.css';
 import './styles/upgrades.css';
 import './styles/bold-modern.css';
 import './styles/footer.css';
+import './styles/touch.css';
 import App from './App.tsx';
 import { validateSiteConfig } from './data/site';
 
