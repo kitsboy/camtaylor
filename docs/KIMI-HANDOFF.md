@@ -1,3 +1,91 @@
+## Session — 2026-09-25 (type system: one scale, a 12px floor, and a guard)
+
+**Machine:** M3 (Buffy) · **Project:** camtaylor
+
+### Done — the 8px problem is gone
+
+Cam picked "type system" from three proposed UI upgrades. The diagnosis came from measuring
+the live page, not from reading CSS: 49 distinct rendered sizes, the **most common size on the
+homepage was 8.8px**, body paragraphs were **11.52px**, nav links fell to **8.32px** on a
+laptop, and ~58% of all text nodes sat under 12px.
+
+- [x] **One scale, eight tokens** in `src/index.css` `:root`: `--fs-2xs` (11px, uppercase
+tracked micro-labels only), `--fs-micro` (**12px floor**), `--fs-caption` (13), `--fs-small`
+(14), `--fs-body` (15), `--fs-lead` (17), `--fs-h3` (20), `--fs-h2`, `--fs-h1`, plus `--lh-tight`
+/ `--lh-snug` / `--lh-body`.
+- [x] **244 declarations migrated** across `index.css`, `bold-modern.css`, `upgrades.css`,
+`footer.css`, `mobile.css`. No literal `font-size` below 1rem remains in any of them — checked
+by grep, not by hope.
+- [x] **Nav holds the 12px floor at every width.** Space is now bought from tracking, padding
+and the agents CTA, never from shrinking the label. Breakpoints moved 1160 → 1260 and a new
+≤820 step was added. Verified by measuring `scrollWidth` vs `clientWidth` every 10px from 1440
+down to 769: **no overflow above 1px anywhere** (the smoke test's tolerance).
+- [x] **Found and fixed a whole class of bug on the way:** an unstyled `<small>` inherits the
+browser's `0.833em` shrink, so `.live-state small` was rendering at **9.17px** despite its parent
+being 11px. Every `small` on the page was enumerated; that was the only case. Now explicit.
+- [x] **Type-scale guard** in `scripts/quality-check.mjs`. Catches `font-size:` *and* `font:`
+shorthand literals below `--fs-2xs`. **Proven non-vacuous** with a canary file: it reported
+`.58rem` and `9px`, exited 1, canary deleted.
+
+### Measurements (local production build, real browser, 1221px viewport)
+
+| Signal | Before | After |
+|--------|--------|-------|
+| Distinct rendered sizes | 49 | 29, all on-scale |
+| Most common text size | 8.8px (62 nodes) | 11px (256), then 12/13/14/15px |
+| Body paragraphs | 11.52px | 15px |
+| Nav links ≤980px | 8.32px | 12px everywhere |
+| Text under 11px | ~250 nodes | **0** |
+| Text under 12px | 275 of 471 | 267 of 657 (all at 11px, the documented exception) |
+
+Page height grew ~1% (14,430 → 14,569px at 1440). Tap targets were **not** in scope — that is
+the touch/motion pass.
+
+### Two findings for Kimi
+
+1. **The contrast guard has a blind spot.** `span.waypoint-camp` failed at 1:1 after the type
+change. It is **not** a real contrast bug: the probe takes the modal pixel colour *inside the
+element's own box*, and `font: 800 13px/1` produced a 13px box that was almost entirely glyph.
+Confirmed by experiment — `line-height: 1.4` turned it green (657 warm / 658 night checks).
+So the fix went to the CSS, and **the instrument still has this blind spot for any
+tight-line-height label**. Hardening it properly is a deliberate decision I did not take alone:
+the obvious fix (ignore pixels matching the foreground) would also mask a genuine ink-on-ink
+failure.
+2. **Pre-existing horizontal overflow on production.** The live site's `scrollWidth` exceeds the
+viewport by **74–164px** at desktop widths, hidden by `body { overflow-x: hidden }`. Verified
+against `https://camtaylor.ca` with the old CSS; the type change actually *reduced* it
+(74 → 30 at 1440). Not a regression, invisible to visitors, worth a deliberate look.
+
+### Decisions
+
+- Kept `--acid` and every brand token untouched; this pass only changes type.
+- 11px is allowed **only** for uppercase, letter-spaced, 700/800-weight micro-labels, where
+tracking and weight carry legibility instead of size. Everything else floors at 12px.
+- Raised the two contrast tests to `test.slow()`. Their cost is the full-page raster the probe
+samples, not the checks; the page is now taller and the pair was brushing the 60s budget under
+3-worker load. Assertions unchanged.
+- Did not touch `public/feed.xml` / `public/sitemap.xml` — `prebuild` rewrites their timestamps
+on every build, so they are reverted and left out of this commit.
+
+### Verification
+
+`npm run quality` ✓ · `npx tsc -b` ✓ · `npm run lint` 0 errors (1 pre-existing
+`ThemeContext.tsx` warning) · `npm run build` ✓ · `npm test` **44/44** ✓
+
+### Known flake (pre-existing, not this change)
+
+`smoke.spec.ts:40` *"private preview banner and navigation have separate bands"* failed once
+under parallel load and passes isolated. Arithmetic: the banner is `0.9rem` padding +
+`1.2rem` line-height = **33.6px**, and `.navbar { top: 34px }` — a **0.4px** margin that rounds
+under load. Worth pinning to a shared `--banner-h` variable, and at phones the banner wraps
+(≈53px) so the nav genuinely overlaps it there. Not caused by, and not fixed in, this session.
+
+### Git State
+
+- Committed this session — see `git log -1`.
+
+---
+
 ## Session — 2026-09-24 (UI legibility pass + contrast guard)
 
 **Machine:** M3 (Buffy) · **Project:** camtaylor

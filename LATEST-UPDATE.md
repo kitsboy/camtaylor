@@ -1,21 +1,32 @@
-# camtaylor — Last Updated 2026-09-24 by Buffy
+# camtaylor — Last Updated 2026-09-25 by Buffy
 
-**Status:** LIVE on Cloudflare Pages. camtaylor.ca + www both serve the new Sherpa site (verified 200).
+**Status:** LIVE on Cloudflare Pages. camtaylor.ca + www both serve the Sherpa site.
 
-**Latest (Buffy, UI pass):** Text contrast raised to WCAG AA across the site in **both
-themes**, and a contrast guard added (`tests/contrast.spec.ts`, 45/45 green, warm + night).
-The warm-theme fixes covered `--text-muted` (3.60:1), the command deck boot log (2.23:1),
-the dark-shell section kicker (1.88:1) and the footer ecosystem chips (1.39:1). Extending the
-guard to night found **157 failures**: the `body` backdrop was a hard-coded warm gradient that
-never flipped, and `--paper` was never themed, so night mode showed light text on warm
-surfaces. Both fixed, plus the light-theme accent literals that had no night variant.
-Commits `8ec846a`, `2cf6cca`. Still open, UI: keyboard/screen-reader pass, reduced-motion
-pass, 375/414px and desktop QA. Full detail in `docs/KIMI-HANDOFF.md` (Session — 2026-09-24).
+**Latest (Buffy, type system):** The site had **49 distinct font sizes** and its most common
+homepage text size was **8.8px**; body paragraphs were 11.52px and nav links dropped to 8.32px
+on a laptop. All of it now comes from **one eight-step scale** in `src/index.css` with a
+**12px floor** (11px only for uppercase tracked micro-labels). 244 declarations migrated across
+five stylesheets; nothing under 11px renders anywhere; the nav holds 12px at every width and was
+verified by measurement every 10px from 1440 → 769 with no overflow. A **type-scale guard** in
+`scripts/quality-check.mjs` now fails the build on any sub-floor literal, and was proven
+non-vacuous with a canary file. Also caught a genuine bug class: unstyled `<small>` silently
+inheriting the browser's `0.833em` shrink (`.live-state small` was 9.17px). Full detail,
+measurements and two findings for Kimi in `docs/KIMI-HANDOFF.md`.
 
-**Ownership — settled:** Kimi owns the camtaylor deployment. Cam + Kimi are the decision pair. Buffy (Freebuff desktop agent) is a subordinate coding tool, NOT the boss. Any prior note claiming "Buffy owns the deployment" or "camtaylor.pages.dev is Buffy's deployment" was Buffy's own self-framing and is superseded.
+**Two things flagged, not fixed:**
+1. The contrast guard has a **blind spot** for tight-line-height labels — the probe samples the
+   modal pixel inside the element's own box, so `font: 800 13px/1` read as ink-on-ink. Fixed in
+   the CSS; the instrument still needs a deliberate hardening decision.
+2. **Pre-existing** horizontal overflow on production: `scrollWidth` exceeds the viewport by
+   74–164px at desktop widths, hidden by `body { overflow-x: hidden }`. Verified against the old
+   CSS; the type change reduced it.
 
-**Deploy:** `npm run deploy:live` from `main` — the only deploy command. Production = Cloudflare Pages project `camtaylor`.
+**Ownership — settled:** Kimi owns the camtaylor deployment. Cam + Kimi are the decision pair.
+Buffy is a subordinate coding tool, NOT the boss.
 
-**Old site:** EZP.net WordPress — Cam deletes it himself later, no rush. Do not chase the EZP teardown.
+**Deploy:** `npm run deploy:live` from `main` — the only deploy command. Cloudflare Pages project
+`camtaylor`.
 
-**Next (next week, no rush):** Cam has another site to move over with Kimi's help. Also: set GitHub default branch to `main` (`origin/HEAD` still points at `talent`).
+**Next:** touch & motion pass (44px target floor, motion budget), then the homepage "wall" —
+25 phone screens in one fixed order. Moving sections onto real routes needs Kimi, since it
+touches published routing, `_redirects` and sitemap/feed generation.
