@@ -33,11 +33,12 @@ function AltitudeMeter({ value }: { value: number }) {
   return (
     <div className="altitude-meter" title={`Altitude: ${value}%`}>
       <div className="altitude-meter-track">
+        {/* Mounts, rather than waiting on an intersection: inside the
+            horizontal carousel an intersection may never arrive. */}
         <motion.div
           className="altitude-meter-fill"
           initial={{ width: 0 }}
-          whileInView={{ width: `${value}%` }}
-          viewport={{ once: true }}
+          animate={{ width: `${value}%` }}
           transition={{ duration: 0.9, ease: 'easeOut' }}
         />
       </div>
@@ -197,8 +198,21 @@ export const Ventures: React.FC = () => {
 
       <div className="ventures-scroll-wrap">
         <ScrollFade />
-        <div className="ventures-slider" ref={sliderRef}>
-          {filtered.map((vent, idx) => {
+        {/* The cascade is driven by the SECTION entering the viewport, not by
+            each card. A card parked outside a horizontal carousel never fires
+            its own `whileInView`, so a fast flick used to leave five of seven
+            cards stranded at opacity 0 — permanently invisible. The section is
+            always in the vertical viewport when someone is looking at the
+            carousel, so every card is guaranteed to reveal. */}
+        <motion.div
+          className="ventures-slider"
+          ref={sliderRef}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-20px' }}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+        >
+          {filtered.map((vent) => {
             const Icon = ICONS[VENTURES.indexOf(vent)] ?? Globe;
             return (
               <motion.div
@@ -206,10 +220,10 @@ export const Ventures: React.FC = () => {
                 className="venture-card glass-depth-2"
                 data-accent={vent.accent ? '' : undefined}
                 style={vent.accent ? { '--venture-accent': vent.accent } as React.CSSProperties : undefined}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, margin: '-20px' }}
-                transition={{ duration: 0.4, delay: idx * 0.08 }}
+                variants={{
+                  hidden: { opacity: 0, scale: 0.95 },
+                  visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } },
+                }}
                 whileHover={{ y: -6 }}
               >
                 <div className="venture-route-trace" aria-hidden="true" />
@@ -269,7 +283,7 @@ export const Ventures: React.FC = () => {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
 
       <div className="venture-dots" aria-label="Venture carousel pagination">
