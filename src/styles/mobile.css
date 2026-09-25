@@ -181,7 +181,7 @@ a,
   color: #fff;
   font-family: var(--font-heading);
   font-weight: 600;
-  font-size: 0.82rem;
+  font-size: var(--fs-small);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -196,7 +196,7 @@ a,
   }
 
   .nav-brand-text {
-    font-size: 0.88rem;
+    font-size: var(--fs-body);
     letter-spacing: 0.04em;
   }
 
@@ -210,7 +210,7 @@ a,
 }
 
 @media (max-width: 380px) {
-  .nav-brand-text { font-size: 0.78rem; }
+  .nav-brand-text { font-size: var(--fs-caption); }
 }
 
 /* 31–45: Hero mobile */
@@ -240,12 +240,12 @@ a,
   }
 
   .hero-description {
-    font-size: 0.92rem;
+    font-size: var(--fs-body);
     margin-bottom: 24px;
   }
 
   .hero-route-status {
-    font-size: 0.72rem;
+    font-size: var(--fs-caption);
     padding: 10px 12px;
     flex-wrap: wrap;
   }
@@ -405,7 +405,7 @@ a,
   }
 
   .section-subtitle {
-    font-size: 0.88rem;
+    font-size: var(--fs-body);
     padding: 0 4px;
   }
 
@@ -445,7 +445,7 @@ a,
     min-height: 56px;
   }
 
-  .tier-label { font-size: 0.82rem; }
+  .tier-label { font-size: var(--fs-small); }
 
   .contact-sidebar {
     order: 2;
@@ -463,7 +463,7 @@ a,
   }
 
   .trust-badge {
-    font-size: 0.72rem;
+    font-size: var(--fs-caption);
     font-family: var(--font-heading);
     font-weight: 600;
     padding: 8px 12px;
@@ -486,7 +486,7 @@ a,
     border-radius: var(--radius);
     font-family: var(--font-heading);
     font-weight: 700;
-    font-size: 0.88rem;
+    font-size: var(--fs-body);
     margin-bottom: 8px;
     box-shadow: 0 6px 20px rgba(30, 69, 52, 0.25);
   }
@@ -502,7 +502,7 @@ a,
     border-radius: var(--radius);
     color: var(--text-secondary);
     font-family: var(--font-heading);
-    font-size: 0.82rem;
+    font-size: var(--fs-small);
     font-weight: 600;
     cursor: pointer;
     margin-bottom: 16px;
@@ -549,7 +549,7 @@ a,
     border: none;
     color: var(--text-muted);
     font-family: var(--font-heading);
-    font-size: 0.58rem;
+    font-size: var(--fs-2xs);
     font-weight: 600;
     letter-spacing: 0.02em;
     padding: 6px 2px;
@@ -589,7 +589,7 @@ a,
     display: flex;
     min-height: 50px;
     border-radius: 14px;
-    font-size: 0.92rem;
+    font-size: var(--fs-body);
     box-shadow: 0 8px 28px rgba(30, 69, 52, 0.35);
   }
 

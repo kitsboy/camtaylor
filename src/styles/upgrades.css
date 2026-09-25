@@ -6,7 +6,7 @@
   padding: 0.45rem 1rem;
   background: #211d18;
   color: #f2d18b;
-  font: 600 0.68rem/1.2rem 'Outfit', sans-serif;
+  font: 600 var(--fs-micro)/1.2rem 'Outfit', sans-serif;
   letter-spacing: 0.12em;
   text-align: center;
 }
@@ -14,7 +14,7 @@
 .form-preview-notice {
   margin: 0 0 1rem;
   color: #7a5510;
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
 }
 
 /* Elite upgrade layer — tokens, motion, polish */
@@ -136,7 +136,7 @@
   background: var(--bg-card);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
-  font-size: 0.88rem;
+  font-size: var(--fs-body);
   color: var(--text-secondary);
 }
 
@@ -201,7 +201,7 @@
   border: 1px solid var(--glass-border);
   background: var(--bg-card);
   color: var(--text-primary);
-  font-size: 0.8rem;
+  font-size: var(--fs-small);
   font-family: var(--font-heading);
   cursor: pointer;
   transition: var(--transition-fast);
@@ -287,7 +287,7 @@
 }
 
 .venture-route-eyebrow {
-  font-size: 0.75rem;
+  font-size: var(--fs-micro);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--gold);
@@ -322,7 +322,7 @@
   border-radius: 999px;
   border: 1px solid var(--glass-border);
   background: transparent;
-  font-size: 0.78rem;
+  font-size: var(--fs-caption);
   cursor: pointer;
 }
 
@@ -338,7 +338,7 @@
   background: var(--bg-card);
   border-radius: var(--radius);
   border-left: 3px solid var(--gold);
-  font-size: 0.9rem;
+  font-size: var(--fs-body);
   font-style: italic;
   color: var(--text-secondary);
 }
@@ -347,7 +347,7 @@
   display: block;
   margin-top: 8px;
   font-style: normal;
-  font-size: 0.8rem;
+  font-size: var(--fs-small);
   color: var(--text-muted);
 }
 
@@ -388,7 +388,7 @@
 }
 
 .venture-talent-badge {
-  font-size: 0.65rem;
+  font-size: var(--fs-micro);
   padding: 2px 6px;
   border-radius: 4px;
   background: var(--gold);

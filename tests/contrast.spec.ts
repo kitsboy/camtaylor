@@ -331,6 +331,10 @@ async function applyTheme(page: Page, theme: ThemeName) {
 const MIN_CHECKS: Record<ThemeName, number> = { warm: 50, night: 50 };
 
 test('homepage text meets WCAG AA contrast in both themes', async ({ page }) => {
+  // The cost here is not the checks (657 of them read fast) but the full-page
+  // raster the probe samples colours from: ~14.5k px tall, twice, under a
+  // 3-worker load. Same instrument, honest budget.
+  test.slow();
   await page.goto('/');
   await page.getByRole('contentinfo').getByRole('button', { name: /All Give A Bit routes/i }).click();
 
@@ -355,6 +359,7 @@ test('a dispatch page meets WCAG AA contrast in both themes', async ({ page }) =
 });
 
 test('the command deck meets WCAG AA contrast in both themes', async ({ page }) => {
+  test.slow();
   await page.goto('/');
   // Wait for the nav to mount so the global key handler is attached before the
   // keypress, otherwise the shortcut can land on nothing.

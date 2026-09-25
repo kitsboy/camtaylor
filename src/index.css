@@ -31,6 +31,28 @@
 
   --radius: 10px;
   --radius-lg: 16px;
+
+  /* ── Type scale ────────────────────────────────────────────
+     One scale, seven steps. Everything readable sits at 13px or
+     above; `--fs-micro` (12px) is the hard floor, and `--fs-2xs`
+     (11px) is the single exception, reserved for uppercase,
+     letter-spaced micro-labels where tracking and weight carry the
+     legibility instead of size. No literal `font-size` below the
+     floor is allowed — `scripts/quality-check.mjs` fails the build
+     on one. Line heights pair with the steps so copy stays on a
+     rhythm instead of 55 ad-hoc line boxes. */
+  --fs-2xs:    0.6875rem;              /* 11px — uppercase tracked micro-labels only */
+  --fs-micro:  0.75rem;                /* 12px — floor: meta, labels, chips, captions */
+  --fs-caption: 0.8125rem;             /* 13px — notes, attributions, supporting detail */
+  --fs-small:  0.875rem;               /* 14px — dense UI copy, tags, links */
+  --fs-body:   0.9375rem;              /* 15px — body paragraphs */
+  --fs-lead:   1.0625rem;              /* 17px — ledes, card descriptions */
+  --fs-h3:     1.25rem;                /* 20px — card and sidebar titles */
+  --fs-h2:     clamp(1.6rem, 3.6vw, 2.3rem);
+  --fs-h1:     clamp(2.9rem, 10.5vw, 5.2rem);
+  --lh-tight:  1.15;
+  --lh-snug:   1.35;
+  --lh-body:   1.6;
 }
 
 /* ── Reset ─────────────────────────────────────────────── */
@@ -65,7 +87,7 @@ img, video {
   padding: 10px 16px;
   border-radius: var(--radius);
   font-family: var(--font-heading);
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
   font-weight: 600;
   text-decoration: none;
   transition: top 0.2s ease;
@@ -150,7 +172,7 @@ img, video {
 
 .section-subtitle {
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
   max-width: 520px;
   margin: 0 auto;
   line-height: 1.6;
@@ -273,7 +295,7 @@ img, video {
 
 .brand-dot {
   color: var(--gold);
-  font-size: 0.9rem;
+  font-size: var(--fs-body);
 }
 
 .nav-links { display: flex; gap: 28px; }
@@ -327,7 +349,7 @@ img, video {
   color: var(--text-secondary);
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: var(--fs-body);
   padding: 12px 0;
   text-align: left;
   cursor: pointer;
@@ -344,7 +366,7 @@ img, video {
   color: var(--text-secondary);
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: var(--fs-small);
   cursor: pointer;
   transition: var(--transition-fast);
   letter-spacing: 0.02em;
@@ -361,7 +383,7 @@ img, video {
   padding: 7px 14px;
   font-family: var(--font-heading);
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: var(--fs-small);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -412,7 +434,7 @@ img, video {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.78rem;
+  font-size: var(--fs-caption);
   color: var(--text-secondary);
   margin-bottom: 18px;
   padding: 8px 12px;
@@ -441,7 +463,7 @@ img, video {
 
 .hero-eyebrow {
   font-family: var(--font-heading);
-  font-size: 0.72rem;
+  font-size: var(--fs-caption);
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -476,7 +498,7 @@ img, video {
 }
 
 .title-role {
-  font-size: 3.8rem;
+  font-size: var(--fs-h1);
   font-weight: 800;
   letter-spacing: 0.03em;
   display: block;
@@ -486,7 +508,7 @@ img, video {
 
 .title-tagline {
   font-family: var(--font-serif);
-  font-size: 1.2rem;
+  font-size: var(--fs-h3);
   font-style: italic;
   font-weight: 400;
   color: var(--text-secondary);
@@ -497,7 +519,7 @@ img, video {
 
 @media (max-width: 768px) {
   .title-role { font-size: 2.6rem; }
-  .title-name { font-size: 1.1rem; }
+  .title-name { font-size: var(--fs-h3); }
   .title-tagline { font-size: 1rem; }
 }
 
@@ -523,7 +545,7 @@ img, video {
   color: #fff;
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 0.88rem;
+  font-size: var(--fs-body);
   padding: 12px 24px;
   display: flex;
   align-items: center;
@@ -545,7 +567,7 @@ img, video {
   color: var(--text-primary);
   font-family: var(--font-heading);
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: var(--fs-body);
   padding: 12px 24px;
   display: flex;
   align-items: center;
@@ -583,7 +605,7 @@ img, video {
 .metric-item { display: flex; flex-direction: column; gap: 4px; }
 
 .metric-label {
-  font-size: 0.68rem;
+  font-size: var(--fs-micro);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--text-muted);
@@ -593,7 +615,7 @@ img, video {
 .metric-value {
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 0.92rem;
+  font-size: var(--fs-body);
   color: var(--text-primary);
 }
 
@@ -610,7 +632,7 @@ img, video {
   border: 1px solid rgba(30, 69, 52, 0.15);
   border-radius: 20px;
   padding: 5px 12px;
-  font-size: 0.7rem;
+  font-size: var(--fs-micro);
   font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -710,7 +732,7 @@ img, video {
 
 .axiom-title {
   font-family: var(--font-heading);
-  font-size: 1.1rem;
+  font-size: var(--fs-h3);
   font-weight: 700;
   margin-bottom: 10px;
   color: var(--text-primary);
@@ -719,7 +741,7 @@ img, video {
 .axiom-description {
   color: var(--text-secondary);
   line-height: 1.65;
-  font-size: 0.875rem;
+  font-size: var(--fs-small);
 }
 
 .manifesto-quote-wrapper {
@@ -748,13 +770,13 @@ img, video {
   margin-bottom: 16px;
   color: var(--text-primary);
 }
-@media (max-width: 600px) { .manifesto-quote { font-size: 1.1rem; } }
+@media (max-width: 600px) { .manifesto-quote { font-size: var(--fs-h3); } }
 
 .manifesto-cite {
   font-family: var(--font-heading);
   font-weight: 600;
   letter-spacing: 0.1em;
-  font-size: 0.8rem;
+  font-size: var(--fs-small);
   color: var(--green);
   text-transform: uppercase;
 }
@@ -790,7 +812,7 @@ img, video {
 
 .service-title {
   font-family: var(--font-heading);
-  font-size: 1.25rem;
+  font-size: var(--fs-h3);
   font-weight: 700;
   margin-bottom: 10px;
   color: var(--text-primary);
@@ -799,7 +821,7 @@ img, video {
 .service-description {
   color: var(--text-secondary);
   line-height: 1.65;
-  font-size: 0.875rem;
+  font-size: var(--fs-small);
   margin-bottom: 18px;
 }
 
@@ -810,7 +832,7 @@ img, video {
   border: 1px solid rgba(30, 69, 52, 0.12);
   border-radius: 5px;
   padding: 4px 10px;
-  font-size: 0.7rem;
+  font-size: var(--fs-micro);
   font-family: var(--font-heading);
   font-weight: 600;
   color: var(--green);
@@ -856,7 +878,7 @@ img, video {
   border: 1px solid rgba(184, 135, 42, 0.18);
   border-radius: 10px;
   padding: 3px 9px;
-  font-size: 0.65rem;
+  font-size: var(--fs-micro);
   font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -865,14 +887,14 @@ img, video {
 
 .venture-name {
   font-family: var(--font-heading);
-  font-size: 1.25rem;
+  font-size: var(--fs-h3);
   font-weight: 700;
   margin-bottom: 4px;
   color: var(--text-primary);
 }
 
 .venture-role {
-  font-size: 0.78rem;
+  font-size: var(--fs-caption);
   font-weight: 600;
   color: #245a42;
   margin-bottom: 12px;
@@ -883,7 +905,7 @@ img, video {
 .venture-desc {
   color: var(--text-secondary);
   line-height: 1.6;
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
   flex-grow: 1;
   margin-bottom: 18px;
 }
@@ -894,7 +916,7 @@ img, video {
   gap: 5px;
   color: var(--green);
   text-decoration: none;
-  font-size: 0.8rem;
+  font-size: var(--fs-small);
   font-weight: 700;
   font-family: var(--font-heading);
   transition: var(--transition-fast);
@@ -949,7 +971,7 @@ img, video {
   line-height: 1.6;
   max-width: 420px;
   margin-bottom: 24px;
-  font-size: 0.9rem;
+  font-size: var(--fs-body);
 }
 
 .success-details {
@@ -968,7 +990,7 @@ img, video {
   display: flex;
   justify-content: space-between;
   margin-bottom: 6px;
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
 }
 .details-row:last-child { margin-bottom: 0; }
 .details-row span:first-child { color: var(--text-secondary); }
@@ -981,7 +1003,7 @@ img, video {
   color: var(--green);
   font-family: var(--font-heading);
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
   padding: 9px 18px;
   cursor: pointer;
   transition: var(--transition-fast);
@@ -1000,7 +1022,7 @@ img, video {
 
 .form-label {
   display: block;
-  font-size: 0.72rem;
+  font-size: var(--fs-caption);
   font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -1016,7 +1038,7 @@ img, video {
   border-radius: var(--radius);
   color: var(--text-primary);
   font-family: var(--font-body);
-  font-size: 0.9rem;
+  font-size: var(--fs-body);
   padding: 11px 14px;
   transition: var(--transition-fast);
 }
@@ -1041,7 +1063,7 @@ img, video {
   color: var(--text-secondary);
   font-family: var(--font-heading);
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: var(--fs-small);
   padding: 8px;
   cursor: pointer;
   transition: var(--transition-fast);
@@ -1061,7 +1083,7 @@ img, video {
   color: #fff;
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: var(--fs-body);
   padding: 13px;
   display: flex;
   align-items: center;
@@ -1095,7 +1117,7 @@ img, video {
 
 .sidebar-title {
   font-family: var(--font-heading);
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
   font-weight: 700;
   margin-bottom: 12px;
   color: var(--text-primary);
@@ -1106,7 +1128,7 @@ img, video {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
   line-height: 1.6;
   color: var(--text-secondary);
 }
@@ -1155,7 +1177,7 @@ img, video {
   align-items: center;
   gap: 8px;
   font-family: var(--font-heading);
-  font-size: 0.7rem;
+  font-size: var(--fs-micro);
   font-weight: 700;
   letter-spacing: 0.12em;
   color: var(--green-light);
@@ -1179,7 +1201,7 @@ img, video {
   display: flex;
   flex-direction: column;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.8rem;
+  font-size: var(--fs-small);
   overflow-y: auto;
 }
 
@@ -1213,7 +1235,7 @@ img, video {
   color: var(--green-light);
   padding: 3px 7px;
   font-family: var(--font-heading);
-  font-size: 0.7rem;
+  font-size: var(--fs-micro);
   cursor: pointer;
   transition: var(--transition-fast);
 }
@@ -1235,7 +1257,7 @@ img, video {
   border: none;
   color: rgba(255,255,255,.85);
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.8rem;
+  font-size: var(--fs-small);
   outline: none;
 }
 
@@ -1275,7 +1297,7 @@ img, video {
 
 .footer-tagline {
   color: rgba(255,255,255,.35);
-  font-size: 0.78rem;
+  font-size: var(--fs-caption);
   font-style: italic;
   font-family: var(--font-serif);
 }
@@ -1308,7 +1330,7 @@ img, video {
 }
 @media (max-width: 600px) { .footer-bottom { flex-direction: column; gap: 12px; text-align: center; } }
 
-.footer-copyright { color: rgba(255,255,255,.28); font-size: 0.75rem; }
+.footer-copyright { color: rgba(255,255,255,.28); font-size: var(--fs-micro); }
 
 .footer-links { display: flex; align-items: center; gap: 12px; }
 
@@ -1317,7 +1339,7 @@ img, video {
   border: none;
   color: rgba(255,255,255,.35);
   font-family: var(--font-heading);
-  font-size: 0.75rem;
+  font-size: var(--fs-micro);
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -1337,7 +1359,7 @@ img, video {
 
 .footer-status-text {
   color: rgba(255,255,255,.28);
-  font-size: 0.7rem;
+  font-size: var(--fs-micro);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -1408,7 +1430,7 @@ img, video {
 
 .about-eyebrow {
   font-family: var(--font-heading);
-  font-size: 0.72rem;
+  font-size: var(--fs-caption);
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -1427,7 +1449,7 @@ img, video {
 .about-bio {
   color: var(--text-secondary);
   line-height: 1.75;
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
   margin-bottom: 20px;
   max-width: 560px;
 }
@@ -1442,7 +1464,7 @@ img, video {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
   color: var(--text-secondary);
 }
 .about-meta-item svg { color: var(--green-light); flex-shrink: 0; }
@@ -1461,7 +1483,7 @@ img, video {
 
 .nostr-section-title {
   font-family: var(--font-heading);
-  font-size: 1.1rem;
+  font-size: var(--fs-h3);
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1471,7 +1493,7 @@ img, video {
 
 .nostr-section-sub {
   color: var(--text-secondary);
-  font-size: 0.88rem;
+  font-size: var(--fs-body);
   max-width: 480px;
   margin: 0 auto 10px;
   line-height: 1.55;
@@ -1482,7 +1504,7 @@ img, video {
   align-items: center;
   gap: 5px;
   color: var(--green);
-  font-size: 0.8rem;
+  font-size: var(--fs-small);
   font-weight: 600;
   text-decoration: none;
   font-family: var(--font-heading);
@@ -1541,14 +1563,14 @@ img, video {
 
 .nostr-name {
   font-family: var(--font-heading);
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 2px;
 }
 
 .nostr-role {
-  font-size: 0.75rem;
+  font-size: var(--fs-micro);
   color: var(--text-secondary);
 }
 
@@ -1556,7 +1578,7 @@ img, video {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.62rem;
+  font-size: var(--fs-micro);
   font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -1594,7 +1616,7 @@ img, video {
 
 .nostr-nip05 {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.78rem;
+  font-size: var(--fs-caption);
   color: var(--green);
   background: rgba(30, 69, 52, 0.06);
   border: 1px solid rgba(30, 69, 52, 0.12);
@@ -1635,7 +1657,7 @@ img, video {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.72rem;
+  font-size: var(--fs-caption);
   font-weight: 600;
   font-family: var(--font-heading);
   color: var(--text-secondary);
@@ -1648,7 +1670,7 @@ img, video {
 .form-input-error { border-color: #c44 !important; }
 .form-error {
   color: #a33;
-  font-size: 0.78rem;
+  font-size: var(--fs-caption);
   margin-top: 5px;
 }
 .form-submit-error {
@@ -1660,7 +1682,7 @@ img, video {
   border-radius: var(--radius);
   padding: 10px 14px;
   color: #a33;
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
   margin-bottom: 14px;
 }
 .form-honeypot {
@@ -1700,7 +1722,7 @@ img, video {
   color: #fff;
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: var(--fs-body);
   padding: 13px 20px;
   display: flex;
   align-items: center;
@@ -1734,7 +1756,7 @@ img, video {
 .footer-legal-link {
   color: rgba(255,255,255,.35);
   font-family: var(--font-heading);
-  font-size: 0.75rem;
+  font-size: var(--fs-micro);
   font-weight: 500;
   text-decoration: none;
   transition: var(--transition-fast);
@@ -1765,7 +1787,7 @@ img, video {
   gap: 6px;
   color: var(--text-secondary);
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
   font-weight: 500;
   transition: var(--transition-fast);
 }
@@ -1777,7 +1799,7 @@ img, video {
   gap: 6px;
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: var(--fs-body);
   color: var(--text-primary);
 }
 
@@ -1798,7 +1820,7 @@ img, video {
 
 .legal-updated {
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
   margin-bottom: 32px;
 }
 
@@ -1806,7 +1828,7 @@ img, video {
 
 .legal-content h2 {
   font-family: var(--font-heading);
-  font-size: 1.1rem;
+  font-size: var(--fs-h3);
   font-weight: 700;
   margin-bottom: 10px;
   color: var(--text-primary);
@@ -1816,7 +1838,7 @@ img, video {
 .legal-content li {
   color: var(--text-secondary);
   line-height: 1.7;
-  font-size: 0.9rem;
+  font-size: var(--fs-body);
 }
 
 .legal-content ul {
@@ -1835,7 +1857,7 @@ img, video {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.8rem;
+  font-size: var(--fs-small);
   color: var(--text-muted);
 }
 
@@ -1928,7 +1950,7 @@ img, video {
   gap: 8px;
   padding: 10px 14px;
   font-family: var(--font-heading);
-  font-size: 0.68rem;
+  font-size: var(--fs-micro);
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1940,7 +1962,7 @@ img, video {
 
 .hero-video-live {
   margin-left: auto;
-  font-size: 0.6rem;
+  font-size: var(--fs-micro);
   padding: 2px 7px;
   background: rgba(232, 160, 32, 0.15);
   color: var(--amber);
@@ -2090,7 +2112,7 @@ img, video {
 }
 
 .loading-screen-text {
-  font-size: 0.82rem;
+  font-size: var(--fs-small);
   color: var(--text-secondary);
   margin-bottom: 16px;
 }
@@ -2224,7 +2246,7 @@ body.custom-cursor-on * { cursor: none !important; }
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 8px;
-  font-size: 0.72rem;
+  font-size: var(--fs-caption);
   font-family: var(--font-heading);
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -2250,13 +2272,13 @@ body.custom-cursor-on * { cursor: none !important; }
 
 .expedition-title {
   font-family: var(--font-heading);
-  font-size: 1.05rem;
+  font-size: var(--fs-lead);
   font-weight: 700;
   margin-bottom: 6px;
 }
 
 .expedition-outcome {
-  font-size: 0.9rem;
+  font-size: var(--fs-body);
   color: var(--text-secondary);
   line-height: 1.6;
 }
@@ -2286,7 +2308,7 @@ body.custom-cursor-on * { cursor: none !important; }
 .testimonial-text {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
   line-height: 1.65;
   color: var(--text-primary);
   margin-bottom: 16px;
@@ -2295,13 +2317,13 @@ body.custom-cursor-on * { cursor: none !important; }
 .testimonial-author {
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: var(--fs-small);
   font-style: normal;
   display: block;
 }
 
 .testimonial-role {
-  font-size: 0.75rem;
+  font-size: var(--fs-micro);
   color: var(--text-muted);
 }
 
@@ -2319,7 +2341,7 @@ body.custom-cursor-on * { cursor: none !important; }
   align-items: center;
   gap: 8px;
   font-family: var(--font-heading);
-  font-size: 0.88rem;
+  font-size: var(--fs-body);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2334,7 +2356,7 @@ body.custom-cursor-on * { cursor: none !important; }
 }
 
 .anti-services-list li {
-  font-size: 0.88rem;
+  font-size: var(--fs-body);
   color: var(--text-secondary);
   padding-left: 18px;
   position: relative;
@@ -2356,7 +2378,7 @@ body.custom-cursor-on * { cursor: none !important; }
 }
 
 .venture-status {
-  font-size: 0.62rem;
+  font-size: var(--fs-micro);
   font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -2388,7 +2410,7 @@ body.custom-cursor-on * { cursor: none !important; }
   border-radius: 2px;
 }
 .altitude-meter-label {
-  font-size: 0.68rem;
+  font-size: var(--fs-micro);
   font-family: var(--font-heading);
   font-weight: 700;
   color: var(--text-muted);
@@ -2402,7 +2424,7 @@ body.custom-cursor-on * { cursor: none !important; }
   margin-bottom: 12px;
 }
 .venture-stack-tag {
-  font-size: 0.65rem;
+  font-size: var(--fs-micro);
   font-family: var(--font-heading);
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -2440,7 +2462,7 @@ body.custom-cursor-on * { cursor: none !important; }
   border-radius: var(--radius);
   padding: 8px 12px;
   font-family: var(--font-heading);
-  font-size: 0.75rem;
+  font-size: var(--fs-micro);
   font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
@@ -2494,7 +2516,7 @@ body.custom-cursor-on * { cursor: none !important; }
 .venture-modal-close:hover { color: var(--text-primary); }
 
 .venture-modal-eyebrow {
-  font-size: 0.7rem;
+  font-size: var(--fs-micro);
   font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -2511,7 +2533,7 @@ body.custom-cursor-on * { cursor: none !important; }
 }
 
 .venture-modal-role {
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
   color: var(--text-secondary);
   margin-bottom: 24px;
 }
@@ -2525,7 +2547,7 @@ body.custom-cursor-on * { cursor: none !important; }
   border-left: 3px solid var(--gold);
 }
 .venture-slide-num {
-  font-size: 0.65rem;
+  font-size: var(--fs-micro);
   font-family: var(--font-heading);
   font-weight: 700;
   color: var(--gold);
@@ -2533,12 +2555,12 @@ body.custom-cursor-on * { cursor: none !important; }
 }
 .venture-slide h4 {
   font-family: var(--font-heading);
-  font-size: 0.82rem;
+  font-size: var(--fs-small);
   font-weight: 700;
   margin: 4px 0 6px;
 }
 .venture-slide p {
-  font-size: 0.88rem;
+  font-size: var(--fs-body);
   color: var(--text-secondary);
   line-height: 1.55;
 }
@@ -2559,7 +2581,7 @@ body.custom-cursor-on * { cursor: none !important; }
 }
 
 .ecosystem-ribbon-label {
-  font-size: 0.68rem;
+  font-size: var(--fs-micro);
   font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: 0.16em;
@@ -2576,7 +2598,7 @@ body.custom-cursor-on * { cursor: none !important; }
 }
 
 .ecosystem-chip {
-  font-size: 0.72rem;
+  font-size: var(--fs-caption);
   font-family: var(--font-heading);
   font-weight: 600;
   padding: 5px 12px;
@@ -2599,7 +2621,7 @@ body.custom-cursor-on * { cursor: none !important; }
   position: absolute;
   top: -8px;
   right: 16px;
-  font-size: 1.2rem;
+  font-size: var(--fs-h3);
 }
 
 /* NOSTR relays & zap */
@@ -2610,7 +2632,7 @@ body.custom-cursor-on * { cursor: none !important; }
   margin-bottom: 10px;
 }
 .nostr-relay-chip {
-  font-size: 0.62rem;
+  font-size: var(--fs-micro);
   font-family: var(--font-heading);
   font-weight: 600;
   padding: 2px 7px;
@@ -2633,10 +2655,10 @@ body.custom-cursor-on * { cursor: none !important; }
 }
 .tier-label {
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: var(--fs-caption);
 }
 .tier-range {
-  font-size: 0.65rem;
+  font-size: var(--fs-micro);
   opacity: 0.7;
 }
 
@@ -2644,7 +2666,7 @@ body.custom-cursor-on * { cursor: none !important; }
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.78rem;
+  font-size: var(--fs-caption);
   color: var(--text-muted);
   margin-top: 12px;
   justify-content: center;
@@ -2662,7 +2684,7 @@ body.custom-cursor-on * { cursor: none !important; }
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.68rem;
+  font-size: var(--fs-micro);
   color: var(--green-light);
   font-family: var(--font-heading);
   font-weight: 600;
