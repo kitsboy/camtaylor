@@ -40,8 +40,10 @@ export function PrivacyPage() {
       <section>
         <h2>Analytics</h2>
         <p>
-          If enabled, we use privacy-friendly analytics (Plausible) that does not use cookies and does
-          not track individuals across websites. No personal data is collected by analytics.
+          If enabled, we use privacy-friendly, cookie-free analytics that does not track you across
+          other websites and collects no personal data. It is served either by our own self-hosted
+          instance at analytics.giveabit.io or by Plausible. Nothing is loaded today, and no preview
+          build is ever counted.
         </p>
       </section>
 

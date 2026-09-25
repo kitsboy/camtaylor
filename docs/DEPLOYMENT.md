@@ -101,9 +101,27 @@ one → **Rollback**. DNS stays untouched, so this is the safe undo.
 
 ## Analytics
 
-None is shipped. If Plausible is enabled later, set `VITE_PLAUSIBLE_DOMAIN=camtaylor.ca`
-in the production environment **and** re-add `https://plausible.io` to `script-src` and
-`connect-src` in `public/_headers`.
+None is shipped: `VITE_PLAUSIBLE_DOMAIN` and `VITE_UMAMI_WEBSITE_ID` are both empty in the
+production environment, so no script loads and every `trackEvent()` is a no-op. That is the
+launch default, not an accident.
+
+One module owns this — `src/utils/analytics.ts`, called once from `main.tsx`. It is gated on
+`VITE_PRIVATE_PREVIEW` as well as on an ID, so a preview build is never counted. Whichever
+variable is set wins:
+
+| Provider | Variable | Script host |
+|---|---|---|
+| Plausible (hosted) | `VITE_PLAUSIBLE_DOMAIN=camtaylor.ca` | `https://plausible.io` |
+| Umami (self-hosted, THOR) | `VITE_UMAMI_WEBSITE_ID=<website id>` | `https://analytics.giveabit.io` |
+
+Both hosts are allowed in `script-src` and `connect-src` in `public/_headers`, and
+`npm run quality` fails if either is missing from either directive — a blocked script looks
+exactly like no analytics, which is how the site shipped for a release reporting nothing.
+Setting the variable in the Cloudflare Pages **production environment** is the whole switch
+(push = deploy); no code change, no redeploy command.
+
+**Which provider is Kimi's call.** Cam's instruction is that she has a way of doing this; the
+question is open in `docs/KIMI-HANDOFF.md`, alongside the two form variables below.
 
 See `docs/PRIVATE-LAUNCH-GATE.md` for the pre/post-launch checklist and
 `docs/KIMI-HANDOFF.md` for session state.

@@ -8,13 +8,15 @@ dashboard because DNS edit is not delegated to the build machine.
 ## Launch decisions (2026-09-24)
 
 - `VITE_PRIVATE_PREVIEW=false` for production builds → preview banner off, contact delivery on.
-  **NOTE (2026-09-25, Kimi): this variable is NOT actually set in the Pages production environment today —
-  the live site still builds as a private preview.** It must be set in the dashboard.
-- Contact form: Formspree, target `hello@giveabit.io`. **Live state as of 2026-09-25: NOT delivered** —
-  the Pages production build still has the private preview on and the placeholder form ID. Set
-  `VITE_PRIVATE_PREVIEW=false` and the live `VITE_FORMSPREE_FORM_ID` in the Pages production environment,
-  then confirm with `npm run check:live-form` (must exit 0).
-- Analytics: none shipped. `public/_headers` no longer allows plausible.io or analytics.giveabit.io.
+  **NOTE (2026-09-25, Kimi): this variable was NOT set in the Pages production environment — the live
+  site still built as a private preview, verified against the published bundle** (`npm run check:live-form`).
+  Both production variables were set later that day with a scoped Cloudflare API token and pinned in
+  `wrangler.toml`; `npm run check:live-form` exiting 0 is the confirmation.
+- Contact form: Formspree target `hello@giveabit.io`. The live endpoint is **`xpqgopvd`** — the family
+  form the sibling sites already use — with a **`[camtaylor.ca]`** subject prefix so camtaylor
+  submissions stay distinguishable in the shared inbox. The `xykqodnk` in the older docs was the
+  scaffold placeholder, and the published bundle proved production was posting to it.
+- Analytics: none shipped — both `VITE_PLAUSIBLE_DOMAIN` and `VITE_UMAMI_WEBSITE_ID` are empty, so no script loads. `public/_headers` allows both hosts the single loader can reach (`plausible.io`, `analytics.giveabit.io`), so switching one on is a Pages variable rather than a deploy. Which provider is an open question for Kimi in `docs/KIMI-HANDOFF.md`.
 - Hosting: Cloudflare Pages only. `vercel.json` and `netlify.toml` were deleted.
 - Service worker: network-first for navigations so a deploy is never masked by a stale cache.
 

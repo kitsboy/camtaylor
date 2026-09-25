@@ -23,8 +23,10 @@ if (import.meta.env.DEV) {
   if (configErrors.length > 0) console.warn('Site configuration warnings:', configErrors);
 }
 
-// No-op unless VITE_PLAUSIBLE_DOMAIN is set; without this call, every event the site
-// fires goes nowhere.
+// No-op unless an analytics ID is set (VITE_PLAUSIBLE_DOMAIN or VITE_UMAMI_WEBSITE_ID)
+// *and* this is a public build; without this call, every event the site fires goes
+// nowhere. This is the only place an analytics script is created — see
+// `src/utils/analytics.ts` for why that matters.
 initAnalytics();
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {

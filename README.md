@@ -35,8 +35,8 @@ npm run dev            # http://localhost:5173
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `VITE_FORMSPREE_FORM_ID` | No | Formspree endpoint ID. The form must deliver to `hello@giveabit.io`; the `xykqodnk` fallback is a **placeholder** that delivers nowhere |
-| `VITE_PLAUSIBLE_DOMAIN` | No | Plausible domain — only used when private preview is off |
-| `VITE_UMAMI_WEBSITE_ID` | No | Umami website ID — only used when private preview is off |
+| `VITE_PLAUSIBLE_DOMAIN` | No | Plausible domain (`camtaylor.ca`), served from `https://plausible.io` — only used when private preview is off |
+| `VITE_UMAMI_WEBSITE_ID` | No | Umami website ID — the family's self-hosted Umami at `analytics.giveabit.io`; only used when private preview is off. Whichever of the two is set wins |
 | `VITE_PRIVATE_PREVIEW` | No | Defaults to `true`. `false` publishes the site: banner off, form live |
 
 ---

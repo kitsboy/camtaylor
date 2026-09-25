@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
-import { Analytics } from './components/Analytics';
 import { HomePage } from './pages/HomePage';
 import { IS_PRIVATE_PREVIEW } from './data/site';
 
@@ -45,7 +44,6 @@ function App() {
               PRIVATE PREVIEW · Not public · Form delivery and analytics disabled
             </div>
           )}
-          <Analytics />
           <Suspense fallback={<PageFallback />}>
             <Routes>
               <Route path="/" element={<HomePage />} />

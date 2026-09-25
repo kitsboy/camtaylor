@@ -234,16 +234,48 @@ if (!inbox) {
 // conversion was invisible — the same shape as the contact form reporting nothing while
 // being broken. The loader exists now, and the one thing that silently breaks it is a
 // host missing from the CSP, where a blocked script looks exactly like no analytics.
-const analyticsSource = readFileSync('src/utils/analytics.ts', 'utf8');
-const analyticsHost = analyticsSource.match(/const SCRIPT_HOST = 'https:\/\/([a-z0-9.-]+)'/)?.[1];
-if (!analyticsHost) {
-  failures.push('src/utils/analytics.ts no longer names its script host, so the CSP cannot be checked against it');
+//
+// The loader can reach two hosts (Plausible, and the family's self-hosted Umami), because
+// which one camtaylor uses is an open question for Kimi. Both are checked, because the
+// second one is not the one that gets tested — a set `VITE_UMAMI_WEBSITE_ID` against a CSP
+// that only allows plausible.io is a script the browser blocks in silence.
+const analyticsPath = join('src', 'utils', 'analytics.ts');
+const analyticsSource = readFileSync(analyticsPath, 'utf8');
+const hostList = analyticsSource.match(/ANALYTICS_HOSTS = \[([\s\S]*?)\]/)?.[1] ?? '';
+const analyticsHosts = [...hostList.matchAll(/'https:\/\/([a-z0-9.-]+)'/g)].map((match) => match[1]);
+if (!analyticsHosts.length) {
+  failures.push('src/utils/analytics.ts no longer lists ANALYTICS_HOSTS, so the CSP cannot be checked against it');
 } else {
   const headers = readFileSync('public/_headers', 'utf8');
-  for (const directive of ['script-src', 'connect-src']) {
-    const policy = headers.match(new RegExp(`${directive}[^;]*`))?.[0] ?? '';
-    if (!policy.includes(analyticsHost)) {
-      failures.push(`public/_headers ${directive} does not allow ${analyticsHost} — the analytics script would be blocked in production`);
+  for (const host of analyticsHosts) {
+    for (const directive of ['script-src', 'connect-src']) {
+      const policy = headers.match(new RegExp(`${directive}[^;]*`))?.[0] ?? '';
+      if (!policy.includes(host)) {
+        failures.push(`public/_headers ${directive} does not allow ${host} — the analytics script would be blocked in production`);
+      }
+    }
+  }
+  // One loader, or two scripts load. This repo briefly had two — a React effect in
+  // `src/components/Analytics.tsx` loading Plausible's plain script and `initAnalytics()`
+  // loading the tagged-events one — which is one pageview reported twice the moment
+  // analytics is switched on, and invisible in a browser either way. The pattern is a script
+  // URL, not a bare hostname, so prose that merely names the provider (the privacy policy
+  // does) is not a second loader.
+  const scriptUrl = new RegExp(
+    `https://(?:${analyticsHosts.map((host) => host.replace(/\./g, '\\.')).join('|')})/[^'"\`\\s]*script`,
+    'i',
+  );
+  // Every allowed host has to be one the loader actually loads from, or the policy is dead.
+  for (const host of analyticsHosts) {
+    const url = new RegExp(`https://${host.replace(/\./g, '\\.')}/[^'"\`\\s]*script`, 'i');
+    if (!url.test(analyticsSource)) {
+      failures.push(`${analyticsPath} never loads a script from ${host}, so allowing it in the CSP guards nothing`);
+    }
+  }
+  for (const file of walk('src', ['.ts', '.tsx'])) {
+    if (file === analyticsPath) continue;
+    if (scriptUrl.test(readFileSync(file, 'utf8'))) {
+      failures.push(`${file} loads an analytics script of its own — every analytics script must be created in ${analyticsPath}, or two loaders load two scripts`);
     }
   }
 }
@@ -253,5 +285,5 @@ if (failures.length) {
   process.exit(1);
 }
 console.log(
-  `✓ Quality check passed (${requiredFiles.length} assets, ${CARD.width}x${CARD.height} share card, metadata, privacy gate, type-scale floor, cascade, form inbox, analytics CSP)`,
+  `✓ Quality check passed (${requiredFiles.length} assets, ${CARD.width}x${CARD.height} share card, metadata, privacy gate, type-scale floor, cascade, form inbox, analytics hosts)`,
 );
