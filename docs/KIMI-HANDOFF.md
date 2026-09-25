@@ -1,3 +1,173 @@
+## Session — 2026-09-25 (the ten missing things: theme, form failure, analytics, a11y, signal, dates, schema, cards, budget, desktop)
+
+**Machine:** M3 (Buffy) · **Project:** camtaylor · **Push = deploy** since `41b4bfa`, so every commit
+below is already published. **100/100 tests**, `npm run quality` ✓, `tsc` ✓, lint 0 errors.
+
+Cam: *"Please do all 10, and also all suggested follow ups. So, 14 things."* The four follow-ups were
+four of the ten (the form's failure path, the night theme, desktop length, the keyboard pass), so this
+is ten items in twelve commits, each one pushed on its own.
+
+### 1. The night theme flashed warm on every load — `247de4c`
+
+`useTheme` set `data-theme` in a React effect, so a reader who had chosen night got the warm ground
+painted first, and the default was hard-coded `'warm'` so a dark-OS visitor was never offered the dark
+ground at all. `index.html` now resolves the theme inline ahead of the bundle — stored choice, else
+`prefers-color-scheme`, attribute and browser chrome colour both — and the hook only writes storage on
+a toggle, because only a toggle is a decision; following the OS must not be frozen into one on the
+first visit. Four guards, including one that aborts the bundle and asserts the attribute is *still*
+right, which is what makes it a test about pre-paint rather than about eventually.
+
+### 2. A refused submission had nowhere to go — `532d73a`
+
+When the endpoint refuses, a reader who has just written a brief gets a one-line error and no way to
+act on it. The failure state now carries the whole brief — same subject, name, address, organization,
+tier, message — as a mailto link to the monitored inbox, with the button still there to retry, and the
+failure is tracked so it is visible rather than silent.
+
+**This batch also added the project that tests the published build.** `VITE_PRIVATE_PREVIEW` defaults
+to true, so every test in this repo until now ran against the *preview* build — form disabled, banner
+up. A second webServer builds the public output to `dist-live` and `tests/public.spec.ts` runs against
+it: the form is on, the note names `hello@giveabit.io`, a refused submission hands over the address
+with the brief intact, and a delivered one retires the form. Every submission is intercepted, so a
+test run cannot post mail anywhere. The public build is also where the form's success and failure
+paths can be tested at all.
+
+### 3. `trackEvent` was a no-op — `e84beab`, `ba96817`
+
+Nothing ever loaded an analytics script, so `form_start`, `form_submit`, `form_success` and the new
+`form_error` all went nowhere: the same shape as the contact form, a surface that reports nothing and
+is therefore assumed to be fine. `initAnalytics()` now loads Plausible when `VITE_PLAUSIBLE_DOMAIN` is
+set (still empty, so nothing ships at launch), events fired before the script lands are queued rather
+than dropped, and the host is allowed in both `script-src` and `connect-src`.
+`npm run quality` fails if the loader's host and the CSP disagree, because a blocked script looks
+exactly like no analytics. (`ba96817` is the one-line CSP fix — the canary that proved the gate works
+had reverted the policy.)
+
+### 4. The keyboard and screen-reader pass — `b050ea9`
+
+Run properly for the first time, with a throwaway audit rather than by eye. Two real faults:
+
+- **the closed mobile route sheet was `aria-hidden` and still tabbable** — fourteen controls a
+  keyboard reader could land on with every label hidden from them. `inert` on the closed sheet takes
+  the subtree out of focus and pointer reach too, which is what "closed" has to mean;
+- **the heading outline jumped h2 → h4** in the contact sidebar. Those four titles are h3 now.
+
+The audit itself was wrong twice before it was trusted: it flagged `alt=""` as a missing alt (an
+empty alt is the statement that an image is decorative, and correct for a poster inside a labelled
+button), and counted any control inside an `aria-hidden` subtree as an orphan even when `inert` had
+already made it unreachable. Six guards, all canaried, including a focus trap checked across **forty**
+tabs — more than the sheet holds, so the wrap is actually exercised — and focus returned on Escape.
+
+### 5. The live signal now keeps its last good reading — `23aebb0`
+
+A dropped read blanked the panel and printed "offline", which blames the reader's connection for what
+is usually a blocked request, and throws away a reading the browser received a minute earlier. Each
+panel keeps the last reading it actually got, in session storage, and serves it only when the fresh
+read fails: the chip reads **LAST GOOD**, a line names which panels could not be re-read, and the
+timestamp is the reading's own. It expires (an hour for blocks, three days for the daily Lightning
+snapshots, six hours for price) and it is never presented as current. The old subtitle promised "no
+cache", which this deliberately breaks, so the copy says what happens now. Two guards against
+fixtures: the fallback arrives labelled, and a cold failure still says OFFLINE with no invented number.
+
+### 6. Sitemap and feed dates come from the dispatches — `2e8dc0c`
+
+`prebuild` stamped `new Date()` on every static URL and on `lastBuildDate`, so every deploy claimed
+all twelve pages had changed that day and the two files came out dirty on every build (they had to be
+reverted by hand before each commit). The homepage takes the newest dispatch's date, the four pages
+that only change when someone edits them carry **no** `lastmod` rather than an invented one, and the
+feed's build date is its own newest item. Running the generator twice now produces byte-identical
+files, which is one of the two guards.
+
+### 7. Every page below the homepage now describes itself — `929e479`
+
+A dated, attributed dispatch was plain HTML to anything reading it mechanically. Dispatches declare a
+`BlogPosting` — headline, summary, datePublished, section, author, publisher, url — plus a
+`BreadcrumbList`; case files declare an `Article` and a breadcrumb. `usePageMeta` takes an optional
+node and keeps exactly **one** in the document, replacing rather than appending, so client-side
+navigation cannot describe the next page as the one before it. The `Person` block in `index.html` and
+`public/llms.txt` both pointed at `cam@camtaylor.ca` while the monitored inbox is
+`hello@giveabit.io` — fixed, because the machine-readable surface is the last place anyone looks.
+`llms.txt` is a required asset now and index.html must link it, every inline JSON-LD block must parse
+and declare a `@type`, and the Person must carry an email and a `sameAs`.
+
+### 8. A share card per dispatch and per venture — `9172aa4`
+
+One card served every page, so a shared dispatch was indistinguishable from the homepage in a feed.
+`npm run og` renders thirteen cards now — from each dispatch's own title, summary and date, each
+venture's own name and role — in the same ground, rule and type system, with the title sized by its
+own length. They are JPEG (60–75kB each) rather than PNG, because thirteen cards at the site card's
+475kB is five and a half megabytes of repo and bundle for images fetched one at a time. **The
+generator found a real fault on its first run**: two cards rendered with the footer bar — the domain —
+pushed off the 630px frame by a long summary, because a flex child without `min-height: 0` grows.
+`npm run quality` fails if any dispatch or venture has no 1200x630 JPEG card (canaried by moving one
+away), and `tests/share.spec.ts` checks the rest of the chain, which fails silently otherwise.
+
+### 9. A weight budget and a link check — `f1e2c59`
+
+Nothing could see how much the page shipped. It now ships **166kB of JavaScript** (framer-motion,
+lucide, a router, Formspree), one 69kB chunk, 668kB of imagery and 98kB of webfonts, measured over the
+wire with gzip, with ceilings about a third above. Writing the measurement first was the useful part:
+filtering by `initiatorType === 'script'` saw exactly **one** file, because the bundler fetches the
+vendor chunks as dynamic imports and they report as `other` — a budget that quietly measures a quarter
+of the JavaScript reads as a pass. The link check matters more here than most: this is a single-page
+app, so every path answers 200 including the ones that do not exist, and a status code proves nothing.
+Each internal link is followed and has to render an `h1` without being the 404 page; `/feed.xml` and
+friends are checked with a request instead of a navigation.
+
+### 10. The desktop page — `12edd83`
+
+It was 15,087px, 16.8 screens of a 900px laptop, and no pass had ever measured it. Measured by
+section at 1440: expedition log 1,669px, ventures 1,522, contact 1,228, services 1,217, live signal
+1,086 — spread across every section, the same shape the phone page had.
+
+**One dead end worth recording:** folding the four long lists at this width made the page **297px
+longer**. Their grids are already multi-column, so hiding four of ten family cards saved no height and
+the control cost 56px per section. Reverted, and the test that asserts a desktop grows no disclosure
+now says why, with the number. What did pay is the repeated chrome: `--section-gap` was 72px top *and*
+bottom on a 900px laptop, roughly 1,600px down the page, and it is 5.5vh now — the same tightening the
+phone pass made. **15,087 → 14,817px**, guarded by a deliberately loose 15,200px budget.
+
+### Also in this stretch
+
+- **`61b5bb3` — `npm run check:live-form`.** The live-bundle probe as a command rather than a
+  throwaway: it reads what production is actually serving and which endpoint the form posts to,
+  sends nothing, and exits 1 while the form is broken. It is the verification step for the two
+  Cloudflare Pages variables below.
+- **`178a1c8`** — stopped tracking a scratch pid file and `.last-run.json`, which dirtied the tree on
+  every test run.
+- **`test(contrast)`** — the fixture's "was the page still moving" gate failed once in three
+  full-suite runs today and passes standalone; it retries for six seconds now. A ticker that never
+  ends is still running on the last attempt, so this cannot hide a genuine fault.
+
+### For Kimi — the contact form is still the open item
+
+The ten numbered questions from the previous section all still stand, and the two that unblock the
+form are: **a live `VITE_FORMSPREE_FORM_ID`** and **`VITE_PRIVATE_PREVIEW=false`** as Cloudflare
+Pages production variables. `npm run check:live-form` is the verification: it fails today, correctly,
+with both reasons spelled out. The form's client half is now complete — the recipient is one address
+in one place, the failure path hands the reader that address with the brief intact, and the public
+build has three tests where it previously had none.
+
+### Decisions Cam may want to reverse
+
+- **The theme now follows the operating system on a first visit.** A dark-OS visitor gets the night
+  ground without asking for it, and their first toggle is what gets remembered.
+- **`--section-gap` is 5.5vh instead of 8vh above 768px.** That is 49px instead of 72px between
+  sections on a 900px laptop — tighter rhythm, 270px less page.
+- **The desktop still folds nothing.** Folding made it longer; the numbers are in the test.
+- **The signal folds two of three instruments on a phone** (from the previous session) and now says
+  LAST GOOD rather than offline when a read fails and a reading is available.
+- **The analytics plumbing is live but the domain is still empty**, so nothing ships. Setting
+  `VITE_PLAUSIBLE_DOMAIN=camtaylor.ca` is what turns it on, and the CSP already allows the host.
+
+### Git state
+
+`247de4c` · `532d73a` · `e84beab` · `ba96817` · `b050ea9` · `23aebb0` · `2e8dc0c` · `929e479` ·
+`178a1c8` · `f1e2c59` · `9172aa4` · `12edd83` — all pushed, `origin/main..HEAD` empty, tree clean.
+(`public/build-meta.json` is untracked and Kimi's; it is left alone.)
+
+---
+
 ## Session — 2026-09-25 (the contact form's email: asked Kimi, and fixed everything her answer does not block)
 
 **Machine:** M3 (Buffy) · **Project:** camtaylor · Since `41b4bfa` **push = deploy** (Cloudflare
