@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ArrowUpRight, Compass } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { FAMILY_OFFERINGS } from '../data/family';
+import { SectionFold } from './SectionFold';
 
 export const Family: React.FC = () => {
   const [selectedTone, setSelectedTone] = useState('all');
@@ -21,7 +22,12 @@ export const Family: React.FC = () => {
     </div>
     <p className="family-count" aria-live="polite">Showing {offerings.length} of {FAMILY_OFFERINGS.length} routes</p>
     <div className={`family-grid ${selectedTone !== 'all' ? 'family-grid--spotlight' : ''}`} aria-live="polite">
-      {offerings.map((offering, index) => (
+      <SectionFold
+        shown={3}
+        noun="routes"
+        bodyClassName={`family-grid ${selectedTone !== 'all' ? 'family-grid--spotlight' : ''}`}
+      >
+        {offerings.map((offering, index) => (
         <motion.a
           key={offering.id}
           href={offering.url}
@@ -43,7 +49,8 @@ export const Family: React.FC = () => {
           <span className="family-visit">Visit <ArrowUpRight size={14} /></span>
           <span className="family-tooltip" role="tooltip">Open {offering.name} ↗</span>
         </motion.a>
-      ))}
+        ))}
+      </SectionFold>
     </div>
   </section>
   );

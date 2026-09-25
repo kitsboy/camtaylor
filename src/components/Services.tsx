@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Layers, Briefcase, Zap, Flame } from 'lucide-react';
 import { SERVICES } from '../data/services';
 import { AntiServices } from './AntiServices';
+import { SectionFold } from './SectionFold';
 
 const ICONS = [Layers, Briefcase, Zap, Flame] as const;
 
@@ -18,6 +19,7 @@ export const Services: React.FC = () => {
       </div>
 
       <div className="services-grid">
+        <SectionFold shown={3} noun="areas" bodyClassName="services-grid">
         {SERVICES.map((service, idx) => {
           const Icon = ICONS[idx];
           return (
@@ -46,6 +48,7 @@ export const Services: React.FC = () => {
             </motion.div>
           );
         })}
+        </SectionFold>
       </div>
 
       <div className="services-signal-panel" aria-label="Operating model overview">

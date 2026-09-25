@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ArrowUpRight, Bot, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AGENTS } from '../data/agents';
+import { SectionFold } from './SectionFold';
 
 export const Agents: React.FC = () => {
   const [query, setQuery] = useState('');
@@ -30,6 +31,7 @@ export const Agents: React.FC = () => {
       </label>
       <div className="agents-constellation" aria-hidden="true"><span /><span /><span /><span /></div>
       <div className="agents-grid agents-grid--constellation">
+        <SectionFold shown={3} noun="agents" bodyClassName="agents-grid agents-grid--constellation">
         {filteredAgents.map((agent, index) => (
           <motion.a
             key={agent.id}
@@ -53,6 +55,7 @@ export const Agents: React.FC = () => {
             </div>
           </motion.a>
         ))}
+        </SectionFold>
       </div>
       {filteredAgents.length === 0 && <p className="agent-empty">No agent matches that route yet. Try “research”, “design”, or “Bitcoin”.</p>}
     </div>

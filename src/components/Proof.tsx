@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { CheckCircle2, ExternalLink, Loader2, ShieldCheck, XCircle } from 'lucide-react';
 import { FAMILY_OFFERINGS } from '../data/family';
+import { SectionFold } from './SectionFold';
 
 type Health = 'checking' | 'live' | 'unreachable';
 
@@ -52,6 +53,7 @@ export const Proof: React.FC = () => {
         </div>
         <div className="proof-signal-legend" aria-label="Proof status legend"><span className="proof-legend-live">● Reachable</span><span className="proof-legend-checking">◌ Checking</span><span className="proof-legend-error">● Could not verify</span></div>
         <div className="proof-grid proof-grid--dashboard">
+          <SectionFold shown={3} noun="links" bodyClassName="proof-grid proof-grid--dashboard">
           {FAMILY_OFFERINGS.map((offering) => {
             const state = health[offering.id];
             return (
@@ -67,6 +69,7 @@ export const Proof: React.FC = () => {
               </a>
             );
           })}
+          </SectionFold>
         </div>
         <p className="proof-note">This browser check is a simple signal, not a promise of uptime. If a project cannot be verified, we say so.{lastChecked ? ` Last checked locally at ${lastChecked}.` : ''}</p>
       </div>

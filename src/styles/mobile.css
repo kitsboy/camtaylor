@@ -924,6 +924,55 @@ a,
   }
 }
 
+/* The fold: a phone-length remedy.
+
+   The phone page is ~27 screens tall and its length is spread across every
+   section, so there is no single rewrite that shortens it. What does shorten it
+   is not printing every list at full depth: a phone shows the first few items and
+   the rest wait behind one honest, counted control.
+
+   `<details>` does the disclosure, so keyboard and screen readers get it for
+   free. The CSS here only needs to make the summary look like part of the site
+   and make it a real touch target; `SectionFold` handles when it applies. */
+.section-fold { grid-column: 1 / -1; }
+
+.section-fold-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 10px 14px;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px dashed var(--line-bright);
+  border-radius: var(--radius);
+  font-family: var(--font-heading);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
+}
+
+/* No native triangle: the count chip and the dashes already read as "more". */
+.section-fold-summary::-webkit-details-marker { display: none; }
+.section-fold-summary::marker { content: ''; }
+
+.section-fold-details[open] > .section-fold-summary {
+  margin-bottom: 16px;
+  border-style: solid;
+}
+
+.section-fold-count {
+  padding: 2px 8px;
+  color: var(--ink);
+  background: var(--acid);
+  border-radius: 999px;
+  letter-spacing: 0.08em;
+}
+
 /* High contrast */
 @media (prefers-contrast: more) {
   .nav-link,

@@ -267,7 +267,11 @@ test('dispatch timeline stays legible at 390px', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#expedition-log');
 
-  const log = page.locator('.log-timeline');
+  // `SectionFold` gives the folded dispatches their own `.log-timeline` wrapper
+  // so they keep the timeline's rhythm, which means the class now matches twice
+  // on a phone. The real list is the `<ol>`; the folded body is a `<div>` inside
+  // the `<details>`, and it is hidden until the reader opens it.
+  const log = page.locator('ol.log-timeline');
   await expect(log).toBeVisible();
   await expect(log.locator('.log-entry').first()).toBeVisible();
 });
@@ -516,4 +520,105 @@ test('only one call to action is lit at a time', async ({ page }) => {
   expect(up.pillShowing, 'the pill did not appear on scroll-up').toBe(true);
   expect(up.lane).toBe('pill');
   expect(up.connect, 'two calls to action lit at once').not.toBe(ACCENT);
+});
+
+/**
+ * The phone page was about 27 screens long, and the length was spread across
+ * every section rather than sitting in one place. `SectionFold` shows the first
+ * few items of a long list on a phone and holds the rest behind one control.
+ *
+ * Three things this has to hold, and the third is why it exists:
+ *   - a fold must hide at least two items (a one-item fold costs a tap to save
+ *     one card, and `SERVICES` is one area away from that mistake);
+ *   - the label must state the count it actually hides;
+ *   - **nothing inside may stay invisible once it is open.** The ventures
+ *     carousel stranded cards at `opacity: 0` (`f0fed9d`) because a reveal that
+ *     waits for an element to enter the viewport never fires for content the
+ *     reader has not reached. Folded content is exactly that shape, so this
+ *     opens every fold, walks the page, and reads the opacity back — after a
+ *     settle, because the reveals are 400ms animations and reading mid-flight
+ *     reports a fault that is not there.
+ */
+test('a phone folds the long section tails, and unfolding strands nothing', async ({ page }) => {
+  test.slow();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('.mobile-quick-nav')).toBeVisible();
+  await page.waitForTimeout(1200);
+
+  const folds = page.locator('details.section-fold-details');
+  const count = await folds.count();
+  expect(count, 'nothing folds on a phone, so the page still dumps every section at full depth').toBeGreaterThan(0);
+
+  const collapsed = await page.evaluate(() => document.body.scrollHeight);
+
+  const labels = await folds.evaluateAll((nodes) =>
+    nodes.map((d) => {
+      // The label counts items, not descendants: one dispatch is one `<li>` even
+      // though it holds several links. Count the folded body's own children.
+      const body = Array.from(d.children).find((child) => child.tagName !== 'SUMMARY');
+      return {
+        label: (d.querySelector('summary')?.textContent ?? '').replace(/\s+/g, ' ').trim(),
+        shown: Number(d.querySelector('.section-fold-count')?.textContent ?? '-1'),
+        hidden: body?.children.length ?? 0,
+      };
+    }),
+  );
+  for (const fold of labels) {
+    expect(fold.hidden, `"${fold.label}" hides fewer than two items`).toBeGreaterThanOrEqual(2);
+    expect(fold.shown, `"${fold.label}" does not count what it hides`).toBe(fold.hidden);
+    expect(fold.label, `"${fold.label}" is not a label a reader can act on`).toMatch(/^\d+ more [a-z]+ · tap to unfold$/);
+  }
+
+  // Open them the way a reader does, through the summary control.
+  for (let i = 0; i < count; i++) await folds.nth(i).locator('summary').click();
+  await page.waitForTimeout(600);
+  const unfolded = await page.evaluate(() => document.body.scrollHeight);
+  expect(
+    unfolded - collapsed,
+    'unfolding every section adds almost nothing, so the folds were not holding anything',
+  ).toBeGreaterThan(800);
+
+  await page.evaluate(async () => {
+    document.documentElement.style.scrollBehavior = 'auto';
+    const step = 400;
+    for (let y = 0; y <= document.body.scrollHeight; y += step) {
+      window.scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 60));
+    }
+  });
+  await page.waitForTimeout(3000);
+
+  const stranded = await folds.evaluateAll((nodes) => {
+    const out: string[] = [];
+    for (const d of nodes) {
+      for (const el of d.querySelectorAll<HTMLElement>('a, li, article')) {
+        if (el.getBoundingClientRect().height < 4) continue;
+        const style = getComputedStyle(el);
+        if (parseFloat(style.opacity) < 0.99 || style.visibility === 'hidden') {
+          out.push(`${el.tagName}.${el.className} opacity ${style.opacity} — ${(el.textContent ?? '').trim().slice(0, 30)}`);
+        }
+      }
+    }
+    return out;
+  });
+  expect(stranded, `content stayed invisible after unfolding:\n${stranded.join('\n')}`).toHaveLength(0);
+});
+
+/**
+ * The fold is a phone affordance and nothing else. A desktop page is 15,000px
+ * and already fine, and splitting a two-column list at an odd number leaves one
+ * card alone in its row — so on a desktop the component renders its children
+ * straight through, with no wrapper and no `<details>` left behind.
+ */
+test('a desktop does not fold anything', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await expect(page.locator('.hero-route-status')).toBeVisible();
+  await page.waitForTimeout(900);
+
+  expect(await page.locator('details.section-fold-details').count(), 'a desktop grew a disclosure').toBe(0);
+  expect(await page.locator('.section-fold').count(), 'a desktop kept the fold wrapper').toBe(0);
+  // The open state is also a desktop regression, so check the content is there.
+  expect(await page.locator('.family-card').count(), 'the desktop lost family cards to the fold').toBeGreaterThanOrEqual(10);
 });

@@ -7,6 +7,7 @@ import {
   formatDispatchDate,
   formatDispatchMonth,
 } from '../utils/dispatches';
+import { SectionFold } from './SectionFold';
 
 const TERRAINS = [...new Set(DISPATCHES.map((entry) => entry.terrain))];
 
@@ -62,6 +63,7 @@ export const ExpeditionLog: React.FC = () => {
       )}
 
       <ol className="log-timeline">
+        <SectionFold as="li" shown={3} noun="dispatches" bodyClassName="log-timeline">
         {entries.map((entry, index) => (
           <motion.li
             key={entry.slug}
@@ -111,6 +113,7 @@ export const ExpeditionLog: React.FC = () => {
             </article>
           </motion.li>
         ))}
+        </SectionFold>
       </ol>
 
       {entries.length === 0 && (
