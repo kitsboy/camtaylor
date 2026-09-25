@@ -16,11 +16,16 @@ import './styles/footer.css';
 import './styles/touch.css';
 import App from './App.tsx';
 import { validateSiteConfig } from './data/site';
+import { initAnalytics } from './utils/analytics';
 
 if (import.meta.env.DEV) {
   const configErrors = validateSiteConfig();
   if (configErrors.length > 0) console.warn('Site configuration warnings:', configErrors);
 }
+
+// No-op unless VITE_PLAUSIBLE_DOMAIN is set; without this call, every event the site
+// fires goes nowhere.
+initAnalytics();
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {

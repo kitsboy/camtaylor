@@ -147,10 +147,30 @@ if (!inbox) {
   }
 }
 
+// ── Analytics, if it is ever switched on ───────────────────────────────────────────
+// `trackEvent` was a no-op for a whole release: nothing ever loaded an analytics script,
+// so `form_start`, `form_submit` and `form_success` went nowhere and the form's own
+// conversion was invisible — the same shape as the contact form reporting nothing while
+// being broken. The loader exists now, and the one thing that silently breaks it is a
+// host missing from the CSP, where a blocked script looks exactly like no analytics.
+const analyticsSource = readFileSync('src/utils/analytics.ts', 'utf8');
+const analyticsHost = analyticsSource.match(/const SCRIPT_HOST = 'https:\/\/([a-z0-9.-]+)'/)?.[1];
+if (!analyticsHost) {
+  failures.push('src/utils/analytics.ts no longer names its script host, so the CSP cannot be checked against it');
+} else {
+  const headers = readFileSync('public/_headers', 'utf8');
+  for (const directive of ['script-src', 'connect-src']) {
+    const policy = headers.match(new RegExp(`${directive}[^;]*`))?.[0] ?? '';
+    if (!policy.includes(analyticsHost)) {
+      failures.push(`public/_headers ${directive} does not allow ${analyticsHost} — the analytics script would be blocked in production`);
+    }
+  }
+}
+
 if (failures.length) {
   console.error(failures.map((failure) => `✗ ${failure}`).join('\n'));
   process.exit(1);
 }
 console.log(
-  `✓ Quality check passed (${requiredFiles.length} assets, ${CARD.width}x${CARD.height} share card, metadata, privacy gate, type-scale floor, cascade, form inbox)`,
+  `✓ Quality check passed (${requiredFiles.length} assets, ${CARD.width}x${CARD.height} share card, metadata, privacy gate, type-scale floor, cascade, form inbox, analytics CSP)`,
 );

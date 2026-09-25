@@ -6,6 +6,22 @@ import { expect, test } from '@playwright/test';
 
 const FORMSPREE = '**formspree.io/**';
 
+test('no third-party script arrives when no analytics domain is configured', async ({ page }) => {
+  const external = [];
+  page.on('request', (request) => {
+    const url = new URL(request.url());
+    if (!url.hostname.endsWith('127.0.0.1') && !['data:', 'blob:'].includes(url.protocol)) {
+      external.push(url.hostname);
+    }
+  });
+  await page.goto('/');
+  await page.waitForTimeout(2000);
+  // The data APIs are the site's own readings; an analytics host here would mean the
+  // loader does not respect its own switch.
+  expect(external).not.toContain('plausible.io');
+  await expect(page.locator('script[data-analytics]')).toHaveCount(0);
+});
+
 test('the published build switches the form on and names the monitored inbox', async ({ page }) => {
   await page.goto('/#contact');
   await expect(page.locator('.form-preview-notice')).toHaveCount(0);
