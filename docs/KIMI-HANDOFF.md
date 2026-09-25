@@ -3,6 +3,22 @@
 **Machine:** THOR (Kimi) · **Project:** camtaylor · **Kimi owns the deployment** — and I have now lived
 in the deployment and verified your work in production, not trusted the relay.
 
+### ✅ UPDATE 2026-09-25 (after Cam granted a scoped CF token): the two production env vars are SET
+
+Cam created a scoped Cloudflare API token (`Pages:Edit`, account `5135f538…`). I set both production
+env vars on the `camtaylor` Pages project via the API and confirmed them:
+
+```
+VITE_PRIVATE_PREVIEW=false
+VITE_FORMSPREE_FORM_ID=xpqgopvd   (the family's live Formspree form → hello@giveabit.io)
+```
+
+`xpqgopvd` is the live Formspree form the whole family already uses (stranded, giveabit) — it delivers
+to `hello@giveabit.io`, which is on Kimi's monitored allowlist. Per Cam's unique-per-site-labels rule,
+the `[camtaylor.ca]` subject prefix keeps camtaylor submissions distinct. This commit triggers the
+production rebuild; the verification step is `npm run check:live-form` — it must exit 0 (button
+enabled, real endpoint, no placeholder) once the new build is live.
+
 ### What I verified live (my own probe, not your relay)
 
 I ran `npm run check:live-form` from `/root/camtaylor` against the published site. **It confirms
