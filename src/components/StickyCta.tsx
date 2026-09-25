@@ -29,6 +29,20 @@ export const StickyCta: React.FC = () => {
 
   const hidden = contactVisible || footerVisible || direction === 'down';
 
+  /**
+   * This pill and the route bar's Connect item are the same door. Both are right
+   * on their own; both lit at once is the page shouting the same thing twice.
+   * Publishing which one is on screen lets the stylesheet keep exactly one of
+   * them lit — the same mechanism `data-theme` and `data-reduced-motion` use to
+   * carry state that several components need.
+   */
+  useEffect(() => {
+    document.documentElement.dataset.cta = hidden ? 'bar' : 'pill';
+    return () => {
+      document.documentElement.removeAttribute('data-cta');
+    };
+  }, [hidden]);
+
   const scrollToContact = () => {
     document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
   };

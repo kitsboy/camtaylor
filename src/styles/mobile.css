@@ -13,7 +13,8 @@
      4px bottom padding. It has to be real, because it is the offset for the
      back-to-top button, the footer's clearance and every section's
      scroll-margin. It sat at 62px while the bar was 10 items wide and
-     overflowing — a number nothing had checked against the element. */   --mobile-nav-height: 53px;
+     overflowing — a number nothing had checked against the element. */
+  --mobile-nav-height: 53px;
   --section-pad-mobile: 48px;
   --touch-min: 44px;
 }
@@ -733,9 +734,8 @@ a,
 
   .mobile-quick-nav-btn:active { transform: scale(0.96); }
 
-  /* Connect is the bar's call to action, which is why the floating pill is off
-     on a phone: two CTAs for one action is one too many, and this one does not
-     depend on which way you last scrolled. */
+  /* Connect is the bar's call to action: permanent, thumb-reach, and not
+     dependent on which way you last scrolled. */
   .mobile-quick-nav-btn--cta {
     color: var(--ink);
     background: var(--acid);
@@ -745,15 +745,46 @@ a,
 
   .mobile-quick-nav-btn--cta.active { color: var(--ink); background: var(--acid); }
 
-  /* Parked, not deleted. The bar's Connect item is now a permanent acid
-     control, so the scroll-direction pill was a second CTA for the same action
-     in the same strip of screen — and the third fixed layer competing for it,
-     with the back-to-top button. Note the pill was only ever a phone element:
-     `index.css` turns it on inside this same media query.
+  /* The scroll-up pill is the same door as Connect, and it is the wider and
+     louder of the two — so while it is on screen, Connect stands down to an
+     ordinary item. `StickyCta` publishes which of them is showing on
+     `<html data-cta>`, the same way the theme and reduced-motion do. Exactly
+     one call to action is lit at a time; they are never both shouting. */
+  [data-cta="pill"] .mobile-quick-nav-btn--cta {
+    color: var(--text-secondary);
+    background: none;
+    box-shadow: none;
+    font-weight: 600;
+  }
 
-     To bring it back, delete this one line and drop the `--cta` class from
-     `MobileQuickNav`'s last item so the two are not the same door twice. */
-  .sticky-cta { display: none; }
+  [data-cta="pill"] .mobile-quick-nav-btn--cta.active {
+    color: var(--text-primary);
+    background: rgba(30, 69, 52, 0.07);
+  }
+
+  /* The pill sits in the strip above the bar, and was only ever a phone
+     element: `index.css` turns it on inside this same media query. */
+  .sticky-cta {
+    bottom: calc(var(--mobile-nav-height) + var(--safe-bottom) + 8px);
+    transition: transform 0.3s var(--ease-out), opacity 0.3s ease;
+  }
+
+  .sticky-cta--hidden {
+    transform: translateY(140%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .sticky-cta-btn {
+    width: calc(100% - 32px);
+    max-width: 400px;
+    margin: 0 auto;
+    display: flex;
+    min-height: 50px;
+    border-radius: 14px;
+    font-size: var(--fs-body);
+    box-shadow: 0 8px 28px rgba(30, 69, 52, 0.35);
+  }
 
   .footer {
     padding-bottom: calc(80px + var(--mobile-nav-height) + var(--safe-bottom));
@@ -770,9 +801,9 @@ a,
     display: flex;
     position: fixed;
     right: calc(16px + var(--safe-right));
-    /* Clear of the route bar. It used to be offset for a floating CTA that no
-       longer exists on a phone. */
-    bottom: calc(var(--mobile-nav-height) + var(--safe-bottom) + 12px);
+    /* Clear of the route bar *and* of the pill above it, which arrives on
+       scroll-up and would otherwise land on top of this button. */
+    bottom: calc(var(--mobile-nav-height) + var(--safe-bottom) + 72px);
     z-index: 85;
     width: 44px;
     height: 44px;

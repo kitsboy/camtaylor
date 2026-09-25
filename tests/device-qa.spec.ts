@@ -471,3 +471,49 @@ test('the route sheet menu carries all twelve camps in three legs', async ({ pag
   await page.locator('.nav-menu-btn').click();
   await expect(menu).not.toHaveClass(/nav-mobile-menu--open/);
 });
+
+/**
+ * The pill and the bar's Connect item are the same door: both say "start a
+ * conversation" and both are the loudest thing on their strip of screen. Both
+ * are worth having — the pill is the wide invitation, Connect is the permanent
+ * thumb-reach — but both lit at once is the site shouting twice about one
+ * thing. Exactly one carries the accent at any moment.
+ *
+ * `StickyCta` publishes which is showing on `<html data-cta>`.
+ */
+test('only one call to action is lit at a time', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('.mobile-quick-nav')).toBeVisible();
+
+  const ACCENT = 'rgb(215, 255, 85)';
+  const read = () =>
+    page.evaluate(() => ({
+      pillShowing: !document.querySelector('.sticky-cta')!.classList.contains('sticky-cta--hidden'),
+      connect: getComputedStyle(document.querySelector('.mobile-quick-nav-btn--cta')!).backgroundColor,
+      lane: document.documentElement.dataset.cta ?? '(none)',
+      scrollY: Math.round(window.scrollY),
+    }));
+
+  // Scrolling down sends the pill away; the bar carries the call.
+  await page.evaluate(async () => {
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 4000);
+    await new Promise((r) => setTimeout(r, 700));
+  });
+  const down = await read();
+  expect(down.scrollY, 'the page did not scroll, so this proves nothing').toBeGreaterThan(3000);
+  expect(down.pillShowing, 'the pill should be away while reading downwards').toBe(false);
+  expect(down.lane).toBe('bar');
+  expect(down.connect, 'the bar should be carrying the call to action').toBe(ACCENT);
+
+  // Scrolling back up is what summons the pill, and the bar stands down.
+  await page.evaluate(async () => {
+    window.scrollTo(0, 3600);
+    await new Promise((r) => setTimeout(r, 700));
+  });
+  const up = await read();
+  expect(up.pillShowing, 'the pill did not appear on scroll-up').toBe(true);
+  expect(up.lane).toBe('pill');
+  expect(up.connect, 'two calls to action lit at once').not.toBe(ACCENT);
+});
