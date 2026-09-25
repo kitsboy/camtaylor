@@ -32,7 +32,7 @@ export function PrivacyPage() {
           <a href="https://formspree.io" target="_blank" rel="noopener noreferrer">
             Formspree
           </a>{' '}
-          and delivered to {SITE.email}. We do not sell or share your data with third parties for
+          and delivered to {SITE.familyEmail}. We do not sell or share your data with third parties for
           marketing purposes.
         </p>
       </section>

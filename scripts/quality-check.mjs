@@ -122,10 +122,35 @@ for (const entry of atRuleDeclarationsThatNeverApply(stylesheetOrder())) {
   failures.push(`a phone override that never applies at any width — ${describe(entry)}`);
 }
 
+// ── The contact form's destination ──────────────────────────────────────────────
+// The form hands a stranger's message to Formspree, which delivers it to exactly one
+// inbox: `INQUIRY_EMAIL` in `src/data/site.ts`, the address Kimi monitors so she can
+// filter the spam before any of it reaches Cam. Three things have to agree with that
+// one string — the public `familyEmail`, the copy on the page, and the env template
+// the deployer actually reads. This gate exists because the page stated a delivery
+// address the endpoint did not deliver to, and nothing said so.
+const siteSource = readFileSync('src/data/site.ts', 'utf8');
+const inbox = siteSource.match(/export const INQUIRY_EMAIL = '([^']+)'/)?.[1];
+if (!inbox) {
+  failures.push(
+    'src/data/site.ts must export INQUIRY_EMAIL — the one inbox a contact-form submission is delivered to',
+  );
+} else {
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(inbox)) failures.push(`INQUIRY_EMAIL is not an address: ${inbox}`);
+  if (!siteSource.includes('familyEmail: INQUIRY_EMAIL')) {
+    failures.push(
+      'SITE.familyEmail must be INQUIRY_EMAIL, or the public address and the form destination can drift apart',
+    );
+  }
+  if (!envExample.includes(inbox)) {
+    failures.push(`.env.example no longer tells the deployer the form must deliver to ${inbox}`);
+  }
+}
+
 if (failures.length) {
   console.error(failures.map((failure) => `✗ ${failure}`).join('\n'));
   process.exit(1);
 }
 console.log(
-  `✓ Quality check passed (${requiredFiles.length} assets, ${CARD.width}x${CARD.height} share card, metadata, privacy gate, type-scale floor, cascade)`,
+  `✓ Quality check passed (${requiredFiles.length} assets, ${CARD.width}x${CARD.height} share card, metadata, privacy gate, type-scale floor, cascade, form inbox)`,
 );

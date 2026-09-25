@@ -429,8 +429,14 @@ test('private preview disables contact delivery', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Send message' })).toBeDisabled();
   await expect(page.locator('input[name="name"]')).toHaveAttribute('autocomplete', 'name');
   await expect(page.locator('input[name="email"]')).toHaveAttribute('autocomplete', 'email');
-  await expect(page.locator('.contact-delivery-note')).toContainText('camtaylor.ca');
-  await expect(page.locator('.contact-delivery-note')).toContainText('cam@camtaylor.ca');
+  // The delivery note has to name the inbox the form actually delivers to — the one
+  // Kimi monitors — and not the address it used to promise. Reverting the copy fails
+  // here, which is the whole point: the page had two different addresses on it and
+  // neither was where the endpoint delivered.
+  await expect(page.locator('.contact-delivery-note')).toContainText('hello@giveabit.io');
+  await expect(page.locator('.contact-delivery-note')).not.toContainText('cam@camtaylor.ca');
+  await expect(page.locator('#contact .mobile-email-cta')).toContainText('hello@giveabit.io');
+  await expect(page.locator('#contact .mobile-email-cta')).not.toContainText('cam@camtaylor.ca');
 });
 
 test('command deck closes with escape', async ({ page }) => {

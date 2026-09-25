@@ -33,7 +33,7 @@ npm run dev            # http://localhost:5173
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `VITE_FORMSPREE_FORM_ID` | No | Formspree form ID (`xykqodnk` fallback) |
+| `VITE_FORMSPREE_FORM_ID` | No | Formspree endpoint ID. The form must deliver to `hello@giveabit.io`; the `xykqodnk` fallback is a **placeholder** that delivers nowhere |
 | `VITE_PLAUSIBLE_DOMAIN` | No | Plausible domain — only used when private preview is off |
 | `VITE_UMAMI_WEBSITE_ID` | No | Umami website ID — only used when private preview is off |
 | `VITE_PRIVATE_PREVIEW` | No | Defaults to `true`. `false` publishes the site: banner off, form live |

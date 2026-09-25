@@ -1,3 +1,19 @@
+/**
+ * The one inbox a contact-form submission must be delivered to, and the only
+ * address the site may name as a message's destination.
+ *
+ * Kimi monitors this address: she reads everything that lands, drops the spam and
+ * forwards the genuine inquiries on to Cam. That is why the form is not pointed at
+ * Cam's own mailbox, and why the copy on the page has to agree with the Formspree
+ * endpoint rather than merely sound plausible.
+ *
+ * One string, three readers — the success panel, the delivery note and the privacy
+ * policy. `npm run quality` fails the build if `.env.example`, which is what the
+ * deployer actually reads, stops naming this address. The copy used to promise
+ * `cam@camtaylor.ca` while the endpoint delivered nowhere near it.
+ */
+export const INQUIRY_EMAIL = 'hello@giveabit.io';
+
 export const SITE = {
   name: 'Cam Taylor',
   title: 'Sherpa',
@@ -5,7 +21,10 @@ export const SITE = {
   domain: 'camtaylor.ca',
   url: 'https://camtaylor.ca',
   email: 'cam@camtaylor.ca',
-  familyEmail: 'hello@giveabit.io',
+  // The monitored inquiry inbox — see `INQUIRY_EMAIL` above. The contact form's
+  // destination, its success copy and the front door in the contact header all
+  // read this one value, so they cannot drift apart.
+  familyEmail: INQUIRY_EMAIL,
   agentsUrl: 'https://agents.giveabit.io',
   location: 'British Columbia, Canada',
   timezone: 'Pacific Time (PT)',
@@ -114,11 +133,22 @@ export function validateSiteConfig(): string[] {
   const errors: string[] = [];
   if (!SITE.url.startsWith('https://')) errors.push('SITE.url must use HTTPS');
   if (!SITE.email.includes('@')) errors.push('SITE.email must be a valid email');
+  if (SITE.familyEmail !== INQUIRY_EMAIL) errors.push('SITE.familyEmail must be INQUIRY_EMAIL — the form destination and the public address cannot drift');
   if (!SITE.heroVideoId.trim()) errors.push('SITE.heroVideoId is missing');
   if (NAV_ITEMS.some((item) => !item.id || !item.label)) errors.push('NAV_ITEMS contains an incomplete item');
   if (Object.values(HERO_SIGNALS).some((value) => typeof value === 'string' && /\d/.test(value))) errors.push('HERO_SIGNALS must use factual non-numeric labels');
   return errors;
 }
+/**
+ * The Formspree endpoint the contact form posts to. `xykqodnk` is the template's
+ * placeholder, not a live form: with it in place the endpoint accepts a visitor's
+ * message and delivers it nowhere. The live ID is Kimi's to supply — it is set as
+ * a `VITE_FORMSPREE_FORM_ID` build variable, and this fallback exists only so a
+ * local build has something to post to. It is deliberately the same value CI uses.
+ */
 export const FORMSPREE_FORM_ID = import.meta.env.VITE_FORMSPREE_FORM_ID ?? 'xykqodnk';
+
+/** True while the form is pointed at the placeholder endpoint rather than the live one. */
+export const IS_PLACEHOLDER_FORM_ENDPOINT = FORMSPREE_FORM_ID === 'xykqodnk';
 export const PLAUSIBLE_DOMAIN = import.meta.env.VITE_PLAUSIBLE_DOMAIN ?? null;
 export const UMAMI_WEBSITE_ID = import.meta.env.VITE_UMAMI_WEBSITE_ID ?? null;

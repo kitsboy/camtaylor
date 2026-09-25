@@ -68,7 +68,7 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
         <CheckCircle2 className="success-icon" size={48} />
         <h3 className="success-title">Message received</h3>
         <p className="success-message">
-          Thank you, {submittedName || 'there'}. Your inquiry has been sent to {SITE.email}. I&apos;ll
+          Thank you, {submittedName || 'there'}. Your inquiry has been sent to {SITE.familyEmail}. I&apos;ll
           review the details and respond if there&apos;s alignment.
         </p>
         <div className="success-details">
@@ -78,7 +78,7 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
           </div>
           <div className="details-row">
             <span>Reply to:</span>
-            <span>{SITE.email}</span>
+            <span>{SITE.familyEmail}</span>
           </div>
         </div>
         <a
@@ -253,7 +253,7 @@ function CopyEmailButton() {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(SITE.email);
+      await navigator.clipboard.writeText(SITE.familyEmail);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch { /* noop */ }
@@ -263,7 +263,7 @@ function CopyEmailButton() {
       type="button"
       className="copy-email-btn"
       onClick={copy}
-      aria-label={copied ? 'Email copied' : `Copy ${SITE.email}`}
+      aria-label={copied ? 'Email copied' : `Copy ${SITE.familyEmail}`}
     >
       {copied ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
       {copied ? 'Copied' : 'Copy email'}
@@ -315,9 +315,9 @@ export const Contact: React.FC = () => {
             </span>
           </div>
 
-          <a href={`mailto:${SITE.email}`} className="mobile-email-cta">
+          <a href={`mailto:${SITE.familyEmail}`} className="mobile-email-cta">
             <Mail size={18} />
-            <span>{SITE.email}</span>
+            <span>{SITE.familyEmail}</span>
           </a>
           <CopyEmailButton />
 
@@ -351,7 +351,7 @@ export const Contact: React.FC = () => {
                 <li>Priority goes to ventures with clear structure and leverage.</li>
                 <li>
                   Prefer email?{' '}
-                  <a href={`mailto:${SITE.email}`} className="secure-mail-link">{SITE.email}</a>
+                  <a href={`mailto:${SITE.familyEmail}`} className="secure-mail-link">{SITE.familyEmail}</a>
                 </li>
               </ul>
             </div>
@@ -391,11 +391,15 @@ export const Contact: React.FC = () => {
           </SectionFold>
         </div>
       </div>
+      {/* One address, and it is the monitored one. The form used to promise
+          `cam@camtaylor.ca` on the same page that offered `hello@giveabit.io` as the
+          front door; a submission lands in `SITE.familyEmail`, which Kimi reads and
+          forwards, so that is what the page says. */}
       <p className="contact-delivery-note">
         {IS_PRIVATE_PREVIEW ? (
-          <>Nothing is sent from a private preview build. Submissions will be delivered to <strong>{SITE.email}</strong> through Formspree once <strong>{SITE.domain}</strong> goes public.</>
+          <>Nothing is sent from a private preview build. Submissions will be delivered to <strong>{SITE.familyEmail}</strong> through Formspree once <strong>{SITE.domain}</strong> goes public.</>
         ) : (
-          <>Submissions are delivered to <strong>{SITE.email}</strong> through Formspree. Nothing else is stored on this site.</>
+          <>Submissions are delivered to <strong>{SITE.familyEmail}</strong>, the monitored inquiry inbox, through Formspree. Nothing else is stored on this site.</>
         )}
       </p>
     </section>
