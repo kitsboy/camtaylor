@@ -314,41 +314,66 @@ async function audit(page: Page, label: string, rootSelector: string | null = nu
   return result;
 }
 
-test('homepage text meets WCAG AA contrast', async ({ page }) => {
+/** Both themes ship to users, so both are audited. */
+const THEMES = ['warm', 'night'] as const;
+type ThemeName = (typeof THEMES)[number];
+
+async function applyTheme(page: Page, theme: ThemeName) {
+  const currentlyNight = (await page.locator('html').getAttribute('data-theme')) === 'night';
+  if (currentlyNight !== (theme === 'night')) {
+    // Drive the real control rather than writing the attribute, so the toggle's
+    // own styling is exercised too.
+    await page.locator('.theme-toggle').first().click();
+  }
+  await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+}
+
+const MIN_CHECKS: Record<ThemeName, number> = { warm: 50, night: 50 };
+
+test('homepage text meets WCAG AA contrast in both themes', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('contentinfo').getByRole('button', { name: /All Give A Bit routes/i }).click();
-  const result = await audit(page, 'homepage');
-  // A vacuous audit (nothing sampled) must not pass silently.
-  expect(result.checked, 'the audit sampled no text at all').toBeGreaterThan(50);
-  expect(result.failures, 'see console output above').toEqual([]);
+
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const result = await audit(page, `homepage (${theme})`);
+    // A vacuous audit (nothing sampled) must not pass silently.
+    expect(result.checked, `${theme}: the audit sampled no text at all`).toBeGreaterThan(MIN_CHECKS[theme]);
+    expect(result.failures, `see ${theme} output above`).toEqual([]);
+  }
 });
 
-test('the agent and proof shells meet WCAG AA contrast', async ({ page }) => {
-  await page.goto('/');
-  const result = await audit(page, 'homepage (shells)');
-  expect(result.checked, 'the audit sampled no text at all').toBeGreaterThan(50);
-  expect(result.failures, 'see console output above').toEqual([]);
-});
-
-test('a dispatch page meets WCAG AA contrast', async ({ page }) => {
+test('a dispatch page meets WCAG AA contrast in both themes', async ({ page }) => {
   await page.goto('/dispatch/why-this-site-was-rebuilt');
-  const result = await audit(page, 'dispatch');
-  expect(result.checked, 'the audit sampled no text at all').toBeGreaterThan(5);
-  expect(result.failures, 'see console output above').toEqual([]);
+
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    const result = await audit(page, `dispatch (${theme})`);
+    expect(result.checked, `${theme}: the audit sampled no text at all`).toBeGreaterThan(5);
+    expect(result.failures, `see ${theme} output above`).toEqual([]);
+  }
 });
 
-test('the command deck meets WCAG AA contrast', async ({ page }) => {
+test('the command deck meets WCAG AA contrast in both themes', async ({ page }) => {
   await page.goto('/');
   // Wait for the nav to mount so the global key handler is attached before the
   // keypress, otherwise the shortcut can land on nothing.
   await expect(page.locator('.nav-keycap')).toHaveText('/');
-  await page.keyboard.press('/');
-  await expect(page.getByRole('dialog', { name: 'Sherpa Command Deck' })).toBeVisible();
-  await expect(page.getByRole('textbox', { name: 'Terminal command input' })).toBeVisible();
-  // Scoped to the deck: everything behind it is dimmed by the overlay.
-  // `.terminal-window` is the deck's own dialog; other `[role="dialog"]`
-  // elements exist earlier in the DOM (hidden menus), so select it directly.
-  const result = await audit(page, 'command deck', '.terminal-window');
-  expect(result.checked, 'the audit sampled no text at all').toBeGreaterThan(0);
-  expect(result.failures, 'see console output above').toEqual([]);
+
+  for (const theme of THEMES) {
+    await applyTheme(page, theme);
+    await page.keyboard.press('/');
+    await expect(page.getByRole('dialog', { name: 'Sherpa Command Deck' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Terminal command input' })).toBeVisible();
+
+    // Scoped to the deck: everything behind it is dimmed by the overlay.
+    // `.terminal-window` is the deck's own dialog; other `[role="dialog"]`
+    // elements exist earlier in the DOM (hidden menus), so select it directly.
+    const result = await audit(page, `command deck (${theme})`, '.terminal-window');
+    expect(result.checked, `${theme}: the audit sampled no text at all`).toBeGreaterThan(0);
+    expect(result.failures, `see ${theme} output above`).toEqual([]);
+
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog', { name: 'Sherpa Command Deck' })).toBeHidden();
+  }
 });

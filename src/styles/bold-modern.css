@@ -331,11 +331,14 @@ body {
   --bg-subtle: #14242a;
   --text-primary: #edf5ed;
   --text-secondary: #a8b9b3;
-  --text-muted: #71867e;
+  --text-muted: #8b9f97;
   --glass-bg: rgba(16,27,32,.86);
   --glass-border: rgba(100,230,226,.16);
   --ink: #061014;
   --line-bright: rgba(100,230,226,.16);
+  /* `--paper` backs the family cards and other light surfaces. It has to flip
+     with the theme, otherwise light text lands on a warm card. */
+  --paper: #101b20;
 }
 [data-theme="night"] .hero-backdrop-wrap { background: #08171a; }
 [data-theme="night"] .hero-backdrop-aurora { background: radial-gradient(ellipse at 18% 18%, rgba(41,139,139,.36), transparent 32%), radial-gradient(ellipse at 82% 20%, rgba(112,82,194,.34), transparent 30%), radial-gradient(ellipse at 52% 70%, rgba(193,119,39,.2), transparent 34%), linear-gradient(145deg, #08171a 0%, #102332 48%, #201b25 100%); }
@@ -502,14 +505,14 @@ body {
 .kit-open { display: inline-flex; align-items: center; gap: 5px; color: #101713; font: 700 .7rem/1 var(--font-heading); }
 .kit-open svg { color: color-mix(in srgb, var(--kit-color) 78%, #101713); }
 .kit-flag { color: #59635e; font: 700 .54rem/1 var(--font-heading); letter-spacing: .1em; text-transform: uppercase; }
-.kit-flag--ref { padding: 3px 7px; color: var(--kit-ink); background: color-mix(in srgb, var(--kit-color) 55%, transparent); border-radius: 999px; }
+.kit-flag--ref { padding: 3px 7px; color: var(--kit-ink); background: var(--kit-color); border-radius: 999px; }
 .kit-disclosure { display: flex; align-items: flex-start; justify-content: center; gap: 7px; max-width: 760px; margin: 24px auto 0; color: var(--text-muted); text-align: center; font-size: .72rem; line-height: 1.6; }
 .kit-disclosure svg { margin-top: 3px; flex: 0 0 auto; color: var(--cyan); }
 
 [data-theme="night"] .kit-card { background: linear-gradient(145deg, rgba(19, 38, 44, .94), rgba(12, 24, 29, .96)); border-color: rgba(255, 255, 255, .14); }
 [data-theme="night"] .kit-name, [data-theme="night"] .kit-open { color: #f2f8f4; }
 [data-theme="night"] .kit-tagline { color: #c4d3cd; }
-[data-theme="night"] .kit-note, [data-theme="night"] .kit-flag { color: #9db1aa; }
+[data-theme="night"] .kit-note, [data-theme="night"] .kit-flag:not(.kit-flag--ref) { color: #9db1aa; }
 [data-theme="night"] .kit-chip { color: #e6f1ea; background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .18); }
 
 @media (max-width: 700px) { .kit-grid { grid-template-columns: 1fr 1fr; } .kit-card { min-height: 214px; } }
@@ -540,6 +543,17 @@ body {
     radial-gradient(circle at 46% 96%, rgba(255, 61, 15, .16), transparent 30rem),
     radial-gradient(circle at 88% 74%, rgba(7, 205, 196, .12), transparent 22rem),
     linear-gradient(180deg, #f7f3ec 0%, #efe9e0 52%, #f4efe6 100%);
+}
+
+/* This rule ends with a hard-coded warm gradient, so without a night override the
+   page backdrop stayed warm while night mode turned every text token light. */
+[data-theme="night"] body {
+  background:
+    radial-gradient(circle at 7% 6%, rgba(7, 205, 196, .16), transparent 26rem),
+    radial-gradient(circle at 94% 13%, rgba(155, 124, 255, .18), transparent 25rem),
+    radial-gradient(circle at 46% 96%, rgba(255, 61, 15, .1), transparent 30rem),
+    radial-gradient(circle at 88% 74%, rgba(7, 205, 196, .1), transparent 22rem),
+    linear-gradient(180deg, var(--bg) 0%, #071114 52%, var(--bg) 100%);
 }
 
 .app-container::before { opacity: .34; }
@@ -1809,3 +1823,36 @@ body {
 [data-theme="night"] .satohash-proof-link { color: var(--acid); }
 [data-theme="night"] .satohash-proof-body { color: #c7d8d2; }
 [data-theme="night"] .satohash-proof-body code { color: var(--acid); background: rgba(215, 255, 85, .12); }
+
+/* ── Night theme: accent legibility ──────────────────────────────────────────
+   A number of accents in this file are literals chosen for light backgrounds
+   (the deep teal `#23675d`, the dark `--green`, the dark violet). In night mode
+   the surface flips dark but those colours do not, so they are restated here
+   against the night tokens. Kept together so the mapping is auditable. */
+[data-theme="night"] .section-title { color: var(--text-primary); }
+[data-theme="night"] .section-kicker { color: #6fbfb2; }
+[data-theme="night"] .about-eyebrow,
+[data-theme="night"] .venture-role { color: #7fd4c8; }
+[data-theme="night"] .family-card-label,
+[data-theme="night"] .family-card p { color: #a8b9b3; }
+[data-theme="night"] .family-visit { color: var(--text-primary); }
+[data-theme="night"] .service-feature-tag { color: #7fd4c8; border-color: rgba(100, 230, 226, .3); }
+[data-theme="night"] .service-icon-container,
+[data-theme="night"] .venture-icon-wrapper { color: #7fd4c8; }
+[data-theme="night"] .venture-status--live { color: #eafbf8; background: rgba(100, 230, 226, .22); }
+[data-theme="night"] .venture-status--building { color: #ffcdc0; background: rgba(255, 128, 102, .2); }
+[data-theme="night"] .venture-tag { color: #c7b0ff; border-color: rgba(155, 124, 255, .34); background: rgba(155, 124, 255, .14); }
+[data-theme="night"] .venture-link-btn { color: #7fd4c8; }
+[data-theme="night"] .dispatch-eyebrow { color: #c7b0ff; }
+[data-theme="night"] .dispatch-feed a { color: #7fd4c8; }
+[data-theme="night"] .nostr-section-link,
+[data-theme="night"] .nostr-nip05,
+[data-theme="night"] .manifesto-cite { color: #7fd4c8; }
+[data-theme="night"] .nostr-badge-verified { color: #7fd4c8; background: rgba(100, 230, 226, .12); border-color: rgba(100, 230, 226, .28); }
+[data-theme="night"] .nostr-nip05 { background: rgba(100, 230, 226, .08); border-color: rgba(100, 230, 226, .2); }
+[data-theme="night"] .deal-size-btn.active { color: #7fd4c8; border-color: rgba(100, 230, 226, .5); background: rgba(100, 230, 226, .12); }
+[data-theme="night"] .secure-mail-link,
+[data-theme="night"] .sidebar-list a { color: #7fd4c8; }
+[data-theme="night"] .contact-delivery-note strong { color: #7fd4c8; }
+[data-theme="night"] .venture-status--syndicating { color: #cbb2ff; }
+[data-theme="night"] .form-preview-notice { color: #e8c07a; }
