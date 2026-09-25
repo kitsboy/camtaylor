@@ -1472,6 +1472,22 @@ body {
      shows the frame label, the play button and the shine. The poster is
      `object-fit: cover`, so it crops rather than distorts. */
   .hero-video-viewport { aspect-ratio: 21 / 9; }
+
+  /* ── Phone manifesto ────────────────────────────────────────────────────
+     Three axiom cards and the quote are 1,280px of a 390px phone, and the
+     chrome was the cost rather than the words: 28px of card padding, a 40px
+     icon block, a 1.65 line-height on paragraphs of ~170 characters, and a
+     section padding of `--section-gap` — 67px at this height — top and bottom.
+
+     The section padding is the interesting one: `upgrades.css` sets it after
+     `index.css`, so `index.css`'s `.manifesto-section { padding: 70px 0 }` has
+     never applied. This file loads after both, so this one does. */
+  .manifesto-section { padding-top: 46px; padding-bottom: 46px; }
+  .axioms-grid { gap: 12px; margin-bottom: 28px; }
+  .axiom-card { padding: 20px 18px; }
+  .axiom-icon-wrapper { width: 34px; height: 34px; margin-bottom: 12px; }
+  .axiom-description { line-height: 1.55; }
+  .manifesto-quote-wrapper { padding: 22px 16px; }
 }
 
 @media (max-width: 700px) {
