@@ -12,6 +12,24 @@ import { test, expect, type Page } from '@playwright/test';
  *
  * This exists so the UI can keep being restyled without silently regressing
  * legibility. On failure the console lists the element, text, and ratio.
+ *
+ * Two things make that sampling trustworthy, and both were learned the hard way:
+ *
+ *  1. **The text is blanked before the raster.** Sampling the modal pixel inside
+ *     a box only works while the background dominates it. A tight-line-height
+ *     label is almost all glyph, so the probe read the ink as the backdrop and
+ *     reported a legible label at 1:1; worse, a box that was a blend could
+ *     report a mid-tone nobody ever sees, which is a *pass* that hides a real
+ *     failure. Blanking each candidate's own colour first leaves the backdrop at
+ *     the same coordinates, in the same layout, with no ambiguity. The ink comes
+ *     from `getComputedStyle` after the blanking is removed, so no pixel is ever
+ *     asked to be two things.
+ *  2. **Nothing may be mid-flight when the raster is taken.** A screenshot
+ *     captured during a theme flip can show the new background under the old ink,
+ *     which is how a broken theme reads as a passing one. This runs with reduced
+ *     motion (the site makes its own transitions instant under it), but that
+ *     cannot speak for every animation, so the audit also waits for every finite
+ *     animation to finish and refuses to screenshot until none is running.
  */
 
 test.use({ reducedMotion: 'reduce' });
@@ -26,11 +44,23 @@ interface Failure {
   fontSize: number;
 }
 
+interface Sample {
+  text: string;
+  ratio: number;
+  background: string;
+}
+
 interface ProbeResult {
   failures: Failure[];
   checked: number;
   skipped: number;
   skipReasons: Record<string, number>;
+  /**
+   * Ratios for elements marked `data-contrast-report`. Passing elements are not
+   * reported anywhere else, and the instrument's own regression test needs to
+   * see the number rather than the absence of a failure.
+   */
+  samples: Sample[];
 }
 
 /**
@@ -38,7 +68,59 @@ interface ProbeResult {
  * `rootSelector` limits the audit to a subtree (needed when a modal overlays
  * the rest of the page, so content underneath is not judged against it).
  */
-async function probe({ shot, rootSelector }: { shot: string; rootSelector: string | null }): Promise<ProbeResult> {
+/**
+ * Runs in the browser, before the raster: marks every element that renders text
+ * a visitor can read, and records what that text is for the failure output.
+ * Returns how many elements were marked, so a vacuously empty audit is visible.
+ *
+ * The marking is what lets the audit blank the candidates before screenshotting.
+ */
+async function markText(page: Page, rootSelector: string | null): Promise<number> {
+  return page.evaluate((selector: string | null) => {
+    document.querySelectorAll('[data-contrast-blank]').forEach((el) => {
+      el.removeAttribute('data-contrast-blank');
+      el.removeAttribute('data-contrast-text');
+      el.removeAttribute('data-contrast-pseudo');
+    });
+
+    const root: Element = selector ? (document.querySelector(selector) ?? document.body) : document.body;
+    let marked = 0;
+
+    for (const el of Array.from(root.querySelectorAll('body * , *'))) {
+      if (el.closest('[aria-hidden="true"], [data-contrast-ignore]')) continue;
+      if (el.classList.contains('sr-only')) continue;
+
+      const ownText = Array.from(el.childNodes)
+        .filter((n) => n.nodeType === Node.TEXT_NODE)
+        .map((n) => n.textContent ?? '')
+        .join('')
+        .trim();
+
+      let text = ownText;
+      let pseudo: string | null = null;
+
+      // Placeholders are rendered text too, but they are not text nodes.
+      if (!text && (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement)) {
+        text = el.placeholder || '(placeholder)';
+        pseudo = '::placeholder';
+      }
+      if (!text) continue;
+
+      el.setAttribute('data-contrast-blank', '');
+      el.setAttribute('data-contrast-text', text.slice(0, 40));
+      if (pseudo) el.setAttribute('data-contrast-pseudo', pseudo);
+      marked += 1;
+    }
+
+    return marked;
+  }, rootSelector);
+}
+
+/**
+ * Runs in the browser, after the raster. `shot` is a base64 PNG of the full
+ * page, taken with every marked element's text blanked.
+ */
+async function probe({ shot }: { shot: string }): Promise<ProbeResult> {
   const AA_NORMAL = 4.5;
   const AA_LARGE = 3.0;
 
@@ -78,7 +160,7 @@ async function probe({ shot, rootSelector }: { shot: string; rootSelector: strin
     return { r: pixels[i], g: pixels[i + 1], b: pixels[i + 2] };
   };
 
-  /** Most common colour inside the box — the backdrop usually dominates the glyphs. */
+  /** Most common colour inside the box. The text is blanked, so this is backdrop. */
   const modalBackdrop = (rect: DOMRect): Rgb | null => {
     const stepX = Math.max(1, Math.floor(rect.width / 24));
     const stepY = Math.max(1, Math.floor(rect.height / 8));
@@ -111,6 +193,7 @@ async function probe({ shot, rootSelector }: { shot: string; rootSelector: strin
   };
 
   const failures: Failure[] = [];
+  const samples: Sample[] = [];
   const skipReasons: Record<string, number> = {};
   const skip = (reason: string) => {
     skipReasons[reason] = (skipReasons[reason] ?? 0) + 1;
@@ -118,7 +201,6 @@ async function probe({ shot, rootSelector }: { shot: string; rootSelector: strin
   let checked = 0;
   let skipped = 0;
 
-  const root: Element = rootSelector ? (document.querySelector(rootSelector) ?? document.body) : document.body;
   const scrollY = window.scrollY;
 
   // Fixed, non-interactive overlays (the private-preview banner, for instance)
@@ -162,26 +244,6 @@ async function probe({ shot, rootSelector }: { shot: string; rootSelector: strin
       return true;
     });
 
-  const candidates: Array<{ el: Element; text: string; pseudo: string | null }> = [];
-
-  for (const el of Array.from(root.querySelectorAll('body * , *'))) {
-    if (el.closest('[aria-hidden="true"], [data-contrast-ignore]')) continue;
-    if (el.classList.contains('sr-only')) continue;
-
-    const ownText = Array.from(el.childNodes)
-      .filter((n) => n.nodeType === Node.TEXT_NODE)
-      .map((n) => n.textContent ?? '')
-      .join('')
-      .trim();
-    if (ownText) candidates.push({ el, text: ownText, pseudo: null });
-
-    // Placeholders are rendered text too, but are not text nodes.
-    if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
-      const ph = getComputedStyle(el, '::placeholder').color;
-      if (ph && parse(ph)) candidates.push({ el, text: el.placeholder || '(placeholder)', pseudo: '::placeholder' });
-    }
-  }
-
   /** Any ancestor that is still animating in, or faded out, cannot be sampled. */
   const unstable = (el: Element): string | null => {
     let node: Element | null = el;
@@ -194,7 +256,11 @@ async function probe({ shot, rootSelector }: { shot: string; rootSelector: strin
     return null;
   };
 
-  for (const { el, text, pseudo } of candidates) {
+  // The marked candidates, in document order. Their text is blanked in the
+  // raster but real here: the blanking style is removed before this runs.
+  for (const el of Array.from(document.querySelectorAll('[data-contrast-blank]'))) {
+    const text = el.getAttribute('data-contrast-text') ?? '';
+    const pseudo = el.getAttribute('data-contrast-pseudo');
     const style = getComputedStyle(el);
     if (!el.checkVisibility({ opacityProperty: true, visibilityProperty: true, contentVisibilityAuto: true })) {
       skip('not visible');
@@ -253,6 +319,14 @@ async function probe({ shot, rootSelector }: { shot: string; rootSelector: strin
     const r = ratio(fgRgb, bg);
     checked += 1;
 
+    if (el.hasAttribute('data-contrast-report')) {
+      samples.push({
+        text: text.slice(0, 40),
+        ratio: Math.round(r * 100) / 100,
+        background: `rgb(${bg.r}, ${bg.g}, ${bg.b})`,
+      });
+    }
+
     if (r < required) {
       failures.push({
         selector: describe(el),
@@ -266,7 +340,7 @@ async function probe({ shot, rootSelector }: { shot: string; rootSelector: strin
     }
   }
 
-  return { failures, checked, skipped, skipReasons };
+  return { failures, checked, skipped, skipReasons, samples };
 }
 
 async function audit(page: Page, label: string, rootSelector: string | null = null): Promise<ProbeResult> {
@@ -294,8 +368,51 @@ async function audit(page: Page, label: string, rootSelector: string | null = nu
     html.style.scrollBehavior = previous;
   });
 
+  const marked = await markText(page, rootSelector);
+  if (marked === 0) throw new Error(`${label}: no readable text was marked, the audit would be vacuous`);
+
+  // Blank the candidates' own colour for the raster, so what is sampled inside
+  // each box is the backdrop and can never be a glyph.
+  const blanking = await page.addStyleTag({
+    content: [
+      '[data-contrast-blank] { color: transparent !important; }',
+      '[data-contrast-blank]::placeholder { color: transparent !important; }',
+      '[data-contrast-blank]::before, [data-contrast-blank]::after { color: transparent !important; }',
+    ].join('\n'),
+  });
+
+  // And refuse to screenshot while anything finite is still moving. Blanking the
+  // text starts colour transitions of its own, which is why this waits twice.
+  await page.evaluate(async () => {
+    const finite = () =>
+      document.getAnimations().filter((a) => {
+        const timing = a.effect?.getTiming();
+        return timing ? timing.iterations !== Infinity : true;
+      });
+    const settle = () => new Promise((r) => requestAnimationFrame(() => r(null)));
+
+    for (let pass = 0; pass < 2; pass += 1) {
+      await Promise.race([
+        Promise.all(finite().map((a) => a.finished.catch(() => undefined))),
+        new Promise((r) => setTimeout(r, 3000)),
+      ]);
+      await settle();
+    }
+  });
+
+  const stillRunning = await page.evaluate(
+    () =>
+      document.getAnimations().filter((a) => {
+        const timing = a.effect?.getTiming();
+        return timing ? timing.iterations !== Infinity : true;
+      }).length,
+  );
+  expect(stillRunning, `${label}: the page was still moving when the raster was taken`).toBe(0);
+
   const shot = (await page.screenshot({ fullPage: true })).toString('base64');
-  const result = await page.evaluate(probe, { shot, rootSelector });
+  await blanking.evaluate((node) => node.remove());
+
+  const result = await page.evaluate(probe, { shot });
 
   const reasons = Object.entries(result.skipReasons)
     .map(([r, n]) => `${r} x${n}`)
@@ -381,4 +498,62 @@ test('the command deck meets WCAG AA contrast in both themes', async ({ page }) 
     await page.keyboard.press('Escape');
     await expect(page.getByRole('dialog', { name: 'Sherpa Command Deck' })).toBeHidden();
   }
+});
+
+/**
+ * The instrument's own regression test.
+ *
+ * The probe used to take the most common pixel inside a text box as the
+ * backdrop, which only works while the background dominates the box. Where it
+ * does not — a tight line-height, glyphs larger than the box they sit in — the
+ * probe read the ink as the backdrop and compared the ink with itself. The
+ * failure was loud (a huge glyph in a small box was reported at 1:1 while it
+ * was really 4.5:1), and the same ambiguity in reverse — a blend nobody ever
+ * sees — is a silent pass over a failing label.
+ *
+ * The fixture below is ink-dominated on purpose: a 40px glyph clipped to a 26px
+ * box. Its true ratio against white is known, so this can assert the number the
+ * instrument reports rather than the absence of a complaint. With the blanking
+ * removed it fails on ink-against-ink, which is what makes this test worth
+ * something — a guard nobody has watched fail is a guard nobody should trust.
+ */
+test('a tight-line-height label is measured against its backdrop, not its ink', async ({ page }) => {
+  await page.goto('/');
+
+  await page.evaluate(() => {
+    const el = document.createElement('span');
+    el.id = 'contrast-fixture';
+    el.setAttribute('data-contrast-report', '');
+    el.textContent = 'W';
+    // #767676 on #fff is the canonical 4.54:1 grey. Absolute rather than fixed,
+    // and low enough to clear the private-preview banner, which is a
+    // non-interactive overlay and would otherwise get the fixture skipped.
+    // The 26px box clipping a 40px glyph is what makes the pixels mostly ink.
+    el.style.cssText = [
+      'position:absolute',
+      'top:300px',
+      'left:24px',
+      'z-index:99999',
+      'font:800 40px/1 sans-serif',
+      'color:rgb(118,118,118)',
+      'background:rgb(255,255,255)',
+      'width:26px',
+      'height:26px',
+      'overflow:hidden',
+      'padding:0',
+      'margin:0',
+    ].join(';');
+    document.body.appendChild(el);
+  });
+
+  const result = await audit(page, 'tight line-height fixture');
+  const sample = result.samples.find((s) => s.text === 'W');
+
+  expect(sample, 'the fixture was never measured, so this proves nothing').toBeTruthy();
+  expect(sample!.background).toBe('rgb(255, 255, 255)');
+  expect(
+    Math.abs(sample!.ratio - 4.54),
+    `the fixture measured ${sample!.ratio}:1, and it is 4.54:1 — a ratio near 1 means the ink was sampled as the backdrop`,
+  ).toBeLessThan(0.15);
+  expect(result.failures.filter((f) => f.text === 'W')).toEqual([]);
 });
