@@ -1,3 +1,113 @@
+## Session — 2026-09-25 (mobile navigation: one bar, one sheet, and a bar that fits)
+
+**Machine:** M3 (Buffy) · **Project:** camtaylor
+
+Cam: *"do huge upgrade to Mobile Navigation, its very messy"*. It was, and the mess had a
+number behind it.
+
+### The finding that started it
+
+The bottom bar rendered **ten** items. At the 44px touch floor that is a **440px row** inside a
+320–430px viewport:
+
+| | 320px | 390px |
+|---|---|---|
+| before | buttons shrank to **22px**, last 2 already off-screen | buttons shrank to **33px**, all on screen |
+| after `7e3b60e` (44px floor) | **3 of 10 off-screen** | **2 off-screen — Ventures and Connect** |
+
+So the touch pass traded "too small to hit" for "off the screen", and **Connect — the only path to
+the contact section from the bar — was the one that fell off the end**. Nothing caught it, and
+that is the part worth keeping:
+
+- the bar is `position: fixed`, so it contributes **nothing** to `document.scrollingElement.scrollWidth`
+  (the overflow test still read exactly the viewport width, and passed);
+- `body { overflow-x: hidden }` does not clip fixed elements either;
+- the 44px sweep passed because **each button is 44px** — it was the *row* that overflowed.
+
+Both existing guards were blind to a fixed bar *by construction*, not by threshold.
+
+### Done — two commits
+
+**1 — `80971c8` the scroll lock was freezing the very overlay it protected.**
+`useBodyScrollLock` set `touch-action: none` on `<body>`. touch-action is not scoped to the
+element it is set on — the browser intersects it with the ancestors of whatever is being touched
+— so every descendant of the body became unscrollable by touch while an overlay was open. The
+route sheet is taller than a phone screen, so the effect was a twelve-item list the reader could
+not swipe. `overflow: hidden` is enough to hold the page still; overlays own their own scrolling
+with `overscroll-behavior: contain`. This also affects the Command Deck and the venture modal,
+which use the same hook.
+
+**2 — `792c2ac` one bar, one sheet.**
+
+- **The bar holds six camps** — About · Expertise · Ventures · Proof · Log · Connect (Cam's pick).
+  `floor(320 / 44) = 7`, so six is the arithmetic, not the taste. Measured: **52.7px per item at
+  320**, 71px at 430, nothing truncated, last right edge inside the viewport at every width, bar
+  height **53px**, zero document overflow. Added a lit marker on the camp you are standing on, a
+  hairline showing position on the whole route (six labels cannot say that on their own), and
+  Connect as the bar's own acid control.
+- **The drawer is now the route sheet**: all twelve camps in three legs (Lower route / Upper route /
+  Summit push), each stop carrying its index, camp, altitude and conditions — the same content the
+  in-page route sheet and the desktop rail use, from the same `waypoints.ts`. **1228px of stops in
+  an 844px screen**, so it scrolls; smallest stop 56px tall. It stacks *under* the masthead (the
+  sheet is a child of `.navbar`, so it stacks inside the navbar's own context — it painted over the
+  brand and the close button until `.nav-container` was raised to `z-index: 2`).
+- **The backdrop is gone.** The sheet is the whole screen, so nothing is left "outside" to click,
+  and it was a second full-screen control named *Close menu* competing with the toggle's own name.
+- **`--mobile-nav-height` is now 53px** — the bar's measured height — rather than 62px, a number
+  nothing had ever checked against the element. It is the offset for the back-to-top button, the
+  footer's clearance and every section's scroll-margin.
+
+### Measurements (local production build, real browser)
+
+| Signal | Before | After |
+|---|---|---|
+| Bar items | 10 | 6, all reachable at 320px |
+| Row width vs viewport at 320px | 440px in 320px | 316px in 320px |
+| Smallest item | 22px (production) / 44px off-screen (after the floor) | 52.7px, on screen |
+| Sheet | 12 flat labels, no icons, no grouping | 3 legs, index + camp + altitude + conditions |
+| Bar labels, night theme | `--green` active at **1.59:1** | `--text-primary`; inactive 4.4→**5.3:1** |
+
+### ⚠️ Two things for Kimi to know
+
+1. **The floating "Start a conversation" pill is parked on phones** (one line in `mobile.css`,
+   commented with how to restore it). It was only ever a phone element — `index.css` turns it on
+   inside `≤768px` — and with Connect permanent in the bar it was a second CTA for the same action
+   in the same strip of screen, and the third fixed layer competing for it. **Cam may disagree**;
+   the revert is deleting that one declaration and dropping the `--cta` class from the bar's last
+   item so they are not the same door twice. On desktop nothing changed either way.
+2. **A theme flip does not land in one frame, and that made my first version of the new contrast
+   guard vacuous.** The tokens resolve immediately, the bar's own background repaints on the next
+   frame, and the button's *colour* transitions. Measure inside that window and you read warm ink
+   on the warm background — which passes, while the night theme is broken. The guard now waits
+   before it reads, and it was canaried: with `--green` put back it fails on the active camp, as it
+   should. **This is worth knowing about `tests/contrast.spec.ts` too** — it is the same class of
+   blind spot as the tight-line-height one from the type-system session, and it is the second time
+   a green instrument has hidden a real fault.
+
+### Decisions
+
+- Six items, not ten: the bar is a thumb path, the sheet is the map. Ten was never a "quick" nav.
+- The sheet is the viewport, not a dropdown. Twelve stops in three legs do not fit in 80vh and
+  never did.
+- `--text-secondary` for the bar's labels, not `--text-muted`: at 11px these are navigation, and
+  the muted token is 4.4:1 on the night bar.
+- Kept the in-page route sheet. On a 23,166px page it costs 459px and it is the only map you can
+  read without opening anything.
+- Did not touch the desktop masthead, the rail, or the eight desktop nav links.
+
+### Verification
+
+`npm run quality` ✓ · `npx tsc -b` ✓ · `npm run lint` 0 errors (1 pre-existing `ThemeContext.tsx`
+warning) · `npm test` **55/55** ✓ · both new guards canaried against the bugs they exist for
+(the bar-fit guard fires at all four widths when the ten-item list is put back; the legibility
+guard fires on the active camp when `--green` is put back).
+
+### Git State
+
+- HEAD: `792c2ac` · `git log --oneline origin/main..HEAD` → empty.
+
+---
+
 ## Session — 2026-09-25 (touch & motion, and breaking the 25-screen wall)
 
 **Machine:** M3 (Buffy) · **Project:** camtaylor

@@ -2,30 +2,40 @@
 
 **Status:** LIVE on Cloudflare Pages. camtaylor.ca + www both serve the Sherpa site.
 
-**Latest (Buffy, touch & motion + the route sheet):** Three commits. (1) The ventures carousel
-was **permanently stranding cards at `opacity: 0`** after a fast flick, because each card revealed
-itself and a flick jumped past it — the section now drives the cascade. (2) A full sweep of every
-standalone control at 320/390px found **86 undersized tap targets on a phone, now 0** (the old test
-measured 13 curated selectors at a 40px threshold, which is why 102 of 194 were passing while too
-small); ambient motion is parked by default and reduced motion now neutralises every animation —
-**13 loops were still running, now 0**. (3) A new **route sheet** lists all twelve waypoints below
-the ticker with the active camp marked; reaching Contact from the top of the phone page went from
-**21.5 screens of scrolling to one tap**. Full suite **49/49** green. Detail in `docs/KIMI-HANDOFF.md`.
+**Latest (Buffy, mobile navigation):** Cam called the phone navigation "very messy" and it had a
+number behind it — the bottom bar rendered **ten** items, and ten items at the 44px touch floor is
+a **440px row inside a 320–430px viewport**, which put **Ventures and Connect off the right edge of
+a 390px phone**. No guard could see it: a `position: fixed` bar adds nothing to `scrollWidth`, and
+the 44px sweep passed because each *button* was 44px — the row was what overflowed. Now:
 
-**⚠️ Open — decide before the next deploy:** the phone bottom bar renders **10** buttons at the new
-44px floor, which is **440px wide in a 320–390px viewport**. At 390px the last two — *Ventures* and
-*Connect* — now sit **entirely off-screen**; production today avoids this only by shrinking buttons
-to 22–33px, so this is the trade my touch pass made. Neither existing guard can see it: the bar is
-`position: fixed`, so `document.scrollingElement.scrollWidth` is unaffected (still exactly 320), and
-the 44px sweep passes because each button *is* 44px — the row overflows, not the button. Fix needs a
-**count decision from Cam**: the bar holds 6 items at 320px, so which six of the ten?
+- **One route bar**: six camps (About · Expertise · Ventures · Proof · Log · Connect — Cam's pick),
+  **52.7px per item at 320px**, nothing truncated, a lit marker on the camp you are standing on, a
+  hairline for position on the whole route, and Connect as the bar's own acid call to action.
+- **One route sheet**: the drawer is now all twelve camps in three legs with index, altitude and
+  conditions — 1228px of stops that scrolls inside an 844px screen, stacked under the masthead so
+  the close button stays reachable.
+- **Two real faults fixed on the way**: the scroll lock was setting `touch-action: none` on `<body>`,
+  which made the tall menu *unswipeable*; and the active bar label was `--green` in both themes —
+  **1.59:1 on the night bar**. `--mobile-nav-height` is now the bar's measured 53px, not a 62px
+  number nothing had checked.
 
-**Still true:** the route sheet made the wall *navigable*, not *shorter* — the phone page is still
-23,166px (~27 screens) and every section still dumps its full depth.
+Full suite **55/55**, and both new guards were canaried against the bugs they exist for. Detail,
+measurements and two things for Kimi in `docs/KIMI-HANDOFF.md`.
 
-**Also flagged, not fixed (from the type-system pass):** the contrast guard has a **blind spot** for
-tight-line-height labels; and production has **pre-existing** horizontal overflow (74–164px at
-desktop widths) hidden by `body { overflow-x: hidden }`, where content is genuinely parked off-screen.
+**⚠️ Needs a view from Cam:** the floating "Start a conversation" pill is **parked on phones** (one
+commented line in `mobile.css`, restore instructions in it) because Connect is now permanent in the
+bar. It was only ever a phone element, so desktop is unaffected.
+
+**⚠️ Instrument warning, second time:** a **theme flip does not land in one frame** — tokens resolve,
+the bar's background repaints, the button's colour transitions. Measure inside that window and you
+read warm ink on a warm background, which passes while the night theme is broken. My first version of
+the new guard was vacuous for exactly this reason. Same family as the tight-line-height blind spot
+below; `tests/contrast.spec.ts` should be assumed to share it.
+
+**Also flagged, not fixed:** the contrast probe's blind spot for tight-line-height labels; and
+production has **pre-existing** horizontal overflow (74–164px at desktop widths) hidden by
+`body { overflow-x: hidden }`, where content is genuinely parked off-screen. The phone page is also
+still 23,166px (~27 screens) — the route sheet made the wall navigable, not shorter.
 
 **Ownership — settled:** Kimi owns the camtaylor deployment. Cam + Kimi are the decision pair.
 Buffy is a subordinate coding tool, NOT the boss.
