@@ -328,11 +328,12 @@ img, video {
 }
 .nav-menu-btn:hover { border-color: var(--green); color: var(--green); }
 
+/* `.terminal-toggle-label` and `.terminal-toggle-btn` had phone rules here; the
+   masthead's own phone block in `bold-modern.css` loads after this file and sets
+   both, so these never applied. `npm run cascade` prints the whole chain. */
 @media (max-width: 768px) {
   .nav-links { display: none; }
   .nav-menu-btn { display: flex; }
-  .terminal-toggle-label { display: none; }
-  .terminal-toggle-btn { padding: 7px 10px; }
 }
 
 .nav-mobile-menu {
@@ -522,11 +523,10 @@ img, video {
   letter-spacing: 0.01em;
 }
 
-@media (max-width: 768px) {
-  .title-role { font-size: 2.6rem; }
-  .title-name { font-size: var(--fs-h3); }
-  .title-tagline { font-size: 1rem; }
-}
+/* The hero's three type sizes used to have a phone block here. None of the three
+   applied — `bold-modern.css` loads after this file and sets all of them, and
+   its numbers are the masthead pass's. Deleting them changes nothing on screen;
+   `scripts/cascade-check.mjs` is what proved it, and gates on it now. */
 
 .hero-description {
   font-size: 1rem;
@@ -595,17 +595,8 @@ img, video {
   border-top: 1px solid var(--glass-border);
 }
 
-@media (max-width: 768px) {
-  .hero-metrics {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-  .metric-divider { display: none; }
-}
-@media (max-width: 400px) {
-  .hero-metrics { grid-template-columns: 1fr; }
-}
+/* `.hero-metrics` had a one-column rule at 400px here; the masthead's phone
+   block in `bold-modern.css` already makes it one column at 768px. */
 
 .metric-item { display: flex; flex-direction: column; gap: 4px; }
 
@@ -1347,7 +1338,10 @@ img, video {
   justify-content: space-between;
   align-items: center;
 }
-@media (max-width: 600px) { .footer-bottom { flex-direction: column; gap: 12px; text-align: center; } }
+/* The gap and the column direction are `footer.css`'s: it loads after this file
+   and sets both unscoped, so nothing of those two needs writing here. Only the
+   centring is this file's to say. `npm run cascade` is what says so. */
+@media (max-width: 600px) { .footer-bottom { text-align: center; } }
 
 .footer-copyright { color: rgba(255,255,255,.28); font-size: var(--fs-micro); }
 
@@ -1435,7 +1429,9 @@ img, video {
 }
 
 @media (max-width: 768px) {
-  .about-container { grid-template-columns: 1fr; gap: 24px; }
+  /* The `gap: 24px` that used to sit here never applied — `mobile.css` sets a
+     tighter 20px on the same selector and loads after this file. */
+  .about-container { grid-template-columns: 1fr; }
 }
 
 .about-photo {
@@ -1534,10 +1530,6 @@ img, video {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-}
-
-@media (max-width: 700px) {
-  .nostr-grid { grid-template-columns: 1fr; }
 }
 
 .nostr-card {
@@ -1728,9 +1720,10 @@ img, video {
   border-top: 1px solid var(--glass-border);
 }
 
+/* `.footer`'s phone bottom padding is `mobile.css`'s `calc(80px + --mobile-nav-
+   height)`, which loads after this file. */
 @media (max-width: 768px) {
   .sticky-cta { display: block; }
-  .footer { padding-bottom: 72px; }
 }
 
 .sticky-cta-btn {
@@ -1902,9 +1895,10 @@ img, video {
 }
 
 /* ── Responsive helpers ──────────────────────────────────── */
+/* The hero actions and the main column both get their top spacing from
+   `mobile.css` and `bold-modern.css`, which load after this file. */
 @media (max-width: 480px) {
-  .hero-actions { flex-direction: column; }
-  .main-content { padding: 56px 16px 24px; }
+  .main-content { padding-right: 16px; padding-bottom: 24px; padding-left: 16px; }
 }
 
 /* ══════════════════════════════════════════════════════════

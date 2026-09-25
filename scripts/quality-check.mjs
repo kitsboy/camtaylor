@@ -1,5 +1,10 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import {
+  atRuleDeclarationsThatNeverApply,
+  describe,
+  stylesheetOrder,
+} from './cascade-check.mjs';
 
 const failures = [];
 const requiredFiles = ['public/robots.txt', 'public/manifest.json', 'public/favicon.svg', 'public/og-image.png'];
@@ -67,10 +72,21 @@ for (const file of walk('src', ['.css'])) {
     });
 }
 
+// ── Cascade guard ─────────────────────────────────────────────────────────────
+// Six stylesheets load in a fixed order (`src/main.tsx`), so a rule written in
+// the wrong one is not a style change — it is a declaration that never applies,
+// and nothing in a screenshot or a diff says so. Twenty were found by hand and
+// removed when this guard landed; it is here so the next one fails the build
+// instead. `npm run cascade` prints the full picture, including the rings this
+// cannot gate on and the reasons it can never see everything.
+for (const entry of atRuleDeclarationsThatNeverApply(stylesheetOrder())) {
+  failures.push(`a phone override that never applies at any width — ${describe(entry)}`);
+}
+
 if (failures.length) {
   console.error(failures.map((failure) => `✗ ${failure}`).join('\n'));
   process.exit(1);
 }
 console.log(
-  `✓ Quality check passed (${requiredFiles.length} assets, metadata, privacy gate, type-scale floor)`,
+  `✓ Quality check passed (${requiredFiles.length} assets, metadata, privacy gate, type-scale floor, cascade)`,
 );

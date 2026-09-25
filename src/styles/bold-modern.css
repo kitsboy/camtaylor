@@ -1505,20 +1505,14 @@ body {
      icon block, a 1.65 line-height on paragraphs of ~170 characters, and a
      section padding of `--section-gap` — 67px at this height — top and bottom.
 
-     The section padding is the interesting one: `upgrades.css` sets it after
-     `index.css`, so `index.css`'s `.manifesto-section { padding: 70px 0 }` has
-     never applied. This file loads after both, so this one does. */
-  .manifesto-section { padding-top: 46px; padding-bottom: 46px; }
+     The section padding is the interesting one, and it now has one home — the
+     last block in this file, with the reason written out there. */
   .axioms-grid { gap: 12px; margin-bottom: 28px; }
   .axiom-card { padding: 20px 18px; }
   .axiom-icon-wrapper { width: 34px; height: 34px; margin-bottom: 12px; }
   .axiom-description { line-height: 1.55; }
   .manifesto-quote-wrapper { padding: 22px 16px; }
 
-  /* Same 67px of `--section-gap` as the manifesto, for the same reason. */
-  .contact-section { padding-top: 46px; padding-bottom: 46px; }
-  .services-section,
-  .live-section { padding-top: 46px; padding-bottom: 46px; }
 
   /* ── Phone live signal ─────────────────────────────────────────────────
      `clamp()` is a desktop instrument: below 620px the floor wins every
@@ -2161,4 +2155,29 @@ body {
   .route-sheet-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
   .route-sheet-stop { min-height: var(--touch-min); padding: 8px 9px; }
   .route-sheet-note { flex: 1 1 100%; }
+}
+
+/* ── Phone section spacing, in one place ───────────────────────────────────
+   `mobile.css` has carried `--section-pad-mobile: 48px` since the phone pass
+   that introduced it, and no section has ever used it. That file loads second;
+   `upgrades.css` (later) sets `padding-top`/`padding-bottom` from
+   `--section-gap` for six of these sections, and `bold-modern.css` sets
+   `.expedition-section`'s further down still — so the phone token lost every tie
+   it was in, and so did the four hand-written 46px overrides that had come to
+   stand in for it.
+
+   This is the last block in the last stylesheet that sets section padding, which
+   is the only place a phone rule can be sure it applies. It is one rule, one
+   token, and every section that has a padding. `npm run cascade` measures it. */
+@media (max-width: 768px) {
+  .manifesto-section,
+  .services-section,
+  .ventures-section,
+  .contact-section,
+  .expedition-section,
+  .testimonials-section,
+  .about-section,
+  .live-section {
+    padding: var(--section-pad-mobile) 0;
+  }
 }

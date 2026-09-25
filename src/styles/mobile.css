@@ -61,13 +61,21 @@ a,
   .terminal-toggle-btn,
   .theme-toggle,
   .deal-size-btn,
-  .venture-case-btn,
-  .venture-link-btn,
   .copy-email-btn,
-  .log-filter-btn,
-  .venture-filter-btn,
   .mobile-email-cta {
     min-height: var(--touch-min);
+    min-width: var(--touch-min);
+  }
+
+  /* These four were in the block above until their `min-height` was found to be
+     dead: `touch.css` loads last and gives all four 44px already, which
+     `device-qa.spec.ts` measures. Their `min-width` is still this file's, and
+     `min-width: 44px` is not decoration — it is what keeps `1fr 1fr` in
+     `.hero-actions` from collapsing to the wider button's min-content at 320px. */
+  .venture-case-btn,
+  .venture-link-btn,
+  .log-filter-btn,
+  .venture-filter-btn {
     min-width: var(--touch-min);
   }
 
@@ -77,9 +85,6 @@ a,
     right: 0;
   }
 
-  .btn-primary:active,
-  .btn-secondary:active,
-  .submit-btn:active,
   .sticky-cta-btn:active,
   .venture-card:active,
   .service-card:active,
@@ -313,23 +318,16 @@ a,
   cursor: pointer;
 }
 
+/* `.nav-container`'s phone padding and radius, `.brand-dot { display: none }` and
+   the scrolled shadow all used to be here. None of them applied: `bold-modern.css`
+   and `touch.css` load after this file and each one is set there — the brand dot
+   at 430px, which is the width the masthead actually needed it for. They are
+   deleted rather than kept, because a phone rule that never runs reads exactly
+   like one that does. `npm run cascade` still lists every one of them. */
 @media (max-width: 768px) {
-  .nav-container {
-    padding: 8px 14px;
-    border-radius: 14px;
-  }
-
   .nav-brand-text {
     font-size: var(--fs-body);
     letter-spacing: 0.04em;
-  }
-
-  .brand-dot {
-    display: none;
-  }
-
-  .navbar-scrolled .nav-container {
-    box-shadow: 0 8px 28px rgba(26, 23, 18, 0.12);
   }
 }
 
@@ -345,39 +343,25 @@ a,
     align-items: flex-start;
   }
 
-  .hero-shell {
-    padding: 24px 18px;
-    border-radius: 18px;
-  }
-
-  .title-role {
-    font-size: clamp(2.2rem, 11vw, 3rem);
-  }
-
-  .title-name {
-    font-size: clamp(0.95rem, 3.5vw, 1.1rem);
-  }
-
-  .title-tagline {
-    font-size: clamp(0.95rem, 4vw, 1.1rem);
-    line-height: 1.45;
-  }
+  /* The hero's phone chrome used to be set here: `.hero-shell`'s padding and
+     radius, `.title-role`'s and `.title-name`/`.title-tagline`'s sizes,
+     `.hero-description`'s margin, `.hero-route-status`'s padding,
+     `.hero-actions`' gaps and `.hero-metrics`' whole grid. Not one of them
+     applied: `bold-modern.css` loads after this file and its phone block sets
+     every one of those properties, which is why the hero pass had to be written
+     there. What is left below is what this file actually decides. */
 
   .hero-description {
     font-size: var(--fs-body);
-    margin-bottom: 24px;
   }
 
   .hero-route-status {
     font-size: var(--fs-caption);
-    padding: 10px 12px;
     flex-wrap: wrap;
   }
 
   .hero-actions {
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 28px;
   }
 
   .hero-actions .btn-primary,
@@ -388,11 +372,13 @@ a,
     min-height: 48px;
   }
 
+  /* `.hero-metrics`' column, gap and padding are the masthead pass's. This one
+     declaration is not: it is the last `display` in the cascade, so without it
+     `grid-template-columns: 1fr` is inert and the metrics fall back to the base
+     rule's flow. Deleting the block wholesale took the live declaration with the
+     dead ones — `npm run cascade` reports per declaration, and this is why. */
   .hero-metrics {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px 20px;
-    padding-top: 20px;
   }
 
   .hero-video-frame-outer {
@@ -407,6 +393,11 @@ a,
   .glow-orb,
   .glow-orb-cyan {
     opacity: 0.5;
+  }
+
+  /* The cyan orb's parked animation is already set in `touch.css`, which loads
+     last — the copy that stood here never ran. */
+  .glow-orb {
     animation: none;
   }
 }
@@ -495,10 +486,10 @@ a,
 
   .ecosystem-ribbon-links::-webkit-scrollbar { display: none; }
 
+  /* `min-height` is `touch.css`'s 44px, not the 36px that used to sit here. */
   .ecosystem-chip {
     flex-shrink: 0;
     scroll-snap-align: start;
-    min-height: 36px;
     display: inline-flex;
     align-items: center;
   }
@@ -510,14 +501,12 @@ a,
     padding: calc(72px + var(--safe-top)) 16px calc(24px + var(--mobile-nav-height) + var(--safe-bottom));
   }
 
-  .manifesto-section,
-  .services-section,
-  .ventures-section,
-  .contact-section,
-  .expedition-section,
-  .testimonials-section {
-    padding: var(--section-pad-mobile) 0;
-  }
+  /* The phone section padding used to be written here, and this rule never
+     applied to a single section: `upgrades.css` and `bold-modern.css` both load
+     after this file and both set `padding-top`/`padding-bottom` from
+     `--section-gap`. It lives at the end of `bold-modern.css` now, in
+     `--section-pad-mobile`, where it wins. `npm run cascade` prints the rest of
+     the picture. */
 
   .section-header {
     margin-bottom: 28px;
@@ -533,9 +522,6 @@ a,
     padding: 0 4px;
   }
 
-  .about-section {
-    padding: 12px 0 36px;
-  }
 
   .about-container {
     gap: 20px;
@@ -572,7 +558,6 @@ a,
      top while you scroll is a layout waiting to jump. */
   .contact-sidebar {
     order: 2;
-    position: static;
   }
 
   /* The folded detail keeps the sidebar's own column rhythm without reusing the
@@ -697,7 +682,6 @@ a,
   .mobile-quick-nav-btn {
     position: relative;
     flex: 1 1 0;
-    min-width: var(--touch-min);
     min-height: var(--touch-min);
     display: flex;
     flex-direction: column;
@@ -869,7 +853,6 @@ a,
   .venture-link-btn {
     width: 100%;
     justify-content: center;
-    min-height: 44px;
   }
 }
 
@@ -946,9 +929,9 @@ a,
   .service-features { gap: 6px; }
   .service-feature-tag { padding: 3px 8px; }
 
-  .hero-backdrop-wrap {
-    height: 70vh;
-  }
+  /* `.hero-backdrop-wrap` had `height: 70vh` here; `bold-modern.css` sets
+     `100vh` unscoped and loads later, so the backdrop has always been a full
+     screen on a phone. */
 
   .hero-backdrop-motion,
   .hero-backdrop-shimmer {

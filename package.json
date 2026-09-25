@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "quality": "node scripts/quality-check.mjs",
+    "cascade": "node scripts/cascade-check.mjs",
     "preview": "vite preview",
     "test": "playwright test",
     "build:live": "VITE_PRIVATE_PREVIEW=false npm run build",
