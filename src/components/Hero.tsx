@@ -30,9 +30,20 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
     return () => obs.disconnect();
   }, []);
 
+  /**
+   * The phone hero re-orders nine children with CSS `order`, but a stagger walks
+   * DOM order — so on a phone the cascade runs in a sequence the eye cannot
+   * follow, and at 0.12s the primary button lands at 0.8s and the metrics at
+   * 0.96s, a second after the screen that exists to show that button. Halving it
+   * on phones keeps the whole entrance inside 0.5s, where the mismatch reads as
+   * one cascade instead of a queue. Read once at mount, like the variants.
+   */
+  const stagger = !reduced && typeof window !== 'undefined'
+    && window.matchMedia('(max-width: 768px)').matches ? 0.05 : 0.12;
+
   const containerVariants = reduced
     ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
-    : { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.12 } } };
+    : { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: stagger } } };
 
   const itemVariants = reduced
     ? { hidden: { opacity: 1, y: 0 }, visible: { opacity: 1, y: 0 } }
@@ -75,7 +86,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
           </div>
         </motion.div>
 
-        <motion.div variants={itemVariants}>
+        <motion.div className="hero-route-wrap" variants={itemVariants}>
           <RouteStatusRotator />
         </motion.div>
 

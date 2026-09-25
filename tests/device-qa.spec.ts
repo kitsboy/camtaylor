@@ -638,6 +638,68 @@ test('the phone page stays inside its length budget', async ({ page }) => {
 });
 
 /**
+ * The first screen a phone gets belongs to the pitch.
+ *
+ * The hero was re-ordered so the name, the tagline, the sentence and the primary
+ * button all land above the fold (`bold-modern.css`, "the first screen belongs
+ * to the pitch"). Three ways to lose that, and this catches all three:
+ *
+ *   1. `index.css`'s `.hero-video-wrap { order: -1 }` comes back, putting a
+ *      video poster above the name — the original fault, and the one a
+ *      well-meaning "show media first" edit would restore;
+ *   2. something above the title grows (the chips wrap to a third row, a banner
+ *      is added), pushing the button past the bottom edge at 375;
+ *   3. the phone `order` rules stop applying to one file's cascade.
+ *
+ * 375×667 is the smallest phone still in use, so it is the width that decides.
+ * The private-preview banner is present in this build, which makes the chrome
+ * 34px taller than production — the budget below already has it.
+ */
+for (const [width, height] of [[375, 667], [390, 844], [414, 896]] as const) {
+  test(`the hero earns the first screen at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto('/');
+    await expect(page.locator('.hero-title')).toBeVisible();
+    // The entrance walks nine children; measure what the reader is left with.
+    await page.waitForTimeout(1400);
+
+    const seen = await page.evaluate(() => {
+      const box = (sel: string) => {
+        const el = document.querySelector(sel);
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { top: Math.round(r.top + window.scrollY), bottom: Math.round(r.bottom + window.scrollY) };
+      };
+      return {
+        title: box('.hero-title'),
+        cta: box('.hero-actions .btn-primary'),
+        video: box('.hero-video-wrap'),
+        fold: window.innerHeight,
+      };
+    });
+
+    expect(seen.title, 'the hero lost its title').not.toBeNull();
+    expect(seen.cta, 'the hero lost its primary button').not.toBeNull();
+    expect(seen.video, 'the hero lost its video').not.toBeNull();
+    expect(seen.title!.top, 'the name starts below the fold').toBeLessThan(seen.fold);
+    expect(
+      seen.cta!.bottom,
+      `the primary button ends at ${seen.cta!.bottom}px in a ${seen.fold}px screen — ${seen.cta!.bottom - seen.fold}px too low`,
+    ).toBeLessThanOrEqual(seen.fold);
+
+    // The specific fault this guards: media ordered ahead of the pitch.
+    expect(
+      seen.title!.top,
+      `the video poster (${seen.video!.top}px) is above the name (${seen.title!.top}px)`,
+    ).toBeLessThan(seen.video!.top);
+    expect(
+      seen.cta!.top,
+      `the video poster (${seen.video!.top}px) is above the primary button (${seen.cta!.top}px)`,
+    ).toBeLessThan(seen.video!.top);
+  });
+}
+
+/**
  * The fold is a phone affordance and nothing else. A desktop page is 15,000px
  * and already fine, and splitting a two-column list at an odd number leaves one
  * card alone in its row — so on a desktop the component renders its children

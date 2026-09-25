@@ -1433,10 +1433,36 @@ body {
      loads after `mobile.css` — a phone rule written there loses the tie and
      never applies. (That is already true of `mobile.css`'s `.hero-shell`
      padding today.) */
-  .hero-shell { padding: 18px 16px; }
-  .hero-card-meta { margin-bottom: 12px; }
+  /* ── Phone hero: the first screen belongs to the pitch ─────────────────
+     The order below is the whole point. `.hero-video-wrap { order: -1 }`
+     (index.css, ≤900px) put a 16:9 poster above the name, so a phone opened on
+     two location chips, a status chip, a rotating route line and a video — the
+     name sat at 542px and the primary button at 866px, 22px *below* an 844px
+     screen. Everything was already on the page; only the order was wrong.
+
+     `.hero-grid` is a two-column composition on a desktop and nothing else on
+     a phone, so here it stops being a box and its two children take their
+     place in the line — which is what makes the video movable past the button.
+     The shell becomes the flex column that gives `order` something to apply
+     to; that is why the padding sits in this rule. */
+  .hero-shell {
+    display: flex;
+    flex-direction: column;
+    padding: 18px 16px;
+  }
+  .hero-grid { display: contents; }
+
+  .hero-card-meta { order: 1; margin-bottom: 12px; }
+  .hero-copy { order: 2; }
+  .hero-description { order: 3; margin-bottom: 18px; }
+  .hero-badge-container { order: 4; }
+  .hero-actions { order: 5; }
+  .hero-route-wrap { order: 6; }
+  .hero-intelligence-strip { order: 7; }
+  .hero-video-wrap { order: 8; }
+  .hero-metrics { order: 9; }
+
   .hero-route-status { padding: 8px 10px; }
-  .hero-description { margin-bottom: 18px; }
 
   /* Three full-width stacked buttons is 164px of the screen for two places the
      reader can go later. The primary keeps a row to itself; the two secondaries
