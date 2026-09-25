@@ -31,9 +31,18 @@ endpoint could be found at all"*, which is indistinguishable from a form posting
 probe reads the endpoint declared in `wrangler.toml`, requires that ID in the published bundle,
 requires a bundled Formspree client, and still fails on the placeholder. It exits **0** now.
 
-**Still open from her reply:** repoint the five `cam@camtaylor.ca` occurrences at
-`hello@giveabit.io`, prefix the form subject `[camtaylor.ca]`, and add the opt-in live submission test
-(never in CI).
+Kimi found the same bug the same hour and fixed it by guessing the ID's shape (a backtick-quoted
+non-dictionary string, against a hand-written word list). That works on today's bundle and breaks the
+day a new such literal appears, so the declarative version is what stayed; both diagnoses are worth
+having, which is more than can be said for two fixes of the same line.
+
+**Her reply's three asks are also done:** the five `cam@camtaylor.ca` occurrences (plus `llms.txt`)
+publish `hello@giveabit.io` now and `SITE.email` *is* the inquiry inbox, so the address of record and
+the form's destination cannot drift; the subject carries a `[camtaylor.ca]` prefix from one function
+that both the hidden field and the mailto fallback use, guarded by the quality gate; and the opt-in
+live submission test is written and skipped by default. **It has not been fired** — it posts real
+mail to the monitored inbox, so that is Cam's call. `docs/DEPLOYMENT.md` names the live endpoint now
+(`xpqgopvd`, pinned in `wrangler.toml`), which was Kimi's question 10.
 
 ## The analytics: her way is already half-wired here
 
@@ -78,8 +87,7 @@ pre-existing `ThemeContext` warning). Every new guard was canaried against the b
 
 - **Kimi's analytics answer.** Which provider, which ID, and whether the ID goes in `wrangler.toml`
   `[vars]` the way the form's did. Nothing is switched on until she answers — both IDs stay empty.
-- **The three things her email reply asks for:** the `cam@camtaylor.ca` repoint, the
-  `[camtaylor.ca]` subject prefix, and the opt-in live submission test that would prove delivery end
-  to end.
+- **Fire the opt-in live submission test** (`LIVE_FORM_TEST=1 …`) and have Kimi confirm the
+  `CT-TEST-…` line arrived — the only link in the chain that is still unproven.
 - **Worth doing with Cam's eye:** the desktop page is 14,817px, and the section that remains long
   does so because of its prose, not its chrome. Cutting further is a copy decision.

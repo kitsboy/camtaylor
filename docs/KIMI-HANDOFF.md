@@ -149,16 +149,53 @@ So: **the private preview is off on production, the form is switched on, the cop
 inbox, and the published app chunk carries `xpqgopvd`** — the endpoint Kimi's `wrangler.toml` declares,
 and no longer the `xykqodnk` placeholder. That is the whole of the client half of this item, closed.
 
-**The verification command was itself broken, and it is what this session found next.** The probe
+**The verification command was itself broken — and we both found it, in the same hour.** Kimi fixed
+it in `53bfbbc` by guessing the ID's *shape* in the minified bundle (a 7–8 character backtick-quoted
+string that is not one of ~200 hand-listed dictionary words); this side fixed it in `467ff0c` by
+reading the declaration out of `wrangler.toml` and comparing it with the artifact. The merged file is
+the declarative version, because the shape guess is one arbitrary literal away from silently
+returning nothing again, and the comment in `scripts/check-live-form.mjs` records both. Two
+independent diagnoses of one bug is worth having; two fixes of it is a rebase, and that is what
+happened.
+
+**What the broken probe was.** The probe
 looked for a literal `formspree.io/f/<id>` in the published JavaScript, which @formspree/react never
 emits: the library builds that URL from the ID at runtime, so the endpoint branch of the check could
 never match — it reported *"no Formspree endpoint could be found in the published bundle at all"* on a
 production build that was, in fact, correct. **A probe that cannot report success is the same fault as
 a probe that cannot report failure**, and the previous session's "it exits 0 once it is fixed" was
-written against a branch that had never run. Fixed in the commit after this one: the probe reads the
-endpoint declared in `wrangler.toml`, requires that ID in the published bundle, requires a bundled
-Formspree client, and still fails on the placeholder. It exits **0** on production now, which is the
-first time this command has been able to say so.
+written against a branch that had never run. `467ff0c` reads the endpoint declared in `wrangler.toml`,
+requires that ID in the published bundle, requires a bundled Formspree client, and still fails on the
+placeholder. It exits **0** on production now, which is the first time this command has been able to
+say so.
+
+### Her reply's three asks, and what happened to each
+
+- **The `cam@camtaylor.ca` repoint — done, `c9847d7`.** The privacy policy (rights *and* contact),
+   the terms, the field guide, the command deck and `public/llms.txt` all publish `hello@giveabit.io`
+   now. `SITE.email` *is* `INQUIRY_EMAIL` rather than a second literal, so the address of record and
+   the form's destination cannot drift apart again — which is the fault this whole item started from.
+   No occurrence of that address is left in `src/` or in the shipped files.
+- **The `[camtaylor.ca]` subject prefix — done, `c9847d7`.** One function builds it
+   (`INQUIRY_SUBJECT` in `src/data/site.ts`) and both callers use it — the hidden `_subject` field
+   *and* the failure path's mailto, so a message that falls back to the reader's own mail client is
+   still filterable. `npm run quality` fails if the prefix disappears or a second literal subject
+   appears; canaried by putting one back.
+- **The opt-in live submission test — written, `5444426`, and not fired.**
+   `LIVE_FORM_TEST=1 npx playwright test tests/live-form.spec.ts` posts exactly one marked
+   submission (`CT-TEST-…` in the subject and the body) and asserts the endpoint accepts it.
+   Skipped by default, never in CI. **I have not run it**: it sends real mail to the inbox you
+   monitor, so tell me when to fire it (or run it yourself) and the marker will be the first line
+   you can confirm end to end. Everything before that link is now proven.
+
+`docs/DEPLOYMENT.md` lines 20 and 54 name the live endpoint (`xpqgopvd`, pinned in `wrangler.toml`
+`[vars]`) and the address-of-record note about the zone's Google Workspace MX is corrected — that was
+question 10. `docs/PRIVATE-LAUNCH-GATE.md` no longer claims production was live when it was not.
+
+**One thing in your reply is now stale, and it is your call to correct:** `docs/DEPLOYMENT.md`'s
+rollback/domain section and `docs/PRIVATE-LAUNCH-GATE.md`'s "After the switch" list still treat
+`cam@camtaylor.ca` as a mailbox worth keeping. The site no longer publishes it and no test can see
+DNS, so I have only annotated it.
 
 ### The analytics: she does have a way, and it is already half-wired here
 
@@ -271,10 +308,12 @@ one of them caught my own privacy-page wording before it was trusted.
 
 ### Git state
 
-`d945914` (one loader, the host gate, the CSP, the docs that claimed otherwise) · and the commit
-below it, which carries this section — both pushed, tree clean. The docs commit is deliberately not
-named by its own SHA: amending it to correct the SHA changes the SHA again. (`public/build-meta.json`
-is untracked and Kimi's; it is left alone.)
+`79e80db` analytics: one loader, the host gate, the CSP, the docs that claimed otherwise · `5fa1cbe`
+docs: this section · `467ff0c` the live-form probe that could not report success · `476817a` one
+address of record + the subject prefix · `a2362fd` the opt-in live test · `8d4cac0` the docs that
+close the email chain. All pushed, tree clean. (The SHAs differ from the first rebase: Kimi pushed
+five more commits while this was being written, so these were replayed onto them.)
+(`public/build-meta.json` is untracked and Kimi's; it is left alone.)
 
 ---
 

@@ -17,7 +17,7 @@ Cloudflare is the only host. There is no Vercel or Netlify config in this repo, 
 | Node version | 22 |
 | SPA routing | `public/_redirects` (`/* /index.html 200`) |
 | Security headers | `public/_headers` |
-| Environment variables | `VITE_PRIVATE_PREVIEW=false` (production), `VITE_FORMSPREE_FORM_ID=<LIVE ID>` |
+| Environment variables | `VITE_PRIVATE_PREVIEW=false` (production), `VITE_FORMSPREE_FORM_ID=xpqgopvd` — both are pinned in `wrangler.toml` `[vars]`, which the build reads |
 
 `prebuild` regenerates `public/sitemap.xml` and `public/feed.xml` from
 `src/content/dispatches/*.md` on every build — no manual feed edits. It also writes
@@ -51,9 +51,11 @@ npx wrangler login
 1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
 2. Pick `kitsboy/camtaylor`, production branch `main`
 3. Build command `npm run build`, output `dist`
-4. Settings → **Environment variables (Production)**: `VITE_PRIVATE_PREVIEW=false`, `VITE_FORMSPREE_FORM_ID=<LIVE ID>`
-   (replace the `<LIVE ID>` placeholder with the real Formspree endpoint — `xykqodnk` in the old docs was
-   the scaffold placeholder; see `docs/KIMI-HANDOFF.md` top section for the live delivery state).
+4. Settings → **Environment variables (Production)**: `VITE_PRIVATE_PREVIEW=false`, `VITE_FORMSPREE_FORM_ID=xpqgopvd`
+   (the family's live Formspree form, delivering to `hello@giveabit.io`; `xykqodnk` in the older docs was
+   the scaffold placeholder, and the published bundle proved production was posting to it). Both values
+   are pinned in `wrangler.toml` `[vars]` now, so the repo states what production builds with.
+   `npm run check:live-form` proves the published bundle carries the endpoint and the form is switched on.
 5. Every push to `main` then publishes automatically
 
 **Build output dir is pinned in-repo** by `wrangler.toml` (`pages_build_output_dir = "dist"`),
@@ -90,7 +92,10 @@ Old-site cleanup once the new site is confirmed live:
 
 - Remove the leftover origin records (the A/AAAA records pointing at the WordPress host)
 - Cancel/archive the WordPress hosting and any old staging subdomains
-- Keep Cloudflare **Email Routing** for `cam@camtaylor.ca` — it is independent of the website
+- The zone's mail records are independent of the website. Note (2026-09-25, Kimi): `cam@camtaylor.ca`
+  is the stale EZP-era address, the zone serves **Google Workspace** MX inherited from that host, and a
+  live mailbox behind it is unproven — the site no longer publishes it, and `hello@giveabit.io` is the
+  address of record everywhere. Any change to those records is a DNS decision, not a site one.
 - Re-submit `https://camtaylor.ca/sitemap.xml` in Google Search Console (the WordPress
   URLs will 404; the SPA fallback returns the app, which is the intended behaviour)
 
