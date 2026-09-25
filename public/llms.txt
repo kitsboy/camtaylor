@@ -8,7 +8,7 @@ Last updated: 2026-07-15
 - Title: Sherpa
 - Tagline: We get people to the top — and back down again.
 - Location: British Columbia, Canada (Pacific Time)
-- Email: cam@camtaylor.ca
+- Email: hello@giveabit.io (the monitored inquiry inbox; contact-form submissions are delivered here)
 - NOSTR NIP-05: cam@giveabit.io
 - URL: https://camtaylor.ca
 - Social: GitHub, X, Nostr only (no LinkedIn)

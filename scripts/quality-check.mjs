@@ -7,7 +7,13 @@ import {
 } from './cascade-check.mjs';
 
 const failures = [];
-const requiredFiles = ['public/robots.txt', 'public/manifest.json', 'public/favicon.svg', 'public/og-image.png'];
+const requiredFiles = [
+  'public/robots.txt',
+  'public/manifest.json',
+  'public/favicon.svg',
+  'public/og-image.png',
+  'public/llms.txt',
+];
 for (const file of requiredFiles) {
   if (!existsSync(file)) failures.push(`Missing required file: ${file}`);
 }
@@ -17,6 +23,33 @@ for (const token of ['<title>', 'name="description"', 'rel="canonical"', 'applic
   if (!index.includes(token)) failures.push(`Missing metadata: ${token}`);
 }
 if (index.includes('analytics.giveabit.io/script.js')) failures.push('Analytics must be runtime-gated, not hard-coded in index.html');
+
+// ── The machine-readable surface ──────────────────────────────────────────────
+// Structured data is the one part of the site nothing renders, so nothing notices when it
+// breaks: a malformed block is dropped by every consumer in silence, and a `Person` whose
+// email is an address nobody reads is still valid JSON. Both are checked here.
+const ldBlocks = [...index.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(
+  (match) => match[1],
+);
+if (!ldBlocks.length) failures.push('index.html carries no JSON-LD block');
+for (const block of ldBlocks) {
+  try {
+    const parsed = JSON.parse(block);
+    const types = [parsed['@type']].flat().filter(Boolean);
+    if (!types.length) failures.push('a JSON-LD block in index.html declares no @type');
+    if (types.includes('Person')) {
+      if (!Array.isArray(parsed.sameAs) || !parsed.sameAs.length) {
+        failures.push('the Person block declares no sameAs — the identity it describes is unreachable');
+      }
+      if (!String(parsed.email ?? '').includes('@')) failures.push('the Person block carries no email');
+    }
+  } catch (error) {
+    failures.push(`a JSON-LD block in index.html is not valid JSON: ${error.message}`);
+  }
+}
+if (!index.includes('href="/llms.txt"')) {
+  failures.push('index.html does not link /llms.txt, so the file it ships is undiscoverable');
+}
 
 // ── Share card ────────────────────────────────────────────────────────────────
 // The card is generated (`npm run og`), so it is the one asset nobody looks at

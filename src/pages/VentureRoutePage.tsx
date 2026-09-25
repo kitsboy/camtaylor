@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowUpRight, Users } from 'lucide-react';
 import { VENTURES, VENTURE_STATUS_LABELS } from '../data/ventures';
+import { SITE } from '../data/site';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { SiteLayout } from '../components/SiteLayout';
 import { SatohashProvenance } from '../components/SatohashProvenance';
@@ -15,6 +16,37 @@ export function VentureRoutePage() {
       ? `${venture.name}: ${venture.role}. ${venture.desc}`
       : 'Venture route not found on camtaylor.ca.',
     path: venture ? `/route/${venture.id}` : '/route',
+    // A case file is a page about a thing, and a crawler should be able to see where it
+    // sits in the site rather than arriving on it as if it were the front door.
+    schema: venture
+      ? {
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'Article',
+              headline: `Route — ${venture.name}`,
+              description: `${venture.name}: ${venture.role}. ${venture.desc}`,
+              url: `${SITE.url}/route/${venture.id}`,
+              about: { '@type': 'Organization', name: venture.name },
+              author: { '@type': 'Person', name: SITE.name, url: SITE.url },
+              image: `${SITE.url}/og-image.png`,
+            },
+            {
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url },
+                { '@type': 'ListItem', position: 2, name: 'Ventures', item: `${SITE.url}/#ventures` },
+                {
+                  '@type': 'ListItem',
+                  position: 3,
+                  name: venture.name,
+                  item: `${SITE.url}/route/${venture.id}`,
+                },
+              ],
+            },
+          ],
+        }
+      : undefined,
   });
 
   if (!venture) {

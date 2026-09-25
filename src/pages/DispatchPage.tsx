@@ -8,6 +8,7 @@ import {
   formatDispatchDate,
   getDispatch,
 } from '../utils/dispatches';
+import { SITE } from '../data/site';
 
 export function DispatchPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -20,6 +21,39 @@ export function DispatchPage() {
       ? dispatch.summary
       : 'That dispatch is not in the expedition log on camtaylor.ca.',
     path: dispatch ? `/dispatch/${dispatch.slug}` : '/dispatch',
+    // A dated, attributed dispatch is an Article to anything reading this page
+    // mechanically — it was bare HTML to all of them before.
+    schema: dispatch
+      ? {
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'BlogPosting',
+              headline: dispatch.title,
+              description: dispatch.summary,
+              datePublished: dispatch.date,
+              url: `${SITE.url}/dispatch/${dispatch.slug}`,
+              articleSection: dispatch.terrain,
+              author: { '@type': 'Person', name: SITE.name, url: SITE.url },
+              publisher: { '@type': 'Person', name: SITE.name, url: SITE.url },
+              image: `${SITE.url}/og-image.png`,
+            },
+            {
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url },
+                { '@type': 'ListItem', position: 2, name: 'Sherpa', item: `${SITE.url}/#expeditions` },
+                {
+                  '@type': 'ListItem',
+                  position: 3,
+                  name: dispatch.title,
+                  item: `${SITE.url}/dispatch/${dispatch.slug}`,
+                },
+              ],
+            },
+          ],
+        }
+      : undefined,
   });
 
   if (!dispatch) {

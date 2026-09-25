@@ -11,15 +11,45 @@ function setMeta(attr: 'name' | 'property', key: string, content: string) {
   el.setAttribute('content', content);
 }
 
+const SCHEMA_SELECTOR = 'script[data-page-schema]';
+
+/**
+ * The site's own `Person` block lives in `index.html`. Every *page* below the homepage
+ * used to carry no structured data at all, which is thin for a site whose pitch is proof:
+ * a dispatch that is not an `Article` is not a dated, attributed, quotable thing to
+ * anything reading it mechanically. Pages pass their own node and this keeps exactly one
+ * of them in the document — replacing rather than appending, so client-side navigation
+ * cannot leave a dispatch's schema behind on the next page.
+ */
+function setPageSchema(serialized: string | null) {
+  const existing = document.querySelector<HTMLScriptElement>(SCHEMA_SELECTOR);
+  if (!serialized) {
+    existing?.remove();
+    return;
+  }
+  const script = existing ?? document.createElement('script');
+  script.type = 'application/ld+json';
+  script.dataset.pageSchema = '';
+  script.textContent = serialized;
+  if (!existing) document.head.appendChild(script);
+}
+
 export function usePageMeta({
   title,
   description,
   path = '/',
+  schema,
 }: {
   title: string;
   description: string;
   path?: string;
+  /** A JSON-LD node for this page (`Article`, `BreadcrumbList`, …), or nothing. */
+  schema?: Record<string, unknown>;
 }) {
+  // Serialized outside the effect because it is also the dependency: a fresh object
+  // literal at every render would otherwise re-run this effect forever.
+  const schemaJson = schema ? JSON.stringify(schema) : null;
+
   useEffect(() => {
     const fullTitle = path === '/' ? title : `${title} | ${SITE.name}`;
     document.title = fullTitle;
@@ -42,5 +72,13 @@ export function usePageMeta({
       document.head.appendChild(canonical);
     }
     canonical.href = `${SITE.url}${path}`;
-  }, [title, description, path]);
+
+    setPageSchema(schemaJson);
+
+    // Leaving the page must not leave its structured data behind: the next page would
+    // otherwise be described as the one before it.
+    return () => setPageSchema(null);
+    // `schemaJson`, not the object: callers write an object literal at every render, and a
+    // fresh identity in this list would rewrite the head on every render.
+  }, [title, description, path, schemaJson]);
 }
