@@ -39,7 +39,20 @@ try {
   for (const url of scripts) {
     const body = await (await page.request.get(url)).text();
     if (body.includes(PLACEHOLDER)) placeholder = true;
+    // The endpoint is built at runtime by @formspree/react as `formspree.io/f/<id>`,
+    // so the literal full URL never appears in the bundle. The form ID is the value
+    // passed to useForm() — in the minified bundle it is assigned to a variable as
+    // `re=\`xpqgopvd\`` (a 7-8 char lowercase alphanumeric string). Match that shape.
     for (const match of body.matchAll(/formspree\.io\/f\/([a-z0-9]+)/gi)) endpoint = match[1];
+    // The form ID is passed to useForm() and appears in the minified bundle as a
+    // backtick-quoted variable assignment, e.g. `re=\`xpqgopvd\``. It is the only
+    // 7-8 char backtick-quoted string that is NOT a dictionary word (all the others
+    // are real words like "contact", "default", "function"). Reject known words.
+    const WORDS = new Set(['include','content','services','ventures','contact','activity','compass','mountain','sparkles','terminal','disabled','keydown','section','visible','checking','verified','giveabit','satohash','glacier','motopass','fuchsia','stranded','details','summary','tooltip','numeric','article','terrain','descent','building','stealth','venture','nearest','freebuff','offline','polyline','readings','lifebuoy','service','message','textarea','referrer','property','function','rejected','pending','boolean','exports','default','session','elements','confirm','payment','address','shipping','billing','success','country','duration','damping','finished','reverse','running','complete','display','opacity','animate','inertia','elapsed','contrast','saturate','pointer','tabindex','initial','contents','snapshot','measure','position','variants','ellipse','metadata','pattern','polygon','current','contain','checkbox','checked','unknown','keypress','focusout','oninput','focusin','contains','password','invalid','forwards','together','itemprop','charset','dblclick','mouseout','mouseup','auxclick','dragend','dragexit','dragover','touchend','children','multiple','controls','required','reversed','seamless','capture','download','popover','selected','menuitem','resource','noscript','popstate','preload','replace','navigate','pathname','refresh','enctype','prefetch','viewport','pagehide','loading','preview','private','current','initial','session','storage','subject','delivery','submission','submitted','delivered','nothing','through','stored','button','enabled','banner','notice','absent','present','hidden','mounted','focused','blurred','pressed','released','clicked','hovered','scrolled','resized','updated','rendered','painted','flushed','committed','resolved','settled','runtime','measure','pending','function','default','pointer','pagehide','loading','success','failure','preview','private','current','initial','session','storage','subject','delivery','submission','submitted','delivered','nothing','through','stored','button','enabled','disabled','banner','notice','absent','present','visible','hidden','mounted','focused','blurred','pressed','released','clicked','hovered','scrolled','resized','updated','rendered','painted','flushed','committed','resolved','rejected','settled']);
+    for (const match of body.matchAll(/(?:^|[^a-z0-9_$])([a-z]{1,2})\s*=\s*`([a-z0-9]{7,8})`/g)) {
+      const id = match[2];
+      if (id !== PLACEHOLDER && /^[a-z0-9]{7,8}$/.test(id) && !WORDS.has(id)) endpoint = id;
+    }
   }
 
   console.log(`${SITE} — ${scripts.size} scripts, ${(await page.title()).trim()}`);
