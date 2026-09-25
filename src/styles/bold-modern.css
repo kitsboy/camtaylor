@@ -1867,3 +1867,155 @@ body {
 [data-theme="night"] .contact-delivery-note strong { color: #7fd4c8; }
 [data-theme="night"] .venture-status--syndicating { color: #cbb2ff; }
 [data-theme="night"] .form-preview-notice { color: #e8c07a; }
+
+/* ── Route sheet — the whole climb in one block ──────────────────────────────
+   Thirteen sections deep meant the only way to reach anything past the eighth
+   was to scroll through everything before it. The sheet puts all twelve
+   waypoints at the top. Grid position is route order, never a measurement, and
+   colours stay on the audited text tokens: `--text-secondary` and `--text-muted`
+   are the contrast-safe pair, and the active stop is ink on acid. */
+.route-sheet {
+  margin: 0 0 10px;
+  padding: clamp(18px, 2.4vw, 26px);
+  background: linear-gradient(145deg, rgba(255, 255, 255, .72), rgba(233, 226, 214, .7));
+  border: 1px solid var(--line-bright);
+  border-radius: 18px;
+  box-shadow: 9px 9px 0 rgba(11, 17, 20, .07), 0 22px 46px rgba(11, 17, 20, .09);
+}
+
+.route-sheet-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 20px;
+  margin-bottom: 18px;
+}
+
+.route-sheet-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  padding-left: 10px;
+  border-left: 3px solid var(--violet);
+  color: #23675d;
+  font: 700 var(--fs-2xs)/1 var(--font-heading);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+.route-sheet-kicker svg { color: var(--violet); }
+
+.route-sheet-note {
+  flex: 1 1 420px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-caption);
+  line-height: 1.55;
+}
+
+.route-sheet-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(198px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.route-sheet-stop {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 9px;
+  align-items: center;
+  width: 100%;
+  min-height: 50px;
+  padding: 9px 11px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink);
+  background: rgba(255, 255, 255, .58);
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
+  transition: border-color .2s var(--ease-out), background .2s var(--ease-out), box-shadow .2s var(--ease-out);
+}
+
+.route-sheet-stop:hover,
+.route-sheet-stop:focus-visible {
+  border-color: var(--violet);
+  box-shadow: 3px 3px 0 rgba(106, 43, 255, .3);
+}
+
+.route-sheet-stop:focus-visible { outline: 2px solid var(--violet); outline-offset: 2px; }
+
+.route-sheet-stop--active {
+  background: var(--acid);
+  border-color: var(--ink);
+  box-shadow: 3px 3px 0 rgba(11, 17, 20, .22);
+}
+
+.route-sheet-index {
+  color: var(--text-muted);
+  font: 700 var(--fs-2xs)/1 var(--font-heading);
+  font-variant-numeric: tabular-nums;
+}
+
+.route-sheet-camp {
+  font: 700 var(--fs-caption)/1.2 var(--font-heading);
+  letter-spacing: .01em;
+}
+
+.route-sheet-meta {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 3px 9px;
+  color: var(--text-secondary);
+  font-size: var(--fs-2xs);
+  letter-spacing: .04em;
+}
+
+.route-sheet-alt { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+.route-sheet-stop--active .route-sheet-index,
+.route-sheet-stop--active .route-sheet-meta,
+.route-sheet-stop--active .route-sheet-alt { color: #14242a; }
+
+/* Night: the same block, lit from underneath. */
+[data-theme="night"] .route-sheet {
+  background: linear-gradient(145deg, rgba(19, 38, 44, .92), rgba(12, 24, 29, .94));
+  border-color: rgba(7, 205, 196, .18);
+  box-shadow: 12px 12px 0 rgba(106, 43, 255, .16), 0 24px 60px rgba(0, 0, 0, .45);
+}
+
+[data-theme="night"] .route-sheet-kicker { color: #6fbfb2; }
+[data-theme="night"] .route-sheet-note { color: #c7d8d2; }
+
+[data-theme="night"] .route-sheet-stop {
+  color: #eef7f2;
+  background: rgba(255, 255, 255, .05);
+  border-color: rgba(255, 255, 255, .14);
+}
+
+[data-theme="night"] .route-sheet-camp { color: #eef7f2; }
+[data-theme="night"] .route-sheet-meta,
+[data-theme="night"] .route-sheet-alt { color: #a8b9b3; }
+
+[data-theme="night"] .route-sheet-stop--active {
+  background: var(--acid);
+  border-color: var(--acid);
+}
+
+[data-theme="night"] .route-sheet-stop--active .route-sheet-camp,
+[data-theme="night"] .route-sheet-stop--active .route-sheet-index,
+[data-theme="night"] .route-sheet-stop--active .route-sheet-meta,
+[data-theme="night"] .route-sheet-stop--active .route-sheet-alt { color: #14242a; }
+
+/* Two columns on a phone: twelve stacked stops would be half a screen of map
+   before the first word of the site. */
+@media (max-width: 768px) {
+  .route-sheet-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .route-sheet-stop { min-height: var(--touch-min); padding: 8px 9px; }
+  .route-sheet-note { flex: 1 1 100%; }
+}

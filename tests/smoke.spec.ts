@@ -74,7 +74,9 @@ test('navigation exposes the agents front door', async ({ page }) => {
 
 test('navigation scrolls to contact', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Connect' }).first().click();
+  // Scoped: the route sheet also offers a way to Connect, so an unscoped
+  // first() would be relying on document order rather than intent.
+  await page.locator('.navbar').getByRole('button', { name: 'Connect' }).click();
   await expect(page.locator('#contact')).toBeInViewport();
 });
 
@@ -107,7 +109,9 @@ test('ecosystem sections render with family and agents', async ({ page }) => {
 
 test('family filters have strong contrast and update the route count', async ({ page }) => {
   await page.goto('/');
-  const satohashFilter = page.getByRole('button', { name: 'glacier' });
+  // Exact: "Glacier" is also a camp on the route sheet, and a substring match
+  // would legitimately hit both controls.
+  const satohashFilter = page.getByRole('button', { name: 'glacier', exact: true });
   await expect(satohashFilter).toHaveCSS('color', 'rgb(16, 23, 19)');
   await expect(satohashFilter).toHaveCSS('border-top-width', '2px');
   await satohashFilter.click();
@@ -466,6 +470,32 @@ test('the log ships an RSS feed with one item per dispatch', async ({ page, requ
   expect((body.match(/<item>/g) ?? []).length).toBe(count);
   expect(body).toContain('<link>https://camtaylor.ca/dispatch/');
   await expect(page.locator('link[rel="alternate"][href="/feed.xml"]')).toHaveCount(1);
+});
+
+test('the route sheet travels to any of the twelve camps', async ({ page }) => {
+  await page.goto('/');
+
+  const sheet = page.locator('.route-sheet');
+  await expect(sheet).toBeVisible();
+
+  const stops = sheet.locator('.route-sheet-stop');
+  await expect(stops).toHaveCount(12);
+  await expect(stops.first()).toContainText('Base Camp');
+  await expect(stops.last()).toContainText('Summit');
+
+  // The sheet is the point of the page: tenth waypoint in, without scrolling
+  // through the nine before it.
+  const target = await stops.nth(9).getAttribute('data-waypoint');
+  await stops.nth(9).click();
+  await expect(page.locator(`#${target}`)).toBeInViewport({ timeout: 20000 });
+
+  // The stop you are standing on is marked as you read.
+  await page.locator('#services').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  await expect(sheet.locator('.route-sheet-stop[aria-current="true"]')).toHaveAttribute(
+    'data-waypoint',
+    'services',
+    { timeout: 20000 },
+  );
 });
 
 test('every homepage section is a waypoint on one route', async ({ page }) => {

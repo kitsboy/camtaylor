@@ -15,6 +15,7 @@ import { Ventures } from '../components/Ventures';
 import { Affiliates } from '../components/Affiliates';
 import { LiveSignal } from '../components/LiveSignal';
 import { RouteTicker } from '../components/RouteTicker';
+import { RouteSheet } from '../components/RouteSheet';
 import { RouteRail } from '../components/RouteRail';
 import { WaypointBand } from '../components/WaypointBand';
 import { Contact } from '../components/Contact';
@@ -92,6 +93,9 @@ export function HomePage() {
       <main className="main-content">
         <Hero onOpenTerminal={openTerminal} />
         <RouteTicker />
+        {/* The map, before the terrain: one tap to any of the twelve camps
+            instead of scrolling the whole line in order. */}
+        <RouteSheet />
         <WaypointBand id="about" />
         <About />
         <WaypointBand id="agents" />
