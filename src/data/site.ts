@@ -14,13 +14,29 @@
  */
 export const INQUIRY_EMAIL = 'hello@giveabit.io';
 
+/**
+ * The subject every submission carries.
+ *
+ * Kimi reads one shared inbox for the whole family, so the prefix is what makes camtaylor
+ * submissions findable there — the sibling sites label theirs the same way. The hidden
+ * `_subject` field and the failure path's mailto both read this, so the two cannot drift and
+ * a message that falls back to the reader's own mail client is still filterable.
+ */
+export const INQUIRY_SUBJECT = (tier: string, range: string) =>
+  `[camtaylor.ca] New inquiry — ${tier} (${range})`;
+
 export const SITE = {
   name: 'Cam Taylor',
   title: 'Sherpa',
   tagline: 'We get people to the top — and back down again.',
   domain: 'camtaylor.ca',
   url: 'https://camtaylor.ca',
-  email: 'cam@camtaylor.ca',
+  // Kimi's instruction (2026-09-25): the EZP-era `cam@camtaylor.ca` is stale, its mailbox
+  // unproven (the zone still serves Google Workspace MX from the old host) and every sibling
+  // site publishes the family inbox instead — so this is the monitored address, not a second
+  // one. `familyEmail` shares the value, which is what keeps the address of record and the
+  // form's destination from ever disagreeing again.
+  email: INQUIRY_EMAIL,
   // The monitored inquiry inbox — see `INQUIRY_EMAIL` above. The contact form's
   // destination, its success copy and the front door in the contact header all
   // read this one value, so they cannot drift apart.

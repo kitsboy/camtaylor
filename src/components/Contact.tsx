@@ -15,7 +15,7 @@ import {
   Loader2,
   ArrowUpRight,
 } from 'lucide-react';
-import { FORMSPREE_FORM_ID, IS_PRIVATE_PREVIEW, SITE } from '../data/site';
+import { FORMSPREE_FORM_ID, INQUIRY_SUBJECT, IS_PRIVATE_PREVIEW, SITE } from '../data/site';
 import { DEAL_TIERS } from '../data/dealTiers';
 import { TESTIMONIALS } from '../data/testimonials';
 import { useReferrer } from '../hooks/useReferrer';
@@ -55,7 +55,7 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
    * the monitored inbox, as a mailto link they can send from their own mail client.
    */
   const fallbackMailto = () => {
-    const subject = `New inquiry — ${activeTier.label} (${activeTier.range})`;
+    const subject = INQUIRY_SUBJECT(activeTier.label, activeTier.range);
     const body = [
       `Name: ${draft.name}`,
       draft.organization && `Organization: ${draft.organization}`,
@@ -240,7 +240,7 @@ function ContactFormBody({ onReset }: { onReset: () => void }) {
         <ValidationError prefix="Message" field="message" errors={state.errors} className="form-error" />
       </div>
 
-      <input type="hidden" name="_subject" value={`New inquiry — ${activeTier.label} (${activeTier.range})`} />
+      <input type="hidden" name="_subject" value={INQUIRY_SUBJECT(activeTier.label, activeTier.range)} />
       {referrer && <input type="hidden" name="referrer" value={referrer} />}
       <input
         type="text"

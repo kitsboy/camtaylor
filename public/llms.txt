@@ -38,7 +38,7 @@ Last updated: 2026-07-15
 Available on homepage. Commands: /help, /about, /status, /services, /ventures, /route, /manifesto, /contact, /book, /nostr, /field-guide, /2026
 
 ## Contact
-Use the contact form at https://camtaylor.ca/#contact or email cam@camtaylor.ca.
+Use the contact form at https://camtaylor.ca/#contact or email hello@giveabit.io.
 Response time: typically within 48h PT.
 
 ## Pages

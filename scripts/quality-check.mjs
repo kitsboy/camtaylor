@@ -228,6 +228,18 @@ if (!inbox) {
   }
 }
 
+// The subject line is how Kimi's shared inbox tells camtaylor submissions apart from the
+// sibling sites that deliver to the same address, and the failure path's mailto has to be
+// filterable too. One function builds it, so the hidden field and the mailto cannot drift —
+// and a second literal subject anywhere is exactly how one of them would lose the prefix.
+const contactSource = readFileSync('src/components/Contact.tsx', 'utf8');
+if (!siteSource.includes('`[camtaylor.ca] New inquiry — ')) {
+  failures.push('INQUIRY_SUBJECT in src/data/site.ts no longer prefixes the subject with [camtaylor.ca], which is what makes camtaylor submissions filterable in the shared inbox');
+}
+if (/New inquiry — /.test(contactSource)) {
+  failures.push('src/components/Contact.tsx builds its own subject — the hidden _subject field and the mailto fallback must both use INQUIRY_SUBJECT, or one of them silently loses the prefix');
+}
+
 // ── Analytics, if it is ever switched on ───────────────────────────────────────────
 // `trackEvent` was a no-op for a whole release: nothing ever loaded an analytics script,
 // so `form_start`, `form_submit` and `form_success` went nowhere and the form's own
