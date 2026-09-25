@@ -33,3 +33,7 @@ playwright-report/
 # Local-only reference material (boot docs, scratch notes)
 ref/
 
+
+# Scratch files created while probing the live site
+tmp-*.mjs
+tmp-*.pid
