@@ -1,3 +1,10 @@
 name = "camtaylor"
 compatibility_date = "2026-09-24"
 pages_build_output_dir = "dist"
+
+[vars]
+# Build-time env vars — the build reads these (see motopass for the working pattern).
+# VITE_PRIVATE_PREVIEW=false turns the private-preview banner off and enables the contact form.
+# VITE_FORMSPREE_FORM_ID is the family's live Formspree form (delivers to hello@giveabit.io).
+VITE_PRIVATE_PREVIEW = "false"
+VITE_FORMSPREE_FORM_ID = "xpqgopvd"
