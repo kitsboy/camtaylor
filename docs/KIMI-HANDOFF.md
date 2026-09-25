@@ -1,3 +1,132 @@
+## Session — 2026-09-25 (the phone page by prose depth: hero, manifesto, contact)
+
+**Machine:** M3 (Buffy) · **Project:** camtaylor
+
+Cam: *"Shrink the phone page further by cutting the prose depth of the hero, manifesto and contact
+sections."* Three batches, three commits, each pushed on its own, plus one bug the work exposed.
+
+### The numbers
+
+All at 390 × 844, folds closed, measured on the built site.
+
+| | before | after |
+|---|---|---|
+| hero | 1,329px | **1,072px** |
+| manifesto | 1,280px | **1,082px** |
+| contact | 2,450px | **1,672px** |
+| **phone page** | 19,973px · 23.7 screens | **18,739px · 22.2 screens** |
+| desktop page | 15,067px | 15,067px (untouched) |
+
+1,234px of phone scrolling, or about 1.5 screens. Nothing was deleted: every fact, quote, link and
+principle is still there, and on a desktop nothing changed at all.
+
+### What was actually costing the height
+
+**Hero — `cd310bb`, 1,329 → 1,072.** The chrome was spending rows:
+
+- **metrics 182 → 111.** The two `.metric-divider` elements are *grid items*, so three metrics and two
+dividers in a single-column grid laid out as **five rows — two of them holding nothing but a 1px rule
+and the gaps around it**. They are `display: none` on a phone now, and each metric is one line, label
+beside value. (`index.css` stacks the label over the value; that needed an explicit
+`flex-direction: row`.)
+- **route strip 98 → 40.** Its twelve bars are `aria-hidden` and their animation is already parked;
+they were what pushed the label and the value onto rows of their own.
+- **actions 164 → 120.** The primary keeps a row to itself, the two secondaries share one, all still
+48px tall.
+- **video 218 → 182.** 16/9 was 181px of the screen for a poster; 21/9 crops it (`object-fit: cover`,
+so it crops rather than distorts).
+
+**Manifesto — `ea3dbf6`, 1,280 → 1,082.** Chrome, not words: card padding 28 → 20px, the 40px icon
+block → 34, description line-height 1.65 → 1.55, and the section padding from `--section-gap`
+(**67px at this viewport height, top and bottom**) → 46. Cards 229 → 197 each, quote 188 → 169.
+
+**Contact — `7f5d250`, 2,450 → 1,672.** The sidebar was 1,028px and **largely repeats the page**: the
+spotlight quote is in the testimonials section, "How it works" repeats the delivery note directly
+below it, the Nostr card repeats the footer, and "Based in" repeats the hero's own meta line. On a
+phone the sidebar now shows what a reader actually uses — what the handling promises, the address,
+and a button to copy it (306px) — and holds the other four cards behind one counted control. Opening
+it restores 2,441px and leaves nothing invisible.
+
+### The finding that made this take three files
+
+**A phone rule only works if it is in the file that defines the property last.** The import order is
+`index.css` → `mobile.css` → `upgrades.css` → `bold-modern.css` → `footer.css` → `touch.css`, so
+anything unscoped in a later file beats a phone media query in an earlier one. Three rules in the
+repo are dead for exactly this reason, and I only found them because I tried to extend them:
+
+- `mobile.css`'s `.hero-shell { padding: 24px 18px }` — `bold-modern.css` redefines `.hero-shell`
+  unscoped (a `clamp()`), so the phone padding has never applied;
+- `index.css`'s `.manifesto-section { padding: 70px 0 }` and `.contact-section { padding: 70px 0 }` —
+  `upgrades.css` sets both from `--section-gap`;
+- `mobile.css`'s `.hero-metrics` grid rule lost the `display: grid` I assumed it still had, and
+  `index.css`'s `.metric-item { flex-direction: column }` outlived my first attempt to un-stack it.
+
+So the hero and manifesto rules went into `bold-modern.css` (after everything that defines them), the
+contact container rules stayed in `mobile.css` (where nothing later contests them), and the section
+padding had to go to `bold-modern.css`. **Suggestion for the next pass: pick one home for responsive
+overrides and enforce it, or write a check that reports which rule wins for a selector + property.**
+Right now "where does this rule go" is a research question, and the answer is not the obvious file.
+
+### The bug this exposed — `ed77b03`
+
+The featured video entered from `x: 28` **inside a shell that clips its overflow**. So for the first
+second of every load the frame's right edge was cut, and the shell's own `scrollWidth` sat **20px past
+its `clientWidth`** while the spring ran. It passed the masthead test only because the shell's padding
+was 22px and the shift was 20px — two pixels of slack, with no reason for the two numbers to be
+related. Narrowing that padding for the hero took the slack away and the test went red.
+
+Fixed by entering from below (`y: 18, scale: 0.97`), which cannot overflow sideways on any frame.
+Verified by sampling the shell every 80ms across the whole entrance at 430, 390 and 320px: the widest
+child is never past the content edge (worst −1px, worst scrollWidth delta 0).
+
+**And the test now says why it failed.** Both overflow assertions print the width, the pixel count and
+the offending element. The old message was "hero shell overflows at 430px", which is the kind of
+failure that gets a threshold edited instead of a bug fixed — I chased it with hand-rolled probes for
+longer than it took to fix.
+
+### Guards
+
+- The masthead test's assertions now carry measurements (above).
+- **New: a phone length budget** (`device-qa.spec.ts`) — the page must stay under 20,000px with folds
+  closed. Length is the thing that comes back, and nothing else in the suite can see it. Canaried:
+  disabling the folds takes the page to 22,636px and the test fails with "26.8 screens" in the
+  message. The ceiling is deliberately ~6% loose, so it is a question ("was this worth a screen?"),
+  not a target to shave.
+- The existing fold test now covers five folds, including the contact sidebar's.
+
+### Verification
+
+- `npm run quality` ✓ · `npx tsc -b` ✓ · `npx eslint .` 0 errors (1 pre-existing `ThemeContext`
+  fast-refresh warning)
+- **`npx playwright test` — 70/70** (was 69)
+- Every measurement above was taken on the built site at 390px, and the desktop number was re-checked
+  after each batch: **15,067px every time**.
+
+### Git state
+
+`cd310bb` · `ea3dbf6` · `ed77b03` · `7f5d250` — all pushed to `origin/main`, tree clean.
+(`public/feed.xml` and `public/sitemap.xml` are rewritten by `prebuild` on every build and reverted
+before each commit.)
+
+### Decisions for Cam
+
+- **The contact sidebar's visibility on a phone.** Four of its seven cards are now behind one tap.
+  They repeat other parts of the page, which is why I picked those four — but the spotlight quote is
+a testimonial, and a testimonial next to the form is doing sales work. Say the word and it moves back
+above the fold (one line in `Contact.tsx`).
+- **The video's entrance** changed from sliding in from the right to rising from below, on all widths.
+  It is a visual change on desktop too, where the old one was being clipped anyway.
+- **21/9 for the phone poster.** Cropping a 16/9 poster to 21/9 loses some of the frame. It is one
+  line if you would rather keep 16/9 and pay the 43px.
+
+### Next
+
+Three proposals in `LATEST-UPDATE.md`, and the first one is measurable right now: **at 390 × 844 the
+primary button ("See the Route") sits at 866px — 22px below the first screen — and the hero renders the
+video poster *before* the name**, because `index.css` sets `.hero-video-wrap { order: -1 }` on phones.
+So the first screen a phone reader gets is two location chips, a status chip, a rotating route line and
+a video poster, with no name and no button.
+
 ## Session — 2026-09-25 (the four follow-ups: the layout stops lying, the instrument stops lying, one door at a time, and a shorter phone page)
 
 **Machine:** M3 (Buffy) · **Project:** camtaylor

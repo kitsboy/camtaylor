@@ -606,6 +606,38 @@ test('a phone folds the long section tails, and unfolding strands nothing', asyn
 });
 
 /**
+ * A length budget for the phone page, because length is the thing that comes
+ * back. It was 23,166px, then 19,973 after the folds, then 18,739 after the hero,
+ * manifest and contact pass — and none of those numbers are visible in a
+ * screenshot or a diff, so nothing else in this file would notice them growing
+ * again by a screen at a time.
+ *
+ * The ceiling is deliberately loose. This is not a target to shave; it is the
+ * point at which someone should ask what was added and whether it was worth
+ * another screen of scrolling on a phone. 20,000px is about 6% above the current
+ * page, so ordinary copy edits will not trip it.
+ */
+test('the phone page stays inside its length budget', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('.mobile-quick-nav')).toBeVisible();
+  await page.waitForTimeout(1200);
+
+  // Measure with every fold closed: that is the page a reader lands on.
+  const folds = page.locator('details.section-fold-details');
+  for (let i = 0; i < (await folds.count()); i++) {
+    const isOpen = await folds.nth(i).evaluate((d) => (d as HTMLDetailsElement).open);
+    if (isOpen) await folds.nth(i).locator('summary').click();
+  }
+
+  const height = await page.evaluate(() => document.body.scrollHeight);
+  expect(
+    height,
+    `the phone page is ${height}px, or ${(height / 844).toFixed(1)} screens — see the handoff for what it was and what changed`,
+  ).toBeLessThan(20000);
+});
+
+/**
  * The fold is a phone affordance and nothing else. A desktop page is 15,000px
  * and already fine, and splitting a two-column list at an odd number leaves one
  * card alone in its row — so on a desktop the component renders its children
