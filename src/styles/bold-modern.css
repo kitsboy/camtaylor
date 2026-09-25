@@ -1131,7 +1131,7 @@ body {
 }
 
 .nav-brand:hover { color: var(--ink); }
-.nav-brand .brand-icon { color: var(--violet); filter: drop-shadow(0 0 7px rgba(106, 43, 255, .45)); }
+.nav-brand .brand-icon { width: 16px; height: 26px; display: block; filter: drop-shadow(0 0 6px rgba(245, 146, 6, .35)); }
 
 .brand-dot {
   display: inline-flex;

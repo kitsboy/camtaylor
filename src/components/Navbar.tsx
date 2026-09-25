@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Terminal, Mountain, Menu, X, Bot, ArrowUpRight } from 'lucide-react';
+import { Terminal, Menu, X, Bot, ArrowUpRight } from 'lucide-react';
 import { IS_PRIVATE_PREVIEW, NAV_ITEMS, ROUTE_LEGS } from '../data/site';
 import { WAYPOINTS, formatAltitude, getWaypoint } from '../data/waypoints';
 import { useScrollSpy } from '../hooks/useScrollSpy';
@@ -79,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             tabIndex={0}
             onKeyDown={(e) => e.key === 'Enter' && scrollTop()}
           >
-            <Mountain className="brand-icon" size={16} />
+            <img src="/logo.svg" className="brand-icon" alt="" width="16" height="26" />
             <span className="nav-brand-text">CAM TAYLOR</span>
             <span className="brand-dot">SHERPA</span>
           </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUp, ArrowUpRight, Bot, Compass, Gauge, Mail, Mountain, ShieldCheck, Terminal, Copy, Check, ExternalLink, Heart, KeyRound, Sparkles, ChevronDown } from 'lucide-react';
+import { ArrowUp, ArrowUpRight, Bot, Compass, Gauge, Mail, ShieldCheck, Terminal, Copy, Check, ExternalLink, Heart, KeyRound, Sparkles, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { IS_PRIVATE_PREVIEW, SITE } from '../data/site';
 import { FAMILY_OFFERINGS } from '../data/family';
@@ -60,7 +60,7 @@ export const Footer: React.FC<FooterProps> = ({ onToggleTerminal }) => {
       <div className="footer-container">
         <div className="footer-hero">
           <div>
-            <p className="footer-kicker"><Mountain size={14} /> BASE CAMP / CAM TAYLOR</p>
+            <p className="footer-kicker"><img src="/logo.svg" alt="" width="12" height="20" /> BASE CAMP / CAM TAYLOR</p>
             <h2 className="footer-big-title">Keep climbing.<br /><span>Keep your keys.</span></h2>
             <p className="footer-wise-line" aria-live="polite">{footerQuotes[quoteIndex]}</p>
           </div>
