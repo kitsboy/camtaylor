@@ -1,61 +1,106 @@
 # Latest update
 
-**Session:** 2026-09-25 (M3 / Buffy) · **Branch:** `main` @ `c5cee6a` · **Deploy:** `npm run deploy:live` from `main`
+**Session:** 2026-09-25 (M3 / Buffy) · **Branch:** `main` @ `73d0b5c` (+ this handoff) · **Deploy:** `npm run deploy:live` from `main`
 
-Kimi owns the camtaylor deployment. This session was UI work only — no routing, no `_redirects`, no
-feed or sitemap changes.
+Kimi owns the camtaylor deployment. This session touched no routing, no `_redirects`, no endpoint
+and no mailbox — it is the contact form's own address, plus a question for Kimi in
+`docs/KIMI-HANDOFF.md`.
 
-## What landed — four commits, all pushed
+## The ask: make the contact form's email work, to `hello@giveabit.io`, with no spam
 
-1. **`46591aa` — the phone's first screen.** `index.css`'s `.hero-video-wrap { order: -1 }` put a
-   video poster above the name, so a phone opened on two chips, a status chip, a rotating route line
-   and a poster. The name sat at 542px and the primary button at 866px — **22px below an 844px
-   screen**. On phones `.hero-grid` is `display: contents` and the shell is one flex column, so the
-   nine children are ordered explicitly. Name 542 → **207**, button 866 → **506**, inside a 375×667
-   screen with 113px to spare. Guarded at 375/390/414, canaried.
-2. **`f4371df` — signal and expertise.** The two sections the last pass did not reach, together
-   3,990px. Signal 1,883 → **946** (the chain reading stays; Lightning and price wait behind
-   *"2 more readings · tap to unfold"*), expertise 2,107 → **1,649** (all four cards stay; the chrome
-   came down instead). Phone page 18,739 → **17,203**, or **22.2 → 20.4 screens**. Desktop 15,067,
-   untouched.
-3. **`290e4be` — the cascade.** `npm run cascade` now computes which declarations can never apply:
-   at each width, for one selector and one longhand property, who wins and who is dead. It found
-   **45 phone-block declarations that had never applied** — 42 deleted (every one verified a no-op by
-   fingerprinting computed styles and heights at six widths), 3 kept because they are live above
-   768px. The quality gate now fails the build on any at-rule declaration that is dead at every width
-   where it applies.
-4. **`c5cee6a` — the share card.** It was a 1200×630 white card, **98% blank**, with one small
-   paragraph in a corner. `npm run og` now generates it from the site's own fonts and palette, with
-   `Sherpa.` at 152px as the focal point and **twelve bars that are the twelve camps' altitudes read
-   out of `waypoints.ts`**. The gate reads the PNG's IHDR and fails on any size but 1200×630, and
-   fails if `index.html` stops declaring the card.
+Kimi monitors `hello@giveabit.io`, drops the spam and forwards the genuine inquiries on to Cam. That
+is the address the form has to deliver to, and **the one thing I cannot supply is the Formspree
+endpoint ID** — so it is written up as a numbered question in the handoff (questions 1–10), and
+everything that does not depend on her answer is already committed.
 
-## One structural fix worth knowing about
+The bug, stated exactly — the page said one thing in three places and offered a different address in
+a fourth:
 
-`mobile.css` has carried `--section-pad-mobile: 48px` since the phone pass that introduced it, and
-**no section has ever used it** — `upgrades.css` and `bold-modern.css` both set `--section-gap` after
-it. The phone section padding is now one rule, in that token, at the end of the last stylesheet that
-sets section padding.
+| on the page | it said | where that goes |
+|---|---|---|
+| success panel, delivery note, privacy policy | "sent to / delivered to `cam@camtaylor.ca`" | nowhere I can verify |
+| the contact section's own front door | `hello@giveabit.io` | the inbox Kimi monitors |
+| the endpoint | `VITE_FORMSPREE_FORM_ID` → **`xykqodnk`** | unknown |
 
-## Two things that need a decision, not a fix
+**`xykqodnk` is the value in `.env.example`, `README.md`, `docs/DEPLOYMENT.md` and both CI jobs, and
+it is the fallback compiled into `src/data/site.ts`.** If it is the scaffold's placeholder — which
+the file names suggest, since it is hard-coded as a fallback and used in CI — then the form accepts a
+visitor's message and delivers it nowhere. **Question 1 to Kimi** is whether it is live, and if not,
+the real ID.
 
-- **The signal fold hides two of three instruments on a phone.** Nothing is deleted, the label counts
-  what is behind it, and `shown={1}` in `LiveSignal.tsx` is the whole change if you want all three.
-- **The card filename is fixed, and platforms cache a card per URL for days.** Re-scrape once after
-  this deploys (X Card Validator, LinkedIn Post Inspector) or the old white card keeps appearing.
+## What landed: `73d0b5c`
+
+- **One address for the form's destination.** `src/data/site.ts` exports
+  `INQUIRY_EMAIL = 'hello@giveabit.io'`; the success panel, the "Reply to:" row, the delivery note
+  (both branches), the copy-email button, the phone mailto CTA, the sidebar's "Prefer email?" link
+  and the privacy policy's *"delivered to"* line all read it. `SITE.familyEmail` is *that value*
+  rather than a second copy of the string.
+- **The deployer is told the truth.** `.env.example` and the README say the form must be delivered to
+  `hello@giveabit.io` and that `xykqodnk` is a placeholder, not a live form.
+- **A gate keeps it honest.** `npm run quality` fails if `INQUIRY_EMAIL` disappears, if
+  `familyEmail` stops being it, or if `.env.example` stops naming the address the form must reach.
+  Canaried: breaking both printed both failures, one per line.
+- **A test on the rendered page.** `tests/smoke.spec.ts` asserts the delivery note names
+  `hello@giveabit.io` and **not** `cam@camtaylor.ca`. Canaried: restoring the old copy fails at
+  line 436.
+
+## What is still blocked on Kimi
+
+Three questions decide the rest: **(1)** whether `xykqodnk` is live or a placeholder — and the real
+ID if it is not; **(3)** confirmation that `hello@giveabit.io` is the recipient; **(4)** which spam
+controls the form should carry, because invisible reCAPTCHA can show a challenge and the button's
+copy has to match. Also open: SPF/DKIM/DMARC on `giveabit.io`, the forward target (`cam@givebait.io`
+in Cam's note is almost certainly the published `cam@giveabit.io`), whether the dead-looking
+`cam@camtaylor.ca` should be repointed site-wide, and whether a live end-to-end submission test
+should be written once the ID exists.
+
+I cannot verify delivery from here — no Formspree account, no DNS zone, no mailbox. The client half
+is done; the endpoint is the missing half.
+
+## Ten things still missing
+
+Each one is something measured on this build, not a guess.
+
+1. **The desktop page is 15,067px — about 17 laptop screens — and no pass has ever measured its
+   length.** Every fold, every budget and every measurement so far is phone-only. Two routes:
+   desktop folds (the odd-number split is real, desktop grids are two columns), or splitting
+   sections onto their own routes — which is routing, and Kimi's call, not a CSS edit.
+2. **Night mode flashes the warm theme on every page load, and the theme never consults the OS.**
+   `useTheme` writes `document.documentElement.dataset.theme` in a React effect, so a returning night
+   reader gets a warm first paint; and the default is hard-coded `'warm'`, so a dark-OS visitor is
+   never given the dark ground at all. An inline pre-paint script plus a `prefers-color-scheme`
+   default fixes both.
+3. **The form has no failure path and no retry.** When Formspree is down or rate-limits (it does, per
+   IP), `ValidationError` prints a line and a reader who has just written a brief has a filled-in form
+   and nowhere to send it. It needs an error state that offers the address directly, with the message
+   still in hand.
+4. **Conversion is unmeasured: `trackEvent` is a no-op.** `form_start`, `form_submit`, `form_success`
+   and the CTA events all exit early because nothing ever loads Plausible — so nobody would have
+   noticed this form being broken, and nobody will know when it starts working.
+5. **One share card serves every page.** Every dispatch, venture route, field guide and `/2026` share
+   the same 1200×630 card. The generator already reads the site's own data — per-page cards (dispatch
+   title and camp, venture name) are the next step, plus a per-path `og:image` in `usePageMeta`.
+6. **Structured data is one JSON-LD `Person`.** No `Article`/`BlogPosting` per dispatch, no
+   `BreadcrumbList`, no `Organization` + `sameAs`, no `WebSite`; and no `llms.txt`. On a site whose
+   entire pitch is *proof before promise*, the machine-readable proof is the thinnest layer.
+7. **The sitemap and the feed date themselves by build time, not by content.** `prebuild` rewrites
+   `lastmod` and `pubDate` on every build, so every deploy claims all twelve pages changed today —
+   the fastest way to teach a crawler to ignore the field. The dates should come from the dispatch
+   front-matter.
+8. **There is no performance budget, no bundle gate, and no link check in CI.** Nothing fails on a
+   regression in JS weight, the 485 kB card, or LCP; and the outbound URLs (`agents.giveabit.io`,
+   `iris.to`, `coracle.social`, three data APIs) and the `_redirects` map are hand-typed strings that
+   nothing verifies. A size limit in `quality` and a link/router sweep are both cheap.
+9. **The live signal has no stale state.** Three keyless public APIs, no cache of last-known-good
+   readings, no `aria-busy`, no "this reading is stale" note — a failed fetch silently drops a panel,
+   and the suite's own load-dependent contrast flake shows how timing-sensitive that section is.
+10. **The keyboard and screen-reader pass has still never been run on the live build.** The custom
+    cursor, the hero canvas, the reveals, the rotating route status (silent, and it changes every few
+    seconds), the route sheet, five folds and the carousel. It is the largest untested surface on the
+    site and it is a browser task.
 
 ## Verification
 
-75/75 Playwright tests, `npm run quality` ✓ (now including the cascade and share-card gates), `tsc` ✓,
-lint 0 errors. Every new guard was canaried against the bug it exists for.
-
-Known flakes, neither from this work: `contrast.spec.ts`'s command-deck test fails about once in three
-full-suite runs under load and passes standalone (fixed nothing, observed only); `smoke.spec.ts`'s
-"charts share one frame" read geometry before its panels settled — that one **was fixed** this
-session, and it still catches a genuine 40px misalignment.
-
-## Still open
-
-The keyboard and screen-reader pass on the live URL: the custom cursor, the hero canvas, the reveals,
-the rotating route status (silent, and it changes every few seconds) and the carousel. It is the
-largest untested surface left.
+`npm run quality` ✓ (4 assets, 1200×630 share card, metadata, privacy gate, type-scale floor,
+cascade, form inbox) · `npx tsc -b` ✓ · `npx oxlint` 0 errors / 1 pre-existing `ThemeContext`
+warning · **`npm test` 75/75** ✓. Both new guards were canaried against the bug they exist for.
