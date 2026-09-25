@@ -1488,6 +1488,9 @@ body {
   .axiom-icon-wrapper { width: 34px; height: 34px; margin-bottom: 12px; }
   .axiom-description { line-height: 1.55; }
   .manifesto-quote-wrapper { padding: 22px 16px; }
+
+  /* Same 67px of `--section-gap` as the manifesto, for the same reason. */
+  .contact-section { padding-top: 46px; padding-bottom: 46px; }
 }
 
 @media (max-width: 700px) {

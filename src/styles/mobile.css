@@ -562,7 +562,27 @@ a,
 
   .contact-form,
   .contact-success {
-    padding: 22px 18px;
+    padding: 18px 16px;
+  }
+
+  .contact-container { gap: 18px; }
+
+  /* The sidebar is a sticky column on a desktop. On a phone it is a short strip
+     of proof below a long form, and a fold inside something that sticks to the
+     top while you scroll is a layout waiting to jump. */
+  .contact-sidebar {
+    order: 2;
+    position: static;
+  }
+
+  /* The folded detail keeps the sidebar's own column rhythm without reusing the
+     sidebar's class — two elements sharing `.contact-sidebar` would confuse
+     every selector that looks for it, which is exactly what the section folds
+     did to `.log-timeline`. */
+  .contact-sidebar-more {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
 
   .expedition-tier-btn {
@@ -570,10 +590,6 @@ a,
   }
 
   .tier-label { font-size: var(--fs-small); }
-
-  .contact-sidebar {
-    order: 2;
-  }
 
   .contact-form {
     order: 1;

@@ -20,6 +20,7 @@ import { DEAL_TIERS } from '../data/dealTiers';
 import { TESTIMONIALS } from '../data/testimonials';
 import { useReferrer } from '../hooks/useReferrer';
 import { trackEvent } from '../utils/analytics';
+import { SectionFold } from './SectionFold';
 
 const SPOTLIGHT = TESTIMONIALS[0];
 
@@ -297,6 +298,8 @@ export const Contact: React.FC = () => {
         </AnimatePresence>
 
         <div className="contact-sidebar">
+          {/* The top of the sidebar is what a phone reader uses: what the
+              handling promises, the address, and a way to copy it. */}
           <div className="trust-badges">
             <span className="trust-badge">
               <Lock size={14} aria-hidden="true" />
@@ -312,71 +315,80 @@ export const Contact: React.FC = () => {
             </span>
           </div>
 
-          <blockquote className="testimonial-spotlight">
-            &ldquo;{SPOTLIGHT.quote}&rdquo;
-            <cite>
-              — {SPOTLIGHT.author}, {SPOTLIGHT.role}
-              {SPOTLIGHT.venture ? ` · ${SPOTLIGHT.venture}` : ''}
-            </cite>
-          </blockquote>
-
           <a href={`mailto:${SITE.email}`} className="mobile-email-cta">
             <Mail size={18} />
             <span>{SITE.email}</span>
           </a>
           <CopyEmailButton />
 
-          {SITE.calendlyUrl && (
-            <a href={SITE.calendlyUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary sidebar-calendly">
-              Book a route check
-            </a>
-          )}
+          {/* On a desktop this is a sidebar and every card shows. On a phone it
+              was 856px of a 23-screen page, and most of it repeats what the
+              page already says elsewhere: the spotlight quote is in the
+              testimonials section, "How it works" repeats the delivery note
+              below, the Nostr card repeats the footer, and "Based in" repeats
+              the hero's own meta line. One tap holds it all. `SectionFold`
+              renders nothing at all above 768px, so the desktop is unchanged. */}
+          <SectionFold shown={0} noun="details" bodyClassName="contact-sidebar-more">
+            <blockquote className="testimonial-spotlight">
+              &ldquo;{SPOTLIGHT.quote}&rdquo;
+              <cite>
+                — {SPOTLIGHT.author}, {SPOTLIGHT.role}
+                {SPOTLIGHT.venture ? ` · ${SPOTLIGHT.venture}` : ''}
+              </cite>
+            </blockquote>
 
-          <div className="sidebar-card">
-            <ShieldAlert className="sidebar-icon" size={24} />
-            <h4 className="sidebar-title">How it works</h4>
-            <ul className="sidebar-list">
-              <li>All inquiries are treated as confidential.</li>
-              <li>Priority goes to ventures with clear structure and leverage.</li>
-              <li>
-                Prefer email?{' '}
-                <a href={`mailto:${SITE.email}`} className="secure-mail-link">{SITE.email}</a>
-              </li>
-            </ul>
-          </div>
+            {SITE.calendlyUrl && (
+              <a href={SITE.calendlyUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary sidebar-calendly">
+                Book a route check
+              </a>
+            )}
 
-          <div className="sidebar-card nostr-contact-card">
-            <Zap className="sidebar-icon" size={24} />
-            <h4 className="sidebar-title">Prefer Nostr?</h4>
-            <ul className="sidebar-list">
-              <li>
-                <a href="https://iris.to/cam@giveabit.io" target="_blank" rel="noopener noreferrer">
-                  DM via iris.to
-                </a>
-              </li>
-              <li>
-                <a href="https://coracle.social" target="_blank" rel="noopener noreferrer">
-                  coracle.social
-                </a>
-              </li>
-              <li>NIP-05: {SITE.nostr}</li>
-            </ul>
-          </div>
-
-          {SITE.pgpFingerprint && (
             <div className="sidebar-card">
-              <h4 className="sidebar-title">PGP</h4>
-              <code className="pgp-fingerprint">{SITE.pgpFingerprint}</code>
+              <ShieldAlert className="sidebar-icon" size={24} />
+              <h4 className="sidebar-title">How it works</h4>
+              <ul className="sidebar-list">
+                <li>All inquiries are treated as confidential.</li>
+                <li>Priority goes to ventures with clear structure and leverage.</li>
+                <li>
+                  Prefer email?{' '}
+                  <a href={`mailto:${SITE.email}`} className="secure-mail-link">{SITE.email}</a>
+                </li>
+              </ul>
             </div>
-          )}
 
-          <div className="sidebar-card">
-            <h4 className="sidebar-title">Based in</h4>
-            <ul className="sidebar-list">
-              <li>{SITE.location}</li>
-              <li>{SITE.timezone}</li>
-            </ul>
-          </div>
+            <div className="sidebar-card nostr-contact-card">
+              <Zap className="sidebar-icon" size={24} />
+              <h4 className="sidebar-title">Prefer Nostr?</h4>
+              <ul className="sidebar-list">
+                <li>
+                  <a href="https://iris.to/cam@giveabit.io" target="_blank" rel="noopener noreferrer">
+                    DM via iris.to
+                  </a>
+                </li>
+                <li>
+                  <a href="https://coracle.social" target="_blank" rel="noopener noreferrer">
+                    coracle.social
+                  </a>
+                </li>
+                <li>NIP-05: {SITE.nostr}</li>
+              </ul>
+            </div>
+
+            {SITE.pgpFingerprint && (
+              <div className="sidebar-card">
+                <h4 className="sidebar-title">PGP</h4>
+                <code className="pgp-fingerprint">{SITE.pgpFingerprint}</code>
+              </div>
+            )}
+
+            <div className="sidebar-card">
+              <h4 className="sidebar-title">Based in</h4>
+              <ul className="sidebar-list">
+                <li>{SITE.location}</li>
+                <li>{SITE.timezone}</li>
+              </ul>
+            </div>
+          </SectionFold>
         </div>
       </div>
       <p className="contact-delivery-note">
