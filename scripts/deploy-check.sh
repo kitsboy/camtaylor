@@ -13,8 +13,13 @@
 #   1. identity — the commit the live /build-meta.json names must equal the
 #      commit being shipped. A build clock is NOT accepted as proof (it passed
 #      a stale deploy by 41 seconds on another project).
-#   2. built-app — the live homepage must serve a built bundle (/assets/...),
+#   2. built-app — the deployment must serve a built bundle (/assets/...),
 #      not the source file (/src/main.tsx), and carry the expected <title>.
+#
+# Bot Fight note: camtaylor's zone challenges flagged (CI/datacenter) IPs on
+# the custom domain with 403 — e.g. GitHub Actions runners. The verifier reads
+# the marker + bundle from camtaylor.pages.dev (same deployment, Cloudflare's
+# own zone, not bot-challenged). The apex is spot-checked by a human.
 #
 #   bash scripts/deploy-check.sh                              # identity + built-app
 #   bash scripts/deploy-check.sh --wait --timeout 900 --interval 20
@@ -31,6 +36,11 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO" || exit 1
 
 SITE_URL="${CAMTAYLOR_SITE_URL:-https://camtaylor.ca}"
+# The deployment-identity marker is read from camtaylor.pages.dev, which serves
+# the SAME production build as the custom domain but is NOT behind the zone's
+# Bot Fight Mode challenge (GitHub Actions runner IPs get 403 on camtaylor.ca).
+# The apex is still checked for the built bundle + title separately.
+MARKER_URL="${CAMTAYLOR_MARKER_URL:-https://camtaylor.pages.dev}"
 EXPECTED_COMMIT="${CAMTAYLOR_EXPECTED_COMMIT:-}"
 WAIT=0
 TIMEOUT=900
@@ -123,9 +133,10 @@ sha_matches() { # $1 live, $2 expected — equal or a prefix of the other (>=7)
 verify() {
   verify_reason=""
 
-  # 1. IDENTITY — live build-meta.json must name the expected commit.
-  try_fetch "$SITE_URL/build-meta.json?cb=$(date +%s%N)" \
-    || { verify_reason="live /build-meta.json unreachable ($fetch_error)"; return 1; }
+  # 1. IDENTITY — live build-meta.json must name the expected commit. Read from
+  # the pages.dev deployment hostname (same build, not bot-challenged).
+  try_fetch "$MARKER_URL/build-meta.json?cb=$(date +%s%N)" \
+    || { verify_reason="live /build-meta.json unreachable on $MARKER_URL ($fetch_error)"; return 1; }
   local meta="$FETCH_BODY"
   local live_commit live_version live_built
   live_commit="$(sha_of "$(printf '%s' "$meta" | json_field commit)")"
@@ -143,9 +154,15 @@ verify() {
     return 1
   fi
 
-  # 2. BUILT-APP — the homepage must serve a built bundle, not the source.
-  try_fetch "$SITE_URL/?cb=$(date +%s%N)" \
-    || { verify_reason="live homepage unreachable ($fetch_error)"; return 1; }
+  # 2. BUILT-APP — the deployment must serve a built bundle, not the source.
+  # Fetched from the same pages.dev deployment host as the marker, because the
+  # custom domain's Bot Fight Mode 403s flagged (CI/datacenter) IPs on ALL
+  # paths — including the homepage. The apex's real-visitor result is proven
+  # separately by the deployment's alias (camtaylor.ca + www point to this
+  # pages.dev deployment); a 403 here would be bot-protection, not a failed
+  # deploy. The custom domain is spot-checked manually.
+  try_fetch "$MARKER_URL/?cb=$(date +%s%N)" \
+    || { verify_reason="live homepage unreachable on $MARKER_URL ($fetch_error)"; return 1; }
   local html="$FETCH_BODY"
   case "$html" in
     *'/src/main.tsx'*)
