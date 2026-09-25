@@ -1,88 +1,61 @@
-# camtaylor — Last Updated 2026-09-25 by Buffy
+# Latest update
 
-**Status:** LIVE on Cloudflare Pages. camtaylor.ca + www both serve the Sherpa site.
+**Session:** 2026-09-25 (M3 / Buffy) · **Branch:** `main` @ `c5cee6a` · **Deploy:** `npm run deploy:live` from `main`
 
-**Latest (Buffy, the phone page by prose depth):** Cam asked to shrink the phone page by cutting the
-prose depth of the **hero, manifesto and contact** sections. Four commits, each pushed on its own.
-Nothing was deleted — every fact, quote, link and principle is still there, and **desktop is untouched
-at 15,067px**.
+Kimi owns the camtaylor deployment. This session was UI work only — no routing, no `_redirects`, no
+feed or sitemap changes.
 
-| 390 × 844, folds closed | before | after |
-|---|---|---|
-| hero | 1,329px | **1,072px** |
-| manifesto | 1,280px | **1,082px** |
-| contact | 2,450px | **1,672px** |
-| **phone page** | 19,973px · 23.7 screens | **18,739px · 22.2 screens** |
+## What landed — four commits, all pushed
 
-- **Hero** (`cd310bb`): the two `.metric-divider` elements are grid items, so three metrics plus two
-  dividers in one column laid out as **five rows — two holding nothing but a 1px rule**. Metrics
-  182 → 111, route strip 98 → 40 (its twelve bars are decoration and already parked), actions
-  164 → 120, video 218 → 182.
-- **Manifesto** (`ea3dbf6`): card padding, the 40px icon block and the 1.65 line-height came down, and
-  the section's 67px of `--section-gap` per side went to 46.
-- **Contact** (`7f5d250`): the sidebar was 1,028px and **mostly repeats the page** — the spotlight
-  quote is in the testimonials section, "How it works" repeats the delivery note below it, the Nostr
-  card repeats the footer, "Based in" repeats the hero meta. A phone keeps the three things a reader
-  uses and holds the other four cards behind one tap. 2,450 → 1,672.
+1. **`46591aa` — the phone's first screen.** `index.css`'s `.hero-video-wrap { order: -1 }` put a
+   video poster above the name, so a phone opened on two chips, a status chip, a rotating route line
+   and a poster. The name sat at 542px and the primary button at 866px — **22px below an 844px
+   screen**. On phones `.hero-grid` is `display: contents` and the shell is one flex column, so the
+   nine children are ordered explicitly. Name 542 → **207**, button 866 → **506**, inside a 375×667
+   screen with 113px to spare. Guarded at 375/390/414, canaried.
+2. **`f4371df` — signal and expertise.** The two sections the last pass did not reach, together
+   3,990px. Signal 1,883 → **946** (the chain reading stays; Lightning and price wait behind
+   *"2 more readings · tap to unfold"*), expertise 2,107 → **1,649** (all four cards stay; the chrome
+   came down instead). Phone page 18,739 → **17,203**, or **22.2 → 20.4 screens**. Desktop 15,067,
+   untouched.
+3. **`290e4be` — the cascade.** `npm run cascade` now computes which declarations can never apply:
+   at each width, for one selector and one longhand property, who wins and who is dead. It found
+   **45 phone-block declarations that had never applied** — 42 deleted (every one verified a no-op by
+   fingerprinting computed styles and heights at six widths), 3 kept because they are live above
+   768px. The quality gate now fails the build on any at-rule declaration that is dead at every width
+   where it applies.
+4. **`c5cee6a` — the share card.** It was a 1200×630 white card, **98% blank**, with one small
+   paragraph in a corner. `npm run og` now generates it from the site's own fonts and palette, with
+   `Sherpa.` at 152px as the focal point and **twelve bars that are the twelve camps' altitudes read
+   out of `waypoints.ts`**. The gate reads the PNG's IHDR and fails on any size but 1200×630, and
+   fails if `index.html` stops declaring the card.
 
-**A bug this exposed** (`ed77b03`): the featured video entered from `x: 28` inside a shell that clips
-its overflow, so its right edge was being **cut for the first second of every load** and the shell's
-`scrollWidth` sat 20px past its `clientWidth`. It only passed its test because the padding was 22px
-against a 20px shift — two pixels of luck. It now rises from below, verified frame by frame at 430,
-390 and 320px. **The masthead test now prints the width, the pixel count and the offending element**
-instead of just "it overflows".
+## One structural fix worth knowing about
 
-**⚠️ Finding for Kimi — a phone rule only works in the file that owns the property.** Import order is
-`index.css` → `mobile.css` → `upgrades.css` → `bold-modern.css` → `footer.css` → `touch.css`, so an
-unscoped rule in a later file beats a phone media query in an earlier one. Three rules in the repo are
-**dead** for this reason (`mobile.css`'s `.hero-shell` padding; `index.css`'s `.manifesto-section` and
-`.contact-section` paddings). Rules this session went wherever they actually win, which is not the
-obvious file. Worth deciding: one home for responsive overrides, or a check that reports the winner.
+`mobile.css` has carried `--section-pad-mobile: 48px` since the phone pass that introduced it, and
+**no section has ever used it** — `upgrades.css` and `bold-modern.css` both set `--section-gap` after
+it. The phone section padding is now one rule, in that token, at the end of the last stylesheet that
+sets section padding.
 
-**New guard:** the phone page must stay under **20,000px** with folds closed. Length is the thing that
-comes back and nothing else in the suite can see it; canaried by disabling the folds (22,636px → fails
-with "26.8 screens" in the message).
+## Two things that need a decision, not a fix
 
-**Full suite 70/70** (was 69), quality ✓, `tsc` ✓, lint 0 errors. Detail and measurements in
-`docs/KIMI-HANDOFF.md`.
+- **The signal fold hides two of three instruments on a phone.** Nothing is deleted, the label counts
+  what is behind it, and `shown={1}` in `LiveSignal.tsx` is the whole change if you want all three.
+- **The card filename is fixed, and platforms cache a card per URL for days.** Re-scrape once after
+  this deploys (X Card Validator, LinkedIn Post Inspector) or the old white card keeps appearing.
 
-**Open items for Kimi / Cam:** the contact sidebar's four folded cards (a testimonial sitting next to
-the form is doing sales work — one line to bring it back); the phone poster cropped 16/9 → 21/9; the
-**no-mouse pass on the live build**, still unrun; the fold numbers on real hardware at 375/414px; one
-contact form submission reaching the real inbox.
+## Verification
 
-**Ownership — settled:** Kimi owns the camtaylor deployment. Cam + Kimi are the decision pair.
-Buffy is a subordinate coding tool, NOT the boss.
+75/75 Playwright tests, `npm run quality` ✓ (now including the cascade and share-card gates), `tsc` ✓,
+lint 0 errors. Every new guard was canaried against the bug it exists for.
 
-**Deploy:** `npm run deploy:live` from `main` — the only deploy command. Cloudflare Pages project
-`camtaylor`.
+Known flakes, neither from this work: `contrast.spec.ts`'s command-deck test fails about once in three
+full-suite runs under load and passes standalone (fixed nothing, observed only); `smoke.spec.ts`'s
+"charts share one frame" read geometry before its panels settled — that one **was fixed** this
+session, and it still catches a genuine 40px misalignment.
 
----
+## Still open
 
-## Next three UI upgrades — Buffy's proposal
-
-**1. Win the first screen. (my pick — measurable today, no new copy)**
-At 390 × 844 the hero's primary button **"See the Route" sits at 866px: 22px below the first screen**.
-And `index.css` sets `.hero-video-wrap { order: -1 }` on phones, so the first screen is two location
-chips, a status chip, a rotating route line and **a video poster — with no name and no button**, and
-"Cam Taylor Sherpa." not until 549px. Every fact is in place already; it is an ordering and spacing
-problem. The target is one screen that shows who this is and one thing to do, with the poster and the
-route strip below. Verifiable: assert the title and the primary CTA are inside the first viewport at
-375/390/414.
-
-**2. Finish the phone page: `signal` and `services`.**
-The pass just now took the sections Cam named. The two biggest left are untouched: **services 2,107px
-and signal 1,883px** — together 4,000px, nearly 5 screens, more than everything handled today. Same
-method: measure the blocks, compact the chrome, fold the tail. The section folds and the length budget
-from this session are already in place to hold whatever it finds.
-
-**3. A no-mouse pass on the live build.**
-Still the biggest untested surface: the custom cursor, the hero canvas, the scroll reveals, the
-rotating route status (it changes every few seconds and is **silent to a screen reader**), the
-carousel, the loading screen. Focus rings on ink *and* acid surfaces, a tab order with no traps, an
-`aria-live` on the status, arrow keys for the carousel, a skip link that lands right, and reveals that
-can never leave content invisible to a keyboard user — the carousel did exactly that until `f0fed9d`,
-and the folds raised the same shape twice since.
-
-My pick is **#1**, then **#2** — they are the same kind of work, and #1 is the cheapest real
-improvement on the site right now.
+The keyboard and screen-reader pass on the live URL: the custom cursor, the hero canvas, the reveals,
+the rotating route status (silent, and it changes every few seconds) and the carousel. It is the
+largest untested surface left.

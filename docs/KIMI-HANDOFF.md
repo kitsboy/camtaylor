@@ -1,3 +1,140 @@
+## Session — 2026-09-25 (first screen, signal + expertise, the cascade, the share card)
+
+**Machine:** M3 (Buffy) · **Project:** camtaylor · **Kimi owns the deployment.**
+
+Four batches, four commits, each pushed on its own. `main` is at `c5cee6a`. 75/75 tests, quality ✓,
+`tsc` ✓, lint 0 errors (1 pre-existing `ThemeContext` fast-refresh warning).
+
+### The numbers
+
+All measured on the built site at `dist`.
+
+| 390 × 844, folds closed | before | after |
+|---|---|---|
+| hero — name | 542px | **207px** |
+| hero — primary button | 866px, 22px *below* the screen | **506px** |
+| `#signal` | 1,883px | **946px** |
+| `#services` | 2,107px | **1,649px** |
+| **phone page** | 18,739px · 22.2 screens | **17,203px · 20.4 screens** |
+| desktop page | 15,067px | 15,067px (untouched) |
+| share card | 98% blank, one small paragraph top-left | 1200x630, 485 kB, readable at 500px |
+
+### 1. The first screen (`46591aa`)
+
+`index.css`'s `.hero-video-wrap { order: -1 }` put a 16:9 poster above the name, so a phone opened on
+two location chips, a status chip, a rotating route line and a video. On phones `.hero-grid` is now
+`display: contents`, the shell is one flex column, and the nine children are ordered explicitly —
+name, tagline, sentence, status chip, buttons, then the route strip, the video and the metrics.
+The entrance stagger halves on phones, because `order` does not reorder a stagger that walks the DOM
+and the primary button was landing 0.8s in.
+
+Guarded at 375/390/414: name and primary button must clear the fold **and** sit above the video.
+Canaried, the guard says `the video poster (139px) is above the name (389px)` and `63px too low`.
+
+### 2. Signal and expertise (`f4371df`)
+
+**Signal.** Three instruments stacked is 1,182px, because a `clamp()` floor is what a phone gets and
+not its `9vw` — so hero-sized section and shell padding had survived, and every chart well kept 46px
+of letterbox above a 640x120 viewBox drawn `meet` at 58px. The chain reading stays (it is what the
+nav item promises); Lightning and price wait behind *"2 more readings · tap to unfold"*. Desktop is
+untouched with all three side by side.
+
+**Expertise.** Four cards are the offering, so nothing is folded — card padding, the gap under the
+icon, paragraph line-height and tag spacing come down instead. A fold here would have been the cheap
+win and the wrong one, so the test asserts all four cards are present *and* the section fits.
+
+The phone length budget ceiling follows it down to 18,500px.
+
+### 3. The cascade (`290e4be`) — the finding, made permanent
+
+The last session found three phone rules that had never applied, by hand. This session built the
+instrument instead: **`npm run cascade`** answers one question exactly — at each width, for one
+selector and one longhand property, which declaration applies and which are dead. It expands
+`padding`/`margin`/`font`/`inset`/`gap`/`border-width`, evaluates every width from 320 to 1440, and
+only ever compares identical selector strings, so it cannot invent a winner it did not read.
+
+It found **45 phone-block declarations that never applied.** 42 were dead at every width where they
+applied and are deleted; 3 are live above 768px and stay — `index.css`'s `.hero-video-wrap { order: -1 }`
+still arranges the hero between 769px and 900px, so deleting it would be a real change.
+
+**The section padding now has one home.** `mobile.css` has carried `--section-pad-mobile: 48px` since
+the phone pass that introduced it and **no section has ever used it** — `upgrades.css` and
+`bold-modern.css` both set `--section-gap` after it, and so did the four hand-written 46px overrides
+I added last session. It is now one rule at the end of the last stylesheet that sets section padding,
+for all eight sections, in that token.
+
+**The gate** fails the build on any at-rule declaration that is dead at *every width where it
+applies* — an at-rule rule that can be proven to have no reader. Canaried with a phone override
+appended to `mobile.css`, it reports `never applies at any width — mobile.css:1022 .hero-shell
+{ padding-right: 30px } — bold-modern.css:1450 sets padding-right: 16px`.
+
+### 4. The share card (`c5cee6a`)
+
+What a link to this site became in a feed was a 1200x630 white card with one small paragraph in its
+top-left corner and two thirds of it empty — 98% blank, legible only at full size, which is the one
+size a share card is never seen at, and carrying none of the brand.
+
+`npm run og` renders the card from the site's own fonts (Outfit 900/800, Plus Jakarta 600/700,
+inlined from `node_modules`) and the site's palette: ink ground with the hero's cyan and violet
+glows, the four-stop brand rule across the top, `Sherpa.` at 152px as the single focal point, the
+tagline against its acid edge, the acid pill the site uses for a live chip carrying the domain, and
+**twelve bars that are the twelve camps' altitudes read out of `waypoints.ts`** — the same file the
+page reads, so the card cannot drift from the site.
+
+The generator checks its own output (dark ground, accent present, largest type 152px, ink in all four
+quadrants) because a card is judged by eye and CI has no eye. The quality gate reads the PNG's IHDR
+and fails if it is not 1200x630, and fails if `index.html` stops declaring `og:image`,
+`twitter:image`, the matching dimensions and both alt texts. `usePageMeta` now sets the image alt per
+page.
+
+### Two mistakes of mine, and the check that caught them
+
+Deleting CSS is only free if it is really dead, so every deletion here was verified by **fingerprint**:
+computed styles for thirteen selectors, all section heights and the document height, at six widths,
+before and after. That check caught two real errors:
+
+1. **a whole block deleted for one dead declaration inside it** — `mobile.css`'s `.hero-metrics` rule
+   held `.display: grid`, which was *live*; removing it took the grid away with the dead declarations
+   and shortened the hero by 23px at every phone width;
+2. **a selector list read from an offset that cut off its first six lines** — the rewrite dropped
+   `min-width: 44px` for `.btn-primary`, `.btn-secondary`, `.submit-btn`, `.sticky-cta-btn`,
+   `.nav-menu-btn` and `.terminal-toggle-btn`, which is what stops `1fr 1fr` in `.hero-actions`
+   collapsing to the wider button's min-content at 320px.
+
+Both are fixed and the fingerprint is now clean at all six widths.
+
+### For Kimi and Cam
+
+**Deploy:** unchanged — `npm run deploy:live` from `main`. Nothing here touches routing,
+`_redirects`, the feed or the sitemap.
+
+**Two things need a decision, not a fix:**
+
+1. **The signal fold hides two of three instruments on a phone.** *"2 more readings · tap to
+   unfold"* holds the Lightning capacity and sats-per-dollar panels. Nothing is deleted and the label
+   counts what is behind it, but if you would rather a phone showed all three, `shown={1}` in
+   `src/components/LiveSignal.tsx` is the whole change.
+2. **The share card filename is fixed.** Twitter and LinkedIn cache a card per URL for days, so
+   **the new card will not appear on already-shared links** until it is re-scraped — the X Card
+   Validator, the LinkedIn Post Inspector, or any `?v=2` on a fresh share. Worth doing once after
+   this deploy, otherwise the old white card is what people keep seeing.
+
+**Two flakes observed, neither from this work:**
+
+- `contrast.spec.ts` — `the command deck meets WCAG AA contrast in both themes` failed once in three
+  full-suite runs today and passes 2/2 standalone. It is load-dependent (the homepage raster is
+  ~14.5k px tall, twice, beside a full suite on 3 workers).
+- `smoke.spec.ts` — the `charts share one frame` assertion read the section's geometry in the first
+  frame after `goto` while the panels were still fetching, so it passed quietly and failed under
+  load. **Fixed this session**: it polls until the row settles, and still reports a genuine 40px
+  misalignment, which is how the canary was checked.
+
+**Still not done:** the keyboard and screen-reader pass on the live URL — the custom cursor, the hero
+canvas, the reveals, the rotating route status (which changes every few seconds in silence) and the
+carousel. It remains the largest untested surface, and it is a browser task.
+
+---
+
 ## Session — 2026-09-25 (the phone page by prose depth: hero, manifesto, contact)
 
 **Machine:** M3 (Buffy) · **Project:** camtaylor
