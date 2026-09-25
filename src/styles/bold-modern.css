@@ -1517,6 +1517,46 @@ body {
 
   /* Same 67px of `--section-gap` as the manifesto, for the same reason. */
   .contact-section { padding-top: 46px; padding-bottom: 46px; }
+  .services-section,
+  .live-section { padding-top: 46px; padding-bottom: 46px; }
+
+  /* ── Phone live signal ─────────────────────────────────────────────────
+     `clamp()` is a desktop instrument: below 620px the floor wins every
+     argument, so the hero-sized padding stayed 56px of section and 20px of
+     shell on a 390px screen. The rest is dead space rather than design —
+     the chart is a 640×120 viewBox drawn `meet` into a 311px well, so it is
+     58px tall whatever the well's 104px says, and the 46px above it was
+     letterbox. 88px keeps the frame without the emptiness. */
+  .live-shell { padding: 16px 14px; }
+  .live-head { gap: 10px; }
+  .live-subtitle { margin-top: 6px; line-height: 1.5; }
+  .live-panels { margin-top: 16px; gap: 12px; }
+  .live-chart-wrap,
+  .live-panel { padding: 12px 14px; }
+  .live-chart-well { height: 88px; margin: 10px -14px 0; }
+  .live-chart-foot { margin: 8px -14px 0; padding: 0 14px; }
+  .live-mini-stats { gap: 10px 8px; margin-top: 10px; padding-top: 10px; }
+  .live-mini-stat,
+  .live-stat { padding-left: 9px; gap: 3px; }
+  .live-panel-note { margin-top: 10px; line-height: 1.45; }
+  .live-fees { margin-top: 14px; gap: 8px; }
+  .live-foot { margin-top: 16px; padding-top: 12px; gap: 10px; }
+
+  /* The fold is styled for the page's light page cards; this section is a dark
+     shell, so the one control that sits on it is re-tinted rather than left as
+     a bright rectangle in the middle of a dashboard. */
+  .live-shell .section-fold-summary {
+    color: rgba(255, 255, 255, .78);
+    background: rgba(255, 255, 255, .06);
+    border-color: rgba(255, 255, 255, .24);
+  }
+  .live-shell .section-fold-details[open] > .section-fold-summary { margin-bottom: 12px; }
+
+  /* Four readings in a 2×2 of 153px cells. The cost was the panel's own
+     padding and the gaps between the cells, not the numbers themselves. */
+  .services-signal-panel { margin: 20px 0 10px; padding: 14px 16px; }
+  .signal-grid { gap: 8px 10px; margin-top: 12px; }
+  .signal-grid div { padding-left: 10px; gap: 2px; }
 }
 
 @media (max-width: 700px) {

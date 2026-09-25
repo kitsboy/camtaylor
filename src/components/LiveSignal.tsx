@@ -13,6 +13,7 @@ import { useLightningSignal } from '../hooks/useLightningSignal';
 import { usePriceSignal } from '../hooks/usePriceSignal';
 import { usePacificClock } from '../hooks/usePacificClock';
 import { SignalChart } from './SignalChart';
+import { SectionFold } from './SectionFold';
 import { buildChartSeries } from '../utils/signalChart';
 
 const CHART_W = 640;
@@ -111,7 +112,17 @@ export const LiveSignal: React.FC = () => {
           </div>
         </div>
 
+        {/*
+          Three instruments, 1,182px of a 390px phone stacked on top of each
+          other. The chain reading is the one the nav item promises ("Live
+          signal"), so it stays; the Lightning and price panels are one tap
+          away behind a counted control. On a desktop nothing is folded —
+          `SectionFold` renders its children straight through — so the
+          three-up layout is unchanged, and every panel stays mounted either
+          way.
+        */}
         <div className="live-panels">
+          <SectionFold shown={1} noun="readings" bodyClassName="live-panels">
           <div className="live-chart-wrap">
             <div className="live-chart-head">
               <span>
@@ -307,6 +318,7 @@ export const LiveSignal: React.FC = () => {
               {activeQuote === 'CAD' && cadRate ? ` Live rate: 1 USD = ${cadRate.toFixed(4)} CAD (mempool.space).` : ''}
             </p>
           </div>
+          </SectionFold>
         </div>
 
         {feeTiers.length > 0 && (

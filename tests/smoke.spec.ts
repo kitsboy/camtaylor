@@ -235,27 +235,48 @@ test('live signal charts share one frame and one reading row', async ({ page }) 
   const wells = signal.locator('.live-chart-well');
   await expect(wells).toHaveCount(3);
 
-  const frames = await wells.evaluateAll((nodes) =>
-    nodes.map((node) => {
-      const box = node.getBoundingClientRect();
-      return { top: Math.round(box.top), height: Math.round(box.height) };
-    }),
-  );
-  const tops = frames.map((frame) => frame.top);
-  const heights = frames.map((frame) => frame.height);
-  expect(Math.max(...tops) - Math.min(...tops)).toBeLessThanOrEqual(2);
-  expect(Math.max(...heights) - Math.min(...heights)).toBeLessThanOrEqual(2);
+  // The panels fill in asynchronously — a chart, a reading, or an honest empty
+  // state — and each one changes its own height when its fetch lands, so the
+  // geometry below is polled until it settles instead of read from the first
+  // frame after `goto`. Read once, this passed on a quiet machine and failed
+  // under three workers with the contrast raster running beside it.
+  const frames = () =>
+    wells.evaluateAll((nodes) =>
+      nodes.map((node) => {
+        const box = node.getBoundingClientRect();
+        return { top: Math.round(box.top), height: Math.round(box.height) };
+      }),
+    );
+  const spread = async (pick: (frame: { top: number; height: number }) => number) => {
+    const values = (await frames()).map(pick);
+    return Math.max(...values) - Math.min(...values);
+  };
+  await expect
+    .poll(() => spread((frame) => frame.top), { message: 'the three chart frames never lined up on one row' })
+    .toBeLessThanOrEqual(2);
+  await expect
+    .poll(() => spread((frame) => frame.height), { message: 'the three chart frames never settled to one height' })
+    .toBeLessThanOrEqual(2);
 
   // The chain readings moved into the first card; the other two keep theirs.
   await expect(signal.locator('.live-chart-wrap .live-stat')).toHaveCount(4);
   await expect(signal.locator('.live-panel .live-stat')).toHaveCount(0);
 
-  // Bottom blocks rest on the card floor, so the row reads as one band.
-  const bottoms = await signal
-    .locator('.live-chart-wrap .live-mini-stats, .live-panel-note')
-    .evaluateAll((nodes) => nodes.map((node) => Math.round(node.getBoundingClientRect().bottom)));
-  expect(bottoms.length).toBe(3);
-  expect(Math.max(...bottoms) - Math.min(...bottoms)).toBeLessThanOrEqual(14);
+  // Bottom blocks rest on the card floor, so the row reads as one band. Same
+  // race, same remedy.
+  const floors = signal.locator('.live-chart-wrap .live-mini-stats, .live-panel-note');
+  await expect(floors).toHaveCount(3);
+  await expect
+    .poll(
+      async () => {
+        const bottoms = await floors.evaluateAll((nodes) =>
+          nodes.map((node) => Math.round(node.getBoundingClientRect().bottom)),
+        );
+        return Math.max(...bottoms) - Math.min(...bottoms);
+      },
+      { message: 'the three card floors never settled into one band' },
+    )
+    .toBeLessThanOrEqual(14);
 });
 
 test('sats per dollar panel plots hourly closes or says so honestly', async ({ page }) => {

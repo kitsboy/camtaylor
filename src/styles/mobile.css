@@ -926,8 +926,25 @@ a,
   }
 
   .anti-services {
-    padding: 20px 18px;
+    margin-top: 24px;
+    padding: 16px 18px;
   }
+  .anti-services-title { margin-bottom: 8px; }
+  .anti-services-list { gap: 6px; }
+
+  /* ── Phone expertise ───────────────────────────────────────────────────
+     Four cards at 1,327px, and the words are not the cost: 28px of padding
+     each side of every card, a 16px gap under a 28px icon, 1.65 line-height
+     on five-line paragraphs, and three rows of tags at 8px apart. The
+     offering is what this section is for, so none of it is folded — the
+     chrome comes down instead. */
+  .services-grid { gap: 12px; }
+  .service-card { padding: 18px; }
+  .service-icon-container { margin-bottom: 8px; }
+  .service-title { margin-bottom: 6px; }
+  .service-description { line-height: 1.5; margin-bottom: 12px; }
+  .service-features { gap: 6px; }
+  .service-feature-tag { padding: 3px 8px; }
 
   .hero-backdrop-wrap {
     height: 70vh;

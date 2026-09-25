@@ -591,8 +591,11 @@ test('a phone folds the long section tails, and unfolding strands nothing', asyn
 
   const stranded = await folds.evaluateAll((nodes) => {
     const out: string[] = [];
+    // `button` and the live-signal blocks are here because the readings fold
+    // holds two instrument panels, and "is the control inside it live" is the
+    // question a fold can get wrong without any link looking broken.
     for (const d of nodes) {
-      for (const el of d.querySelectorAll<HTMLElement>('a, li, article')) {
+      for (const el of d.querySelectorAll<HTMLElement>('a, li, article, button, .live-panel, .live-mini-stat, .service-card')) {
         if (el.getBoundingClientRect().height < 4) continue;
         const style = getComputedStyle(el);
         if (parseFloat(style.opacity) < 0.99 || style.visibility === 'hidden') {
@@ -614,7 +617,7 @@ test('a phone folds the long section tails, and unfolding strands nothing', asyn
  *
  * The ceiling is deliberately loose. This is not a target to shave; it is the
  * point at which someone should ask what was added and whether it was worth
- * another screen of scrolling on a phone. 20,000px is about 6% above the current
+ * another screen of scrolling on a phone. 18,500px is about 7% above the current
  * page, so ordinary copy edits will not trip it.
  */
 test('the phone page stays inside its length budget', async ({ page }) => {
@@ -634,7 +637,59 @@ test('the phone page stays inside its length budget', async ({ page }) => {
   expect(
     height,
     `the phone page is ${height}px, or ${(height / 844).toFixed(1)} screens — see the handoff for what it was and what changed`,
-  ).toBeLessThan(20000);
+  ).toBeLessThan(18500);
+});
+
+/**
+ * The live signal is three instruments stacked on a phone: 1,182px of a 390px
+ * screen, since `clamp()`'s floor — not its 9vw — is what a phone gets. The
+ * chain reading is the one the nav item promises ("Live signal"), so it stays
+ * on the page and the Lightning and price panels wait behind one counted
+ * control.
+ *
+ * The risk in a change like this is a panel that is folded but empty, or a
+ * chart that is present but never drawn; `:visible` counts what a reader can
+ * actually see, so both sides are asserted rather than the fold alone.
+ */
+test('a phone keeps the chain reading and folds the other two instruments', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('.mobile-quick-nav')).toBeVisible();
+  await page.waitForTimeout(1200);
+
+  const readings = page.locator('details.section-fold-details').filter({ hasText: 'more readings' });
+  await expect(readings, 'a phone is showing all three live instruments at once').toHaveCount(1);
+  await expect(readings.locator('.section-fold-count')).toHaveText('2');
+  await expect(page.locator('#signal .live-panel--lightning')).toBeHidden();
+  await expect(page.locator('#signal .live-panel--price')).toBeHidden();
+
+  // Exactly one instrument on the page without a tap: the chain reading.
+  expect(await page.locator('#signal .live-chart-well:visible').count()).toBe(1);
+  expect(await page.locator('#signal .live-mini-stat:visible').count()).toBe(4);
+
+  await readings.locator('summary').click();
+  await page.waitForTimeout(400);
+  await expect(page.locator('#signal .live-panel--lightning')).toBeVisible();
+  await expect(page.locator('#signal .live-panel--price')).toBeVisible();
+  expect(await page.locator('#signal .live-chart-well:visible').count()).toBe(3);
+  await expect(page.locator('#signal .live-mini-stat')).toHaveCount(12);
+});
+
+/**
+ * The expertise cards are the offering, so a phone keeps all four and the
+ * section's length comes off the chrome instead of the content: card padding,
+ * the gap under the icon, paragraph line-height and tag spacing. Folding these
+ * would have been the cheap win and the wrong one.
+ */
+test('a phone keeps all four areas of expertise and pays for them in chrome', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('.services-section')).toBeVisible();
+  await page.waitForTimeout(1200);
+
+  expect(await page.locator('#services .service-card').count(), 'the expertise section lost a card').toBe(4);
+  const height = await page.locator('#services').evaluate((el) => Math.round(el.getBoundingClientRect().height));
+  expect(height, `#services is ${height}px on a 390px phone`).toBeLessThan(1700);
 });
 
 /**
