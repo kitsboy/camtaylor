@@ -27,6 +27,36 @@
 5. **Hero copy tightened**, and a **contrast guard** shipped to keep this from regressing:
    `tests/contrast.spec.ts`.
 
+### Night theme — audited, and it was largely unreadable
+
+The guard was then extended to run both themes, and **night mode was broken**: 157 failures
+on the homepage. Night mode flipped every text token to light but left most surfaces warm:
+
+- The effective `body` background was a **hard-coded warm gradient**, and it is the *last*
+  `body` rule in `bold-modern.css`, so it won the cascade in both themes. `--bg` did flip;
+  the gradient painted over it. The backdrop never changed.
+- **`--paper` (`#f1ede5`) was never given a night value**, so the family cards (and anything
+  else on `--paper`) stayed warm while their text went light — light on light, 1.05:1.
+- The rest were light-theme accent literals with no night variant: the deep teal kicker, and
+  `--green` used as text on links, the NIP-05 code, tier buttons, the secure-mail link and the
+  venture status chips. All of these sat between 1.0:1 and 2.7:1.
+
+Two real bugs fell out along the way:
+
+- A **specificity bug**: `[data-theme="night"] .kit-flag` (0,2,0) clobbered
+  `.kit-flag--ref`'s per-tool `--kit-ink` (0,1,0), so the referral tag lost its
+  designed contrast. Scoped with `:not(.kit-flag--ref)`.
+- The referral flag used a 55% colour-mix background, so `--kit-ink` — chosen to contrast the
+  *solid* colour — no longer contrasted once the mix landed on a dark card. Now solid.
+
+Fixed by giving `body` a night gradient and `--paper` a night value, then restating the
+light-theme accent literals in **one auditable night block** at the end of `bold-modern.css`
+rather than flattening the brand tokens (which are also used as backgrounds).
+**Night is now 0 failures**, and the guard runs both themes.
+
+> Correction: my previous note said night was "checked by hand and passing". That was token
+> arithmetic only. It never looked at the rendered page, and the rendered page was broken.
+
 ### The guard, and what it does not cover
 
 `tests/contrast.spec.ts` samples the actual rendered backdrop pixel by pixel rather than
@@ -38,9 +68,8 @@ so a vacuous pass cannot hide behind an empty audit.
 Coverage today: 657 checks on the homepage, 28 on a dispatch, 13 in the command deck.
 Deliberate blind spots, each documented in the file:
 
-- **Night theme is not audited.** The guard runs the light theme only. The night tokens
-  were checked by hand (`--text-muted` `#71867e` = 4.94:1 / 4.51:1, passing) but nothing
-  automates it.
+- Both themes are now audited (the homepage, a dispatch page and the command deck, in
+  warm *and* night).
 - Anything **animating** or **covered by a fixed overlay** is skipped — its pixels change
   frame to frame or belong to another layer.
 - Gradients are sampled where they land, so a gradient that shifts under a restyle can
@@ -48,7 +77,6 @@ Deliberate blind spots, each documented in the file:
 
 ### Still outstanding (UI-focused — the rest of the launch gate is unchanged)
 
-- [ ] **Night-theme contrast** — extend the guard to run both themes.
 - [ ] **Keyboard + screen-reader pass** on the live URL.
 - [ ] **Reduced-motion pass** on the live URL. (The guard *runs* with reduced motion, but
       nothing asserts the preference is honoured in every animated component.)
@@ -73,9 +101,12 @@ Deliberate blind spots, each documented in the file:
 
 ### Git State
 
-- SHA: `8ec846a9ec70871fea4ec8289da5cb80d9f35c8e` (UI + guard)
+- SHA: `8ec846a` (UI + guard) · `2cf6cca` (night theme repair)
 - Verified: `npm run quality` ✓ · `npx tsc -b` ✓ · `npm run lint` 0 errors (1 pre-existing
   `ThemeContext.tsx` warning) · `npm test` **45/45** (41 before, +4 contrast)
+- **Flaky, not a regression:** `smoke.spec.ts` "lightning capacity panel" failed once under
+  parallel workers and passed on re-run. It polls live mempool.space data, so it is timing
+  dependent. Worth watching, not worth chasing.
 
 ---
 
