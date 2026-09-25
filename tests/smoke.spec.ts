@@ -58,10 +58,24 @@ test('masthead holds the brand and never overflows its container', async ({ page
 
   for (const width of [1440, 1024, 780, 430]) {
     await page.setViewportSize({ width, height: 900 });
-    const navFits = await page.locator('.nav-container').evaluate((el) => el.scrollWidth <= el.clientWidth + 1);
-    const shellFits = await page.locator('.hero-shell').evaluate((el) => el.scrollWidth <= el.clientWidth + 1);
-    expect(navFits, `nav overflows its container at ${width}px`).toBe(true);
-    expect(shellFits, `hero shell overflows at ${width}px`).toBe(true);
+    const fit = (selector: string) =>
+      page.locator(selector).evaluate((el) => ({
+        sw: el.scrollWidth,
+        cw: el.clientWidth,
+        widest: [...el.querySelectorAll<HTMLElement>('*')]
+          .filter((child) => child.getBoundingClientRect().width > 0)
+          .reduce<{ cls: string; past: number } | null>((worst, child) => {
+            const edge = el.getBoundingClientRect().right - parseFloat(getComputedStyle(el).paddingRight);
+            const past = Math.round(child.getBoundingClientRect().right - edge);
+            return !worst || past > worst.past ? { cls: child.className.toString().split(' ')[0] || child.tagName, past } : worst;
+          }, null),
+      }));
+    // The numbers go in the message: "it overflows" without a width and a pixel
+    // count is the kind of failure that gets a threshold edited instead of a bug.
+    const nav = await fit('.nav-container');
+    expect(nav.sw, `nav overflows at ${width}px: ${nav.sw} > ${nav.cw}, widest is ${nav.widest?.cls} past by ${nav.widest?.past}`).toBeLessThanOrEqual(nav.cw + 1);
+    const shell = await fit('.hero-shell');
+    expect(shell.sw, `hero shell overflows at ${width}px: ${shell.sw} > ${shell.cw}, widest is ${shell.widest?.cls} past by ${shell.widest?.past}`).toBeLessThanOrEqual(shell.cw + 1);
   }
 });
 
