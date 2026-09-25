@@ -3,12 +3,14 @@
  * Writes the machine-readable surface of the site at build time:
  *   - public/sitemap.xml  (static routes + one entry per dispatch)
  *   - public/feed.xml     (RSS 2.0, one item per dispatch)
+ *   - public/build-meta.json  (commit + version the build came from)
  *
- * The dispatches live in `src/content/dispatches/*.md`. This script parses
+ * The dispatch content lives in `src/content/dispatches/*.md`. This script parses
  * their frontmatter with the same plain `key: value` rules the app uses in
  * `src/utils/dispatches.ts` — keep the two in step if the format changes.
  */
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -155,6 +157,39 @@ ${feedItems}
 
 writeFileSync(join(publicDir, 'feed.xml'), feed);
 
+// Build metadata — the identity marker for deploy verification.
+//
+// Cloudflare Pages sets CF_PAGES_COMMIT_SHA to the commit it built from, so a
+// build on the Pages builder carries the exact source commit. Locally we fall
+// back to git HEAD. The verifier (scripts/deploy-check.sh) requires the LIVE
+// site's build-meta.json to name the commit being shipped — identity, not a
+// build clock, because a timestamp floor once passed a stale deploy by 41
+// seconds on another site.
+const pkgVersion =
+  JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version ?? '';
+let commitSha = process.env.CF_PAGES_COMMIT_SHA || '';
+if (!commitSha) {
+  try {
+    commitSha = execSync('git rev-parse HEAD', { cwd: root })
+      .toString()
+      .trim();
+  } catch {
+    commitSha = '';
+  }
+}
+writeFileSync(
+  join(publicDir, 'build-meta.json'),
+  `${JSON.stringify(
+    {
+      commit: commitSha,
+      version: pkgVersion,
+      builtAt: new Date().toISOString(),
+    },
+    null,
+    2,
+  )}\n`,
+);
+
 console.log(
-  `Generated sitemap.xml (${staticUrls.length + dispatchUrls.length} urls) and feed.xml (${dispatches.length} dispatches)`,
+  `Generated sitemap.xml (${staticUrls.length + dispatchUrls.length} urls), feed.xml (${dispatches.length} dispatches) and build-meta.json (commit ${commitSha.slice(0, 7) || 'unknown'})`,
 );

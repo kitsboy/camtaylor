@@ -16,7 +16,9 @@
     "test": "playwright test",
     "build:live": "VITE_PRIVATE_PREVIEW=false npm run build",
     "deploy": "npm run build && npx wrangler pages deploy dist --project-name camtaylor --branch main --commit-dirty=true",
-    "deploy:live": "npm run build:live && npx wrangler pages deploy dist --project-name camtaylor --branch main --commit-dirty=true"
+    "deploy:live": "npm run build:live && npx wrangler pages deploy dist --project-name camtaylor --branch main --commit-dirty=true",
+    "deploy:check": "bash scripts/deploy-check.sh",
+    "deploy:check:wait": "bash scripts/deploy-check.sh --wait"
   },
   "dependencies": {
     "@fontsource/outfit": "^5.2.6",
