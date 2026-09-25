@@ -17,7 +17,6 @@ const root = join(__dirname, '..');
 const publicDir = join(root, 'public');
 const dispatchDir = join(root, 'src', 'content', 'dispatches');
 const ORIGIN = 'https://camtaylor.ca';
-const lastmod = new Date().toISOString().slice(0, 10);
 
 function unquote(value) {
   return value.replace(/^["']|["']$/g, '').trim();
@@ -79,8 +78,19 @@ function loadDispatches() {
 
 const dispatches = loadDispatches();
 
+// Dates come from the content, never from the clock.
+//
+// This file used to stamp `new Date()` on every static URL and on `lastBuildDate`, so
+// every deploy claimed all twelve pages had changed that day — which is the fastest way
+// to teach a crawler to ignore the field — and it made the two files dirty on every build
+// for no reason a reader could see. The homepage's last change is the newest dispatch,
+// because a dispatch is what changes it; the four pages that only change when someone
+// edits the page itself carry no `lastmod` at all, which the sitemap schema allows and
+// which is more honest than inventing a date for them.
+const newestDispatch = dispatches[0]?.date ?? null;
+
 const staticUrls = [
-  { loc: `${ORIGIN}/`, priority: '1.0', changefreq: 'weekly' },
+  { loc: `${ORIGIN}/`, priority: '1.0', changefreq: 'weekly', lastmod: newestDispatch },
   { loc: `${ORIGIN}/field-guide`, priority: '0.8', changefreq: 'monthly' },
   { loc: `${ORIGIN}/2026`, priority: '0.7', changefreq: 'monthly' },
   { loc: `${ORIGIN}/privacy`, priority: '0.3', changefreq: 'yearly' },
@@ -99,8 +109,7 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 ${[...staticUrls, ...dispatchUrls]
   .map(
     (url) => `  <url>
-    <loc>${url.loc}</loc>
-    <lastmod>${url.lastmod ?? lastmod}</lastmod>
+    <loc>${url.loc}</loc>${url.lastmod ? `\n    <lastmod>${url.lastmod}</lastmod>` : ''}
     <changefreq>${url.changefreq}</changefreq>
     <priority>${url.priority}</priority>
   </url>`,
@@ -124,6 +133,12 @@ const feedItems = dispatches
   )
   .join('\n');
 
+// The feed's own content changes when a dispatch lands, and at no other time, so its
+// build date is the newest dispatch rather than the moment someone ran a deploy.
+const lastBuildDate = newestDispatch
+  ? new Date(`${newestDispatch}T12:00:00Z`).toUTCString()
+  : new Date(0).toUTCString();
+
 const feed = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
@@ -132,7 +147,7 @@ const feed = `<?xml version="1.0" encoding="UTF-8"?>
     <atom:link href="${ORIGIN}/feed.xml" rel="self" type="application/rss+xml" />
     <description>Dated dispatches from the field: deal architecture, capital, and venture operations.</description>
     <language>en-ca</language>
-    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    <lastBuildDate>${lastBuildDate}</lastBuildDate>
 ${feedItems}
   </channel>
 </rss>
