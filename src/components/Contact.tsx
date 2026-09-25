@@ -396,7 +396,9 @@ export const Contact: React.FC = () => {
 
             <div className="sidebar-card">
               <ShieldAlert className="sidebar-icon" size={24} />
-              <h4 className="sidebar-title">How it works</h4>
+              {/* h3, not h4: these sit directly under the section's h2, and jumping a
+                  level is how a screen-reader reader loses the shape of the page. */}
+              <h3 className="sidebar-title">How it works</h3>
               <ul className="sidebar-list">
                 <li>All inquiries are treated as confidential.</li>
                 <li>Priority goes to ventures with clear structure and leverage.</li>
@@ -409,7 +411,7 @@ export const Contact: React.FC = () => {
 
             <div className="sidebar-card nostr-contact-card">
               <Zap className="sidebar-icon" size={24} />
-              <h4 className="sidebar-title">Prefer Nostr?</h4>
+              <h3 className="sidebar-title">Prefer Nostr?</h3>
               <ul className="sidebar-list">
                 <li>
                   <a href="https://iris.to/cam@giveabit.io" target="_blank" rel="noopener noreferrer">
@@ -427,13 +429,13 @@ export const Contact: React.FC = () => {
 
             {SITE.pgpFingerprint && (
               <div className="sidebar-card">
-                <h4 className="sidebar-title">PGP</h4>
+                <h3 className="sidebar-title">PGP</h3>
                 <code className="pgp-fingerprint">{SITE.pgpFingerprint}</code>
               </div>
             )}
 
             <div className="sidebar-card">
-              <h4 className="sidebar-title">Based in</h4>
+              <h3 className="sidebar-title">Based in</h3>
               <ul className="sidebar-list">
                 <li>{SITE.location}</li>
                 <li>{SITE.timezone}</li>

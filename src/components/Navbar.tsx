@@ -144,6 +144,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           role="dialog"
           aria-modal={menuOpen}
           aria-hidden={!menuOpen}
+          // `aria-hidden` alone leaves the fourteen controls inside this sheet in the tab
+          // order: a keyboard reader tabs into a closed menu and hears nothing, because
+          // every label in it is hidden from them. `inert` takes the subtree out of focus
+          // and pointer reach as well, which is what "closed" has to mean.
+          inert={!menuOpen}
           aria-label="Route sheet"
           onTouchStart={(e) => { touchStartY.current = e.touches[0].clientY; }}
           onTouchEnd={(e) => {
