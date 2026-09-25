@@ -23,7 +23,13 @@
   --text-hero: clamp(2.4rem, 8vw, 3.8rem);
   --text-section: clamp(1.35rem, 4vw, 1.75rem);
   --text-body: clamp(0.92rem, 2.5vw, 1rem);
-  --section-gap: clamp(48px, 8vh, 80px);
+  /* Desktop section padding. It was `clamp(48px, 8vh, 80px)` — 72px top *and* bottom on a
+     900px laptop, which is 144px of every section and roughly 1,600px down the page. The
+     page's length is not in any one section (the longest is the expedition log at 1,669px)
+     but in that repeated chrome, and folding the long lists here does not pay: their grids
+     are already multi-column, so hiding four family cards saved nothing and the control
+     cost 56px. 5.5vh is the same tightening the phone pass made, at the same scale. */
+  --section-gap: clamp(42px, 5.5vh, 64px);
   --nav-height: 72px;
   --glass-blur-nav: 20px;
   --glass-blur-card: 12px;

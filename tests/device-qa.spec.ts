@@ -539,6 +539,30 @@ test('only one call to action is lit at a time', async ({ page }) => {
  *     settle, because the reveals are 400ms animations and reading mid-flight
  *     reports a fault that is not there.
  */
+/**
+ * The desktop page is 14,817px — 16.5 screens of a 900px laptop — and it is the longest
+ * surface on the site by a wide margin. Nothing measured it until now, so nothing could
+ * notice it growing either; this is the ceiling, deliberately loose, so the question is
+ * "was this worth a screen?" rather than a target to shave.
+ *
+ * Where the height actually is, measured by section at 1440: the expedition log 1,669px,
+ * ventures 1,522, contact 1,228, services 1,217, the live signal 1,086. It is spread across
+ * every section rather than sitting in one place — the same shape the phone page had — and
+ * 1,600px of it was the repeated 72px top and bottom of `--section-gap`, now 5.5vh.
+ */
+test('a desktop stays inside its length budget', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await expect(page.locator('.hero-route-status')).toBeVisible();
+  await page.waitForTimeout(1200);
+
+  const height = await page.evaluate(() => document.body.scrollHeight);
+  expect(
+    height,
+    `the desktop page is ${height}px, ${(height / 900).toFixed(1)} screens — over the 15,200px budget`,
+  ).toBeLessThan(15_200);
+});
+
 test('a phone folds the long section tails, and unfolding strands nothing', async ({ page }) => {
   test.slow();
   await page.setViewportSize({ width: 390, height: 844 });
@@ -766,6 +790,10 @@ test('a desktop does not fold anything', async ({ page }) => {
   await expect(page.locator('.hero-route-status')).toBeVisible();
   await page.waitForTimeout(900);
 
+  // Tried and reverted, with the numbers: folding the four long lists at this width made
+  // the page 297px *longer*. Their grids are already multi-column, so hiding four of ten
+  // family cards saved no height at all and the control cost 56px per section. The desktop
+  // length is in the repeated section padding, not in the list tails.
   expect(await page.locator('details.section-fold-details').count(), 'a desktop grew a disclosure').toBe(0);
   expect(await page.locator('.section-fold').count(), 'a desktop kept the fold wrapper').toBe(0);
   // The open state is also a desktop regression, so check the content is there.

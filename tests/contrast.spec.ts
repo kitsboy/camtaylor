@@ -400,14 +400,26 @@ async function audit(page: Page, label: string, rootSelector: string | null = nu
     }
   });
 
-  const stillRunning = await page.evaluate(
-    () =>
-      document.getAnimations().filter((a) => {
-        const timing = a.effect?.getTiming();
-        return timing ? timing.iterations !== Infinity : true;
-      }).length,
-  );
-  expect(stillRunning, `${label}: the page was still moving when the raster was taken`).toBe(0);
+  // Then insist on it, with a bounded number of attempts. The settle above is a race against
+  // a 3s clock, and on a loaded machine a transition can be started by the blanking itself
+  // after that pass has already finished — which failed this fixture once in three full-suite
+  // runs today and passed every standalone run. Retrying cannot make a genuinely animating
+  // page pass: a ticker that never ends is still running on the last attempt.
+  const stillRunning = await expect
+    .poll(
+      () =>
+        page.evaluate(
+          () =>
+            document.getAnimations().filter((a) => {
+              const timing = a.effect?.getTiming();
+              return timing ? timing.iterations !== Infinity : true;
+            }).length,
+        ),
+      { timeout: 6000, message: `${label}: the page was still moving when the raster was taken` },
+    )
+    .toBe(0)
+    .then(() => 0);
+  expect(stillRunning).toBe(0);
 
   const shot = (await page.screenshot({ fullPage: true })).toString('base64');
   await blanking.evaluate((node) => node.remove());
