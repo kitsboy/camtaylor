@@ -3,7 +3,7 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; object-src 'none'; script-src 'self' 'unsafe-inline' https://plausible.io https://analytics.giveabit.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com; font-src 'self'; connect-src 'self' https://formspree.io https://giveabit.io https://mempool.space https://api.exchange.coinbase.com https://api.satohash.io https://plausible.io https://analytics.giveabit.io; frame-src https://www.youtube-nocookie.com; frame-ancestors 'none';
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; object-src 'none'; script-src 'self' 'unsafe-inline' https://plausible.io https://analytics.giveabit.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com; font-src 'self'; connect-src 'self' https://formspree.io https://giveabit.io https://*.giveabit.io https://satohash.io https://katoa.org https://sherpacarta.org https://mempool.space https://api.exchange.coinbase.com https://api.satohash.io https://plausible.io https://analytics.giveabit.io; frame-src https://www.youtube-nocookie.com; frame-ancestors 'none';
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
