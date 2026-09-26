@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { CheckCircle2, ExternalLink, Loader2, ShieldCheck, XCircle } from 'lucide-react';
 import { FAMILY_OFFERINGS } from '../data/family';
 import { SectionFold } from './SectionFold';
+import { SatohashVerify } from './SatohashVerify';
 
 type Health = 'checking' | 'live' | 'unreachable';
 
@@ -79,6 +80,7 @@ export const Proof: React.FC = () => {
           })}
           </SectionFold>
         </div>
+        <SatohashVerify />
         <p className="proof-note">This browser check is a simple signal, not a promise of uptime. If a project cannot be verified, we say so.{lastChecked ? ` Last checked locally at ${lastChecked}.` : ''}</p>
       </div>
     </section>
