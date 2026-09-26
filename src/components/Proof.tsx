@@ -10,18 +10,26 @@ export const Proof: React.FC = () => {
   const [lastChecked, setLastChecked] = useState<string | null>(null);
 
   const checkHealth = useCallback(async () => {
-    setHealth(Object.fromEntries(FAMILY_OFFERINGS.map(({ id }) => [id, 'checking'])));
-    const results = await Promise.all(FAMILY_OFFERINGS.map(async (offering) => {
-      try {
-        await fetch(offering.url, { mode: 'no-cors', cache: 'no-store' });
-        return [offering.id, 'live'] as const;
-      } catch {
-        return [offering.id, 'unreachable'] as const;
-      }
-    }));
-    setHealth(Object.fromEntries(results));
-    setLastChecked(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-  }, []);
+      setHealth(Object.fromEntries(FAMILY_OFFERINGS.map(({ id }) => [id, 'checking'])));
+      const results = await Promise.all(FAMILY_OFFERINGS.map(async (offering) => {
+        // Try a CORS fetch first (works for sites that send access-control-allow-origin,
+        // including giveabit.io and katoa.org, whose Cross-Origin-Resource-Policy: same-site
+        // would block a no-cors request). Fall back to no-cors for sites with no ACAO header.
+        try {
+          await fetch(offering.url, { mode: 'cors', cache: 'no-store' });
+          return [offering.id, 'live'] as const;
+        } catch {
+          try {
+            await fetch(offering.url, { mode: 'no-cors', cache: 'no-store' });
+            return [offering.id, 'live'] as const;
+          } catch {
+            return [offering.id, 'unreachable'] as const;
+          }
+        }
+      }));
+      setHealth(Object.fromEntries(results));
+      setLastChecked(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    }, []);
 
   useEffect(() => {
     let active = true;
