@@ -143,6 +143,7 @@
 .satohash-verify-input {
   flex: 1;
   min-width: 220px;
+  min-height: 44px;
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,.18);
@@ -151,11 +152,12 @@
   font: 400 var(--fs-micro)/1 var(--font-sans);
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
-.satohash-verify-input::placeholder { color: rgba(255,255,255,.4); }
+.satohash-verify-input::placeholder { color: rgba(255,255,255,.7); }
 .satohash-verify-input:focus { outline: 2px solid var(--cyan); outline-offset: 1px; border-color: transparent; }
 .satohash-verify-file {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   padding: 10px 14px;
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,.22);
@@ -175,6 +177,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  min-height: 44px;
   padding: 8px 12px;
   border-radius: 7px;
   background: rgba(100,230,226,.12);
