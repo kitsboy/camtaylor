@@ -58,7 +58,7 @@ export const SITE = {
   ],
   lastUpdated: '2026-07-15',
   responseTime: 'Typically replies within 48h PT',
-  calendlyUrl: null as string | null,
+  calendlyUrl: 'https://calendly.com/camtaylor/60min',
   pgpFingerprint: null as string | null,
   social: {
     github: 'https://github.com/kitsboy',
