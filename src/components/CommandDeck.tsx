@@ -155,6 +155,10 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose, onNav
             onClose();
             navigate('/field-guide');
             break;
+          case 'wisdom':
+            onClose();
+            navigate('/wisdom');
+            break;
           case '2026':
             onClose();
             navigate('/2026');
@@ -291,7 +295,7 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose, onNav
           </div>
 
           <div className="terminal-pills">
-            {['/status', '/route', '/nostr', '/book', '/field-guide', '/help'].map((cmd) => (
+            {['/status', '/route', '/nostr', '/book', '/field-guide', '/wisdom', '/help'].map((cmd) => (
               <button key={cmd} type="button" onClick={() => runCommand(cmd)} className="terminal-pill">
                 {cmd}
               </button>

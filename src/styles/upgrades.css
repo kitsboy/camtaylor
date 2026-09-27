@@ -451,6 +451,149 @@
   }
 }
 
+/* ── Sovereign Healthcare Wisdom Database ───────────────────────────── */
+
+.wisdom-content {
+  text-align: left;
+  max-width: 980px;
+}
+
+.wisdom-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0 4px;
+}
+
+.wisdom-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.wisdom-btc {
+  background: rgba(247, 147, 26, 0.16);
+  color: var(--gold);
+  border: 1px solid rgba(247, 147, 26, 0.35);
+}
+
+.wisdom-ln {
+  background: rgba(124, 58, 237, 0.14);
+  color: #a78bfa;
+  border: 1px solid rgba(124, 58, 237, 0.4);
+}
+
+.wisdom-verified {
+  background: rgba(72, 187, 120, 0.14);
+  color: var(--green);
+  border: 1px solid rgba(72, 187, 120, 0.35);
+}
+
+.wisdom-tier {
+  margin-top: 36px;
+}
+
+.wisdom-tier h2 {
+  font-size: 1.3rem;
+  margin-bottom: 14px;
+  color: var(--gold);
+}
+
+.wisdom-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.wisdom-card {
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 18px;
+  background: var(--card, rgba(255, 255, 255, 0.02));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wisdom-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.wisdom-card-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.wisdom-card-badges {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.wisdom-card-badges .wisdom-badge {
+  padding: 1px 8px;
+  font-size: 0.72rem;
+}
+
+.wisdom-category {
+  font-size: var(--fs-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.wisdom-location {
+  font-weight: 600;
+}
+
+.wisdom-offerings {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.wisdom-vetting {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.wisdom-payment {
+  font-size: var(--fs-caption);
+  margin: 0;
+  padding: 8px 10px;
+  background: rgba(247, 147, 26, 0.07);
+  border-left: 2px solid var(--gold);
+}
+
+.wisdom-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.wisdom-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+}
+
+.wisdom-links .wisdom-source {
+  margin-left: auto;
+  color: var(--green);
+}
+
 @media print {
   .navbar,
   .mobile-quick-nav,

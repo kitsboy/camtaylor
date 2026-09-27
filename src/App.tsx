@@ -22,6 +22,9 @@ const NotFoundPage = lazy(() =>
 const VentureRoutePage = lazy(() =>
   import('./pages/VentureRoutePage').then((m) => ({ default: m.VentureRoutePage })),
 );
+const WisdomPage = lazy(() =>
+  import('./pages/WisdomPage').then((m) => ({ default: m.WisdomPage })),
+);
 const DispatchPage = lazy(() =>
   import('./pages/DispatchPage').then((m) => ({ default: m.DispatchPage })),
 );
@@ -50,6 +53,7 @@ function App() {
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/field-guide" element={<FieldGuidePage />} />
+              <Route path="/wisdom" element={<WisdomPage />} />
               <Route path="/2026" element={<YearReviewPage />} />
               <Route path="/route/:ventureId" element={<VentureRoutePage />} />
               <Route path="/dispatch/:slug" element={<DispatchPage />} />

@@ -33,6 +33,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         <p>© {new Date().getFullYear()} {SITE.domain}</p>
         <div className="legal-footer-links">
           <Link to="/field-guide">Field Guide</Link>
+          <Link to="/wisdom">Wisdom Database</Link>
           <Link to="/2026">2026</Link>
           <Link to="/privacy">Privacy</Link>
           <Link to="/terms">Terms</Link>

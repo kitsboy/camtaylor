@@ -35,7 +35,7 @@ Last updated: 2026-07-15
 - Tadbuy (E-Commerce) — https://tadbuy.giveabit.io
 
 ## Command Deck
-Available on homepage. Commands: /help, /about, /status, /services, /ventures, /route, /manifesto, /contact, /book, /nostr, /field-guide, /2026
+Available on homepage. Commands: /help, /about, /status, /services, /ventures, /route, /manifesto, /contact, /book, /nostr, /field-guide, /wisdom, /2026
 
 ## Contact
 Use the contact form at https://camtaylor.ca/#contact or email hello@giveabit.io.
@@ -44,6 +44,7 @@ Response time: typically within 48h PT.
 ## Pages
 - / — Homepage with hero, ventures, contact
 - /field-guide — Sherpa Field Guide (printable)
+- /wisdom — Sovereign Healthcare Wisdom Database (verified Bitcoin/Lightning-accepting clinics)
 - /2026 — State of the Route annual review
 - /route/:ventureId — Venture deep-dive pages
 - /privacy — Privacy Policy
