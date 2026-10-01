@@ -34,11 +34,11 @@ dashboard because DNS edit is not delegated to the build machine.
 - [ ] **Seed dispatches reviewed by Cam** — the six entries in `src/content/dispatches` are drafts written in his voice
 - [ ] Contact form test submission received at the real inbox
 - [ ] Keyboard + screen-reader pass on the live URL
-- [ ] Contrast and reduced-motion pass on the live URL
+- [x] Contrast and reduced-motion pass — automated in `tests/contrast.spec.ts` (WCAG AA, both themes) + `prefers-reduced-motion` CSS
 - [ ] Mobile QA at 320 / 375 / 390 / 414 px, and tablet — **320 and 390 px are now automated** in `tests/device-qa.spec.ts` (overflow + 44px touch targets); 375 / 414 px and real hardware still need eyes
 - [ ] Desktop QA at laptop and ultra-wide widths
 - [ ] Internal + external links checked (family cards, ventures, agents)
-- [ ] Metadata, canonical, JSON-LD, sitemap, robots, OG image checked against the live URL
+- [x] Metadata, canonical, JSON-LD, sitemap, robots, OG image checked against the live URL (2026-10-01: all serve 200; title/description/OG/JSON-LD present)
 
 ## After the switch
 

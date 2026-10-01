@@ -214,7 +214,12 @@ test('lightning capacity panel plots snapshots or says so honestly', async ({ pa
   await expect(panel.locator('.live-panel-note')).toContainText(/public, announced network only/i);
   await expect(panel.locator('.live-mini-stat')).toHaveCount(4);
 
-  await expect.poll(async () => (await panel.textContent())?.includes('Reading Lightning snapshots')).toBe(false);
+    await expect
+      .poll(async () => (await panel.textContent())?.includes('Reading Lightning snapshots'), {
+        timeout: 15000,
+        message: 'the lightning panel never finished reading its snapshots',
+      })
+      .toBe(false);
 
   if (await panel.locator('.lightning-chart').count()) {
     await expect(panel.locator('.lightning-chart')).toBeVisible();
@@ -295,9 +300,14 @@ test('sats per dollar panel plots hourly closes or says so honestly', async ({ p
   await expect(cadBtn).toHaveAttribute('aria-pressed', 'false');
   await expect(panel).toContainText('Sats per $1');
 
-  await expect.poll(async () => (await panel.textContent())?.includes('Reading price candles')).toBe(false);
+    await expect
+      .poll(async () => (await panel.textContent())?.includes('Reading price candles'), {
+        timeout: 15000,
+        message: 'the price panel never finished reading its candles',
+              })
+                    .toBe(false);
 
-  if (await panel.locator('.price-chart').count()) {
+                if (await panel.locator('.price-chart').count()) {
     await expect(panel.locator('.price-chart')).toBeVisible();
     await expect(panel).toContainText(/hourly closes/);
     await expect(panel.locator('.live-mini-stat strong').first()).not.toHaveText('—');

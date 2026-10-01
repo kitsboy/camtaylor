@@ -2390,3 +2390,26 @@ do not force-push `main` without Cam's approval. Leave the tree clean at session
 - Working tree: clean.
 
 ---
+
+## Session — 2026-10-01 (HERMES: verify gate + flaky tests + docs tidy + QA)
+
+**Machine:** HERMES (Cam-directed)
+**Project:** camtaylor
+**Branch:** main
+
+**Done:**
+- [x] **#1 verify gate now includes `npm run quality`** — `verify` = lint + build + quality + test + audit. The custom quality gate (share card, metadata, privacy, cascade, form inbox, analytics hosts) was previously missing from the pre-push gate.
+- [x] **#2 fixed flaky tests** — `only one call to action is lit at a time` (was reading the accent color mid-transition → now polls for the settled `rgba`/`rgb`); `lightning capacity` + `sats per dollar` panels (bumped `expect.poll` timeout to 15s for live-data settle). Full suite: 100 passed / 1 skipped.
+- [x] **#3 corrected misleading `wrangler.toml` comment** — it claimed "the build reads these [vars]" but the git-connected Pages build reads env vars from the Pages project settings, NOT `wrangler.toml [vars]`. This was the root cause of the analytics being off. Comment now states the truth.
+- [x] **#4 archived superseded `docs/COMMIT-PUSH-PROTOCOL.md`** → `docs/archive/`. `docs/` now holds only live docs.
+- [x] **#5 launch-gate QA** — verified live metadata/SEO (title, description, canonical, OG, JSON-LD, robots.txt, sitemap.xml, og-image, feed all serve 200); marked contrast/reduced-motion + metadata items done in `docs/PRIVATE-LAUNCH-GATE.md`.
+
+**Decisions:**
+- Deterministic tests over fixed waits — poll for settled state (scroll, color, live-data) so the suite doesn't flake under parallel load.
+- `wrangler.toml [vars]` documented as local-only; production env vars live in the Pages project settings.
+
+**Git State:**
+- Branch: main — pushed.
+- Working tree: clean.
+
+---

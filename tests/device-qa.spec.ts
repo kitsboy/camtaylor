@@ -500,26 +500,40 @@ test('only one call to action is lit at a time', async ({ page }) => {
     }));
 
   // Scrolling down sends the pill away; the bar carries the call.
-  await page.evaluate(async () => {
+  // Poll for the settled state instead of a fixed wait — the scroll handler and the
+  // `data-cta` lane update are async, and a hardcoded 700ms raced the animation under load.
+  await page.evaluate(() => {
     document.documentElement.style.scrollBehavior = 'auto';
     window.scrollTo(0, 4000);
-    await new Promise((r) => setTimeout(r, 700));
   });
+  await expect
+    .poll(async () => (await read()).scrollY, { message: 'the page did not scroll, so this proves nothing' })
+    .toBeGreaterThan(3000);
+  await expect
+    .poll(async () => (await read()).lane, { message: 'the bar never took the call while reading down' })
+    .toBe('bar');
   const down = await read();
-  expect(down.scrollY, 'the page did not scroll, so this proves nothing').toBeGreaterThan(3000);
   expect(down.pillShowing, 'the pill should be away while reading downwards').toBe(false);
-  expect(down.lane).toBe('bar');
-  expect(down.connect, 'the bar should be carrying the call to action').toBe(ACCENT);
+  // The accent is a transition, so it settles to full opacity rather than reading
+  // mid-flight (rgba alpha < 1). Poll for the settled color instead of a one-shot read.
+  await expect
+    .poll(async () => (await read()).connect, { message: 'the bar never carried the accent' })
+    .toBe(ACCENT);
 
   // Scrolling back up is what summons the pill, and the bar stands down.
-  await page.evaluate(async () => {
+  await page.evaluate(() => {
     window.scrollTo(0, 3600);
-    await new Promise((r) => setTimeout(r, 700));
   });
-  const up = await read();
-  expect(up.pillShowing, 'the pill did not appear on scroll-up').toBe(true);
-  expect(up.lane).toBe('pill');
-  expect(up.connect, 'two calls to action lit at once').not.toBe(ACCENT);
+  await expect
+    .poll(async () => (await read()).pillShowing, { message: 'the pill did not appear on scroll-up' })
+    .toBe(true);
+  await expect
+    .poll(async () => (await read()).lane, { message: 'the pill never took the call on scroll-up' })
+    .toBe('pill');
+  // The bar must stand down once the pill takes the call — poll until the accent leaves.
+  await expect
+    .poll(async () => (await read()).connect, { message: 'two calls to action lit at once' })
+    .not.toBe(ACCENT);
 });
 
 /**
