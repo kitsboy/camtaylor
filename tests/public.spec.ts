@@ -6,8 +6,8 @@ import { expect, test } from '@playwright/test';
 
 const FORMSPREE = '**formspree.io/**';
 
-test('no third-party script arrives when no analytics domain is configured', async ({ page }) => {
-  const external = [];
+test('the published build loads the family Umami tracker, and only that one', async ({ page }) => {
+  const external: string[] = [];
   page.on('request', (request) => {
     const url = new URL(request.url());
     if (!url.hostname.endsWith('127.0.0.1') && !['data:', 'blob:'].includes(url.protocol)) {
@@ -16,10 +16,12 @@ test('no third-party script arrives when no analytics domain is configured', asy
   });
   await page.goto('/');
   await page.waitForTimeout(2000);
-  // The data APIs are the site's own readings; an analytics host here would mean the
-  // loader does not respect its own switch.
+  // Umami (analytics.giveabit.io) is the family standard and is now defaulted on for the
+  // public build. Plausible is the other wired provider and must stay off — exactly one
+  // loader, exactly one script, so a pageview is never counted twice.
+  await expect(page.locator('script[data-analytics="umami"]')).toHaveCount(1);
+  expect(external).toContain('analytics.giveabit.io');
   expect(external).not.toContain('plausible.io');
-  await expect(page.locator('script[data-analytics]')).toHaveCount(0);
 });
 
 test('the published build switches the form on and names the monitored inbox', async ({ page }) => {

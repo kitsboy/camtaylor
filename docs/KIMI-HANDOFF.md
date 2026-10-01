@@ -2367,3 +2367,26 @@ do not force-push `main` without Cam's approval. Leave the tree clean at session
 - Working tree: clean.
 
 ---
+
+## Session — 2026-10-01 (HERMES: Umami analytics on — reporting to HQ)
+
+**Machine:** HERMES (Cam-directed)
+**Project:** camtaylor
+**Branch:** main
+
+**Done:**
+- [x] **Turned on Umami analytics (family standard).** Root cause: the git-connected Pages build reads env vars from the Pages project settings, NOT from `wrangler.toml [vars]` — so `VITE_UMAMI_WEBSITE_ID` was empty in production and the runtime-gated loader stayed off (site sent zero data to HQ).
+- [x] **Fix:** defaulted `UMAMI_WEBSITE_ID` in `src/data/site.ts` to the family ID `80ee8493-83f7-44cd-8ad6-f59cf9c0d50f` (already registered in HQ `workers/umami-proxy`). The runtime-gated loader in `src/utils/analytics.ts` now activates it in production — matching sibling sites (giveabit, katoa) while still satisfying the quality gate (not hardcoded in index.html; single loader; CSP allows analytics.giveabit.io).
+- [x] Verified: production build (`VITE_PRIVATE_PREVIEW=false`) bundle `index-B4rsQVyM.js` contains the ID + `analytics.giveabit.io/script.js`; loader sets `data-website-id` and calls `window.umami.track`.
+- [x] Updated `tests/public.spec.ts` — the old test asserted "no third-party script when no analytics domain configured"; now asserts the Umami tracker loads and Plausible stays off.
+- [x] Lint 0 errors · quality gate passes (analytics hosts) · 0 audit vulns · full suite green.
+
+**Decisions:**
+- Umami over Plausible (family standard, self-hosted on THOR → analytics.giveabit.io). HQ already reads camtaylor data (39 visitors/30d in metrics/camtaylor.json); this makes the site actually SEND it.
+- Defaulted in code rather than a Pages env var so it works everywhere without a dashboard action.
+
+**Git State:**
+- Branch: main — pushed.
+- Working tree: clean.
+
+---

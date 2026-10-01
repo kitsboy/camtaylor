@@ -167,4 +167,12 @@ export const FORMSPREE_FORM_ID = import.meta.env.VITE_FORMSPREE_FORM_ID ?? 'xykq
 /** True while the form is pointed at the placeholder endpoint rather than the live one. */
 export const IS_PLACEHOLDER_FORM_ENDPOINT = FORMSPREE_FORM_ID === 'xykqodnk';
 export const PLAUSIBLE_DOMAIN = import.meta.env.VITE_PLAUSIBLE_DOMAIN ?? null;
-export const UMAMI_WEBSITE_ID = import.meta.env.VITE_UMAMI_WEBSITE_ID ?? null;
+/**
+ * The family's self-hosted Umami website ID for camtaylor.ca, registered on THOR and
+ * reverse-proxied to analytics.giveabit.io (see HQ workers/umami-proxy). Defaulted here so
+ * the runtime-gated loader in src/utils/analytics.ts activates it in production without a
+ * Cloudflare Pages env var — the same "always report to HQ" behaviour as the sibling sites.
+ * A VITE_UMAMI_WEBSITE_ID build var still overrides it if ever needed.
+ */
+export const UMAMI_WEBSITE_ID =
+  import.meta.env.VITE_UMAMI_WEBSITE_ID ?? '80ee8493-83f7-44cd-8ad6-f59cf9c0d50f';
