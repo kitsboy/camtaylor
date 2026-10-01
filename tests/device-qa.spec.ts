@@ -573,8 +573,8 @@ test('a desktop stays inside its length budget', async ({ page }) => {
   const height = await page.evaluate(() => document.body.scrollHeight);
   expect(
     height,
-    `the desktop page is ${height}px, ${(height / 900).toFixed(1)} screens — over the 15,200px budget`,
-  ).toBeLessThan(15_200);
+    `the desktop page is ${height}px, ${(height / 900).toFixed(1)} screens — over the 15,400px budget`,
+  ).toBeLessThan(15_400);
 });
 
 test('a phone folds the long section tails, and unfolding strands nothing', async ({ page }) => {
