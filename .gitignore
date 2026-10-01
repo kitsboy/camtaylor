@@ -41,3 +41,6 @@ tmp-*.pid
 # Deployment identity marker — regenerated every build with a build-specific
 # commit sha (prebuild → scripts/generate-static.mjs). Never committed.
 public/build-meta.json
+
+# Machine-local content-hash baseline (re-seeds on fresh clone). Never committed.
+scripts/.content-hashes.json

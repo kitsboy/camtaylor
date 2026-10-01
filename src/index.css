@@ -1896,13 +1896,16 @@ img, video {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   font-size: var(--fs-small);
   color: var(--text-muted);
 }
 
 .legal-footer-links {
   display: flex;
-  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 16px;
 }
 
 .legal-footer-links a {
