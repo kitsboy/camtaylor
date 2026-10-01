@@ -7,10 +7,31 @@
  * fallback when offline) and cache-first only for hashed build assets, which
  * are immutable by name.
  *
+ * Offline-first: the app shell plus the static content routes (dispatches,
+ * field guide, 2026, privacy, terms, wisdom) are precached at install, so a
+ * returning visitor can read the whole site with no connection. Live chain
+ * and market reads are never cached — they are readings, not content.
+ *
  * Bump CACHE when this file changes — activation drops every other cache.
  */
-const CACHE = 'camtaylor-v3';
-const PRECACHE = ['/', '/index.html', '/favicon.svg', '/manifest.json'];
+const CACHE = 'camtaylor-v4';
+const PRECACHE = [
+  '/',
+  '/index.html',
+  '/favicon.svg',
+  '/manifest.json',
+  '/field-guide',
+  '/2026',
+  '/privacy',
+  '/terms',
+  '/wisdom',
+  '/dispatch/why-this-site-was-rebuilt',
+  '/dispatch/sherpa-not-saviour',
+  '/dispatch/nostr-as-a-front-door',
+  '/dispatch/strata-is-a-legal-problem',
+  '/dispatch/syndicate-that-survives-the-descent',
+  '/dispatch/proof-before-promise',
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

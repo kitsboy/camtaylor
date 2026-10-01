@@ -16,6 +16,7 @@ import {
   SHERPA_ASCII,
 } from '../data/commandDeck';
 import { VENTURES } from '../data/ventures';
+import { SITE } from '../data/site';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 
@@ -147,6 +148,14 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose, onNav
             break;
           case 'book':
             newHistory.push({ id: nextLogId(), type: 'output', text: formatBook() });
+            // Booking-aware: open the live calendar so the command is an action,
+            // not just a printed URL. Falls back to the contact form if unset.
+            if (SITE.calendlyUrl) {
+              window.open(SITE.calendlyUrl, '_blank', 'noopener,noreferrer');
+            } else {
+              onClose();
+              onNavigate?.('contact');
+            }
             break;
           case 'nostr':
             newHistory.push({ id: nextLogId(), type: 'output', text: formatNostr() });

@@ -129,7 +129,16 @@ export function formatContact(): string {
 
 export function formatBook(): string {
   if (SITE.calendlyUrl) {
-    return `BOOK A ROUTE CHECK:\n${SITE.calendlyUrl}`;
+    return [
+      'BOOK A ROUTE CHECK:',
+      'A 60-minute route check — deal architecture, capital, or a venture in view.',
+      `Open calendar: ${SITE.calendlyUrl}`,
+      '',
+      'Prefer email?',
+      `  ${SITE.email}`,
+      '  Subject: Route Check — 15 min intro',
+      'Or scroll to Connect and submit the expedition form.',
+    ].join('\n');
   }
   return [
     'BOOK A ROUTE CHECK:',

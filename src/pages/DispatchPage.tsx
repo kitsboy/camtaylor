@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Mountain } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Mountain, Printer } from 'lucide-react';
 import { SiteLayout } from '../components/SiteLayout';
 import { DispatchBody } from '../components/DispatchBody';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -100,6 +100,16 @@ export function DispatchPage() {
             </>
           )}
         </p>
+
+        <button
+          type="button"
+          className="dispatch-print"
+          onClick={() => window.print()}
+          aria-label="Save this dispatch as a PDF"
+        >
+          <Printer size={14} />
+          Save as PDF
+        </button>
 
         <p className="dispatch-summary">{dispatch.summary}</p>
 

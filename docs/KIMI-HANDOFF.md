@@ -2413,3 +2413,25 @@ do not force-push `main` without Cam's approval. Leave the tree clean at session
 - Working tree: clean.
 
 ---
+
+## Session — 2026-10-01 (HERMES: 4 UI features)
+
+**Machine:** HERMES (Cam-directed)
+**Project:** camtaylor
+**Branch:** main
+
+**Done:**
+- [x] **UI#1 Real-time live panels** — `useLiveBitcoinSignal` now opens a WebSocket to mempool.space (`wss://mempool.space/api/v1/ws`) and re-reads the chain the moment a new block is mined. Best-effort with 30s reconnect backoff; the REST poll still runs as fallback. Added `wss://mempool.space` to CSP `connect-src`.
+- [x] **UI#2 Calendar-aware Command Deck** — `/book` now opens the live Calendly calendar in a new tab (an action, not just a printed URL) and falls back to the contact form if unset. `formatBook` copy expanded.
+- [x] **UI#3 Dispatch → PDF** — every dispatch page has a "Save as PDF" button (`window.print()`) with clean print styling (button hidden in print; existing print rules hide nav/footer).
+- [x] **UI#4 Offline-first PWA** — `sw.js` bumped to v4; precaches the app shell + all 6 dispatches + key routes (field-guide, 2026, privacy, terms, wisdom) so a returning visitor can read the whole site offline. Live chain/market reads are never cached (they are readings, not content).
+
+**Decisions:**
+- WebSocket over SSE for live panels — the site is static on Cloudflare Pages (no server to push SSE from); mempool.space's public WS is the right real-time source.
+- Offline-first precaches content routes but never the live readings — honesty rules preserved.
+
+**Git State:**
+- Branch: main — pushed.
+- Working tree: clean.
+
+---

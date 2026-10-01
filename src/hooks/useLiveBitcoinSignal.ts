@@ -138,5 +138,60 @@ export function useLiveBitcoinSignal() {
     void refresh();
   }, [refresh]);
 
+  // Live block push: mempool.space's public WebSocket emits a "blocks" message the
+  // moment a new block is mined. Re-reading on that signal keeps the chain panel
+  // genuinely real-time (a new block every ~10 min) without hammering the REST API.
+  // The socket is best-effort — if it fails or the browser blocks it, the poll above
+  // still runs, so the panel is never worse than it was before.
+  useEffect(() => {
+    if (typeof WebSocket === 'undefined') return;
+    let ws: WebSocket | null = null;
+    let closed = false;
+    let retry: ReturnType<typeof setTimeout> | null = null;
+
+    const connect = () => {
+      try {
+        ws = new WebSocket(LIVE_SIGNAL_SOURCE.ws);
+      } catch {
+        return;
+      }
+      ws.onopen = () => {
+        // Subscribe to new-block events.
+        ws?.send(JSON.stringify({ action: 'want', data: ['blocks'] }));
+      };
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(String(event.data));
+          if (msg && (msg.action === 'blocks' || msg.blocks)) void refresh();
+        } catch {
+          /* non-JSON keepalive — ignore */
+        }
+      };
+      ws.onclose = () => {
+        if (closed) return;
+        // Reconnect with backoff; the socket is a nice-to-have, so never loop hot.
+        retry = setTimeout(connect, 30000);
+      };
+      ws.onerror = () => {
+        try {
+          ws?.close();
+        } catch {
+          /* noop */
+        }
+      };
+    };
+
+    connect();
+    return () => {
+      closed = true;
+      if (retry) clearTimeout(retry);
+      try {
+        ws?.close();
+      } catch {
+        /* noop */
+      }
+    };
+  }, [refresh]);
+
   return { status, blocks, fees, mempool, updatedAt, isStale, refresh };
 }

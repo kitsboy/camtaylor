@@ -15,6 +15,10 @@ export const LIVE_SIGNAL_SOURCE = {
   lightningSeries: 'https://mempool.space/api/v1/lightning/statistics/3m',
   priceCandles: 'https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=3600',
   priceRates: 'https://mempool.space/api/v1/prices',
+  // Live block push — mempool.space exposes a public WebSocket that emits a
+  // "blocks" message the moment a new block is mined. The panels subscribe so
+  // the chain reading updates in real time instead of waiting for the next poll.
+  ws: 'wss://mempool.space/api/v1/ws',
 } as const;
 
 export const PRICE_COPY = {
