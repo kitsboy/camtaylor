@@ -311,6 +311,17 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose, onNav
             ))}
           </div>
 
+          {history.length <= BOOT_LOGS.length && (
+            <div className="terminal-quick-actions" aria-label="Quick actions">
+              <span className="terminal-quick-label">Try:</span>
+              {['/book', '/route giveabit', '/wisdom', '/summit'].map((cmd) => (
+                <button key={cmd} type="button" onClick={() => runCommand(cmd)} className="terminal-quick-pill">
+                  {cmd}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="terminal-input-line">
             <span className="terminal-prompt">{'camtaylor.ca $>'}</span>
             <input

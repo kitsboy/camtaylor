@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Mountain, Printer } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { SiteLayout } from '../components/SiteLayout';
 import { DispatchBody } from '../components/DispatchBody';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -14,6 +15,27 @@ export function DispatchPage() {
   const { slug } = useParams<{ slug: string }>();
   const dispatch = getDispatch(slug);
   const { newer, older } = dispatchNeighbours(slug ?? '');
+  const [progress, setProgress] = useState(0);
+
+  // Reading progress: a thin bar that fills as the reader scrolls through the
+  // article. Long-form feels shorter when the eye can see how far along it is.
+  useEffect(() => {
+    const onScroll = () => {
+      const el = document.getElementById('dispatch-article');
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const total = rect.height - window.innerHeight;
+      if (total <= 0) {
+        setProgress(0);
+        return;
+      }
+      const p = Math.min(1, Math.max(0, -rect.top / total));
+      setProgress(p);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [slug]);
 
   usePageMeta({
     title: dispatch ? dispatch.title : 'Dispatch not found',
@@ -77,7 +99,10 @@ export function DispatchPage() {
 
   return (
     <SiteLayout>
-      <article className="dispatch-page">
+      <div className="dispatch-progress" aria-hidden="true">
+        <span style={{ width: `${progress * 100}%` }} />
+      </div>
+      <article className="dispatch-page" id="dispatch-article">
         <Link to="/#expeditions" className="legal-back">
           <ArrowLeft size={16} />
           <span>Expedition log</span>

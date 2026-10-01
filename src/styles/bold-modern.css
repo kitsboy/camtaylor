@@ -1310,6 +1310,60 @@ body {
 .terminal-toggle-btn:hover,
 .terminal-toggle-btn.active { background: #183239; color: var(--acid); box-shadow: 3px 3px 0 var(--acid); }
 
+.nav-live-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color .2s ease;
+}
+.nav-live-status:hover { color: var(--ink); }
+.nav-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+.nav-live-status--live .nav-live-dot {
+  background: var(--acid);
+  box-shadow: 0 0 0 0 rgba(215, 255, 85, .6);
+  animation: nav-live-pulse 2s infinite;
+}
+.nav-live-status--connecting .nav-live-dot { background: var(--gold); }
+.nav-live-status--stale .nav-live-dot { background: var(--coral); }
+@keyframes nav-live-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(215, 255, 85, .6); }
+  70% { box-shadow: 0 0 0 6px rgba(215, 255, 85, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(215, 255, 85, 0); }
+}
+/* The label is a tooltip on hover; the dot alone carries the status so the
+   masthead never overflows at any width. */
+.nav-live-label { display: none; }
+.nav-live-status:hover .nav-live-label {
+  display: inline;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--acid);
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 5;
+}
+.nav-live-status { position: relative; }
+
 /* ── Hero masthead type ──────────────────────────────────────────────── */
 .hero-shell {
   padding: clamp(26px, 3.2vw, 42px) clamp(22px, 3vw, 38px) clamp(24px, 2.6vw, 34px);
@@ -1401,6 +1455,34 @@ body {
   letter-spacing: .1em;
   text-transform: uppercase;
 }
+
+.hero-deck-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 6px 12px;
+  border: 1px dashed var(--line-bright);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font: 700 var(--fs-2xs)/1 var(--font-heading);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color .2s ease, color .2s ease;
+}
+.hero-deck-hint kbd {
+  padding: 2px 6px;
+  border: 1px solid var(--line-bright);
+  border-radius: 5px;
+  background: var(--bg-elevated);
+  color: var(--ink);
+  font: 700 11px/1 var(--font-heading);
+}
+.hero-deck-hint:hover { border-color: var(--gold); color: var(--gold); }
+[data-theme="night"] .hero-deck-hint { color: #9db1aa; }
+[data-theme="night"] .hero-deck-hint kbd { color: #e8e4d8; background: #0b1418; border-color: #2a3a3f; }
 
 .hero-intelligence-strip {
   gap: 18px;
@@ -1845,6 +1927,22 @@ body {
 [data-theme="night"] .dispatch-print:hover { color: var(--gold); }
 @media print {
   .dispatch-print { display: none !important; }
+}
+.dispatch-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 60;
+  background: transparent;
+  pointer-events: none;
+}
+.dispatch-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--acid), var(--cyan));
+  transition: width .1s linear;
 }
 .dispatch-summary { margin: 18px 0 26px; padding-left: 16px; border-left: 3px solid var(--acid); color: #35443f; font-size: clamp(1rem, 2vw, 1.1rem); line-height: 1.6; }
 

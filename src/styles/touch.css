@@ -77,17 +77,20 @@
 /* ── The floor, applied where a thumb actually is ────────────────────────── */
 @media (max-width: 768px) {
   .family-filter,
-  .venture-filter-btn,
-  .log-filter-btn,
-  .live-quote-btn,
-  .live-refresh,
-  .proof-refresh,
-  .ecosystem-chip,
-  .agents-cta,
-  .footer-hero-cta,
-  .contact-front-door-links a,
-  .venture-case-btn,
-  .venture-link-btn { min-height: var(--touch-min); }
+    .venture-filter-btn,
+    .log-filter-btn,
+    .live-quote-btn,
+    .live-refresh,
+    .proof-refresh,
+    .ecosystem-chip,
+    .agents-cta,
+    .footer-hero-cta,
+    .contact-front-door-links a,
+    .venture-case-btn,
+    .venture-link-btn,
+    .nav-live-status,
+    .hero-deck-hint { min-height: var(--touch-min); }
+  .nav-live-status { min-width: var(--touch-min); }
 
   .live-quote-btn { min-width: var(--touch-min); }
 

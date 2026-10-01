@@ -1,12 +1,10 @@
 # camtaylor — Last Updated 2026-10-01
 
-- **4 UI features shipped:**
-  - Real-time live panels (WebSocket to mempool.space — chain updates on new block)
-  - Calendar-aware Command Deck (`/book` opens Calendly)
-  - Dispatch → PDF export (print-to-PDF button on every dispatch)
-  - Offline-first PWA (sw.js v4 precaches shell + dispatches + key routes)
-- Calendly "Book a route check" is the primary hero CTA.
-- `check:links` added to the verify gate (all 30 external links resolve).
-- Umami analytics ON (reports to HQ); mobile 390px overflow fixed; deps hardened (0 audit vulns).
+- **4 UI improvements shipped:**
+  - Command Deck discoverable (hero ⌘K chip + quick-action pills on open)
+  - Proof section strengthened (verifiable "by the numbers" strip from VENTURES data)
+  - Live route-status pulse in navbar (LIVE/CONNECTING/OFFLINE dot, same hook as hero)
+  - Dispatch reading-progress bar (fills as you scroll)
+- Earlier: 4 UI features (real-time live panels, calendar-aware /book, dispatch→PDF, offline-first PWA); Calendly primary hero CTA; check:links in verify gate; Umami analytics ON.
 
 Commit: see `git log -1`

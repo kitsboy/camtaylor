@@ -1251,6 +1251,34 @@ img, video {
 }
 .terminal-pill:hover { background: var(--green); color: #fff; }
 
+.terminal-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.terminal-quick-label {
+  color: var(--green-light);
+  font-family: var(--font-heading);
+  font-size: var(--fs-micro);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  opacity: .7;
+}
+.terminal-quick-pill {
+  background: rgba(155, 124, 255, 0.12);
+  border: 1px solid rgba(155, 124, 255, 0.35);
+  border-radius: 999px;
+  color: #b9a6ff;
+  padding: 4px 10px;
+  font-family: var(--font-heading);
+  font-size: var(--fs-micro);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.terminal-quick-pill:hover { background: var(--violet); color: #fff; }
+
 .terminal-input-line {
   display: flex;
   align-items: center;

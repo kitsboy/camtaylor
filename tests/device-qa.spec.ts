@@ -627,7 +627,20 @@ test('a phone folds the long section tails, and unfolding strands nothing', asyn
   });
   await page.waitForTimeout(3000);
 
-  const stranded = await folds.evaluateAll((nodes) => {
+    // The price panel's CAD quote button is disabled (dimmed) until the live CAD
+      // rate arrives from mempool.space. On a loaded machine that fetch can outlast
+      // the scroll above, so wait for it to settle before judging whether anything
+      // was stranded — a disabled control is not a broken fold.
+      await expect
+        .poll(
+          async () =>
+            (await page.locator('.live-quote-btn[disabled]').count()) === 0 ||
+            (await page.locator('.live-panel--price').textContent())?.includes('CAD rate unavailable'),
+          { timeout: 15000, message: 'the price panel never settled its quote currency' },
+        )
+        .toBe(true);
+
+      const stranded = await folds.evaluateAll((nodes) => {
     const out: string[] = [];
     // `button` and the live-signal blocks are here because the readings fold
     // holds two instrument panels, and "is the control inside it live" is the

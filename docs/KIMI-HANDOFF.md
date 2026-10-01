@@ -2435,3 +2435,25 @@ do not force-push `main` without Cam's approval. Leave the tree clean at session
 - Working tree: clean.
 
 ---
+
+## Session — 2026-10-01 (HERMES: 4 UI improvements)
+
+**Machine:** HERMES (Cam-directed)
+**Project:** camtaylor
+**Branch:** main
+
+**Done:**
+- [x] **UI#1 Command Deck discoverable** — hero now has a visible "⌘K Open the Command Deck" hint chip; the deck shows quick-action pills (`/book`, `/route giveabit`, `/wisdom`, `/summit`) on first open.
+- [x] **UI#2 Proof section strengthened** — added a verifiable "by the numbers" proof strip (ventures built / live today / markets), computed from the live VENTURES data so it can never drift.
+- [x] **UI#3 Live route-status pulse in navbar** — a small LIVE/CONNECTING/OFFLINE/LAST-GOOD dot + label in the nav-actions, driven by the same useLiveBitcoinSignal hook as the hero (pulsing acid dot when live).
+- [x] **UI#4 Dispatch reading experience** — a thin reading-progress bar at the top of each dispatch that fills as you scroll.
+
+**Decisions:**
+- Proof strip computed from VENTURES data (single source of truth) — "proof before promise" means the numbers are real, not hardcoded.
+- Navbar live status reuses the existing hook — no new data source, just surfaces what the hero already reads.
+
+**Git State:**
+- Branch: main — pushed.
+- Working tree: clean.
+
+---

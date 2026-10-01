@@ -144,6 +144,17 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
           </Link>
         </motion.div>
 
+        <motion.button
+          type="button"
+          className="hero-deck-hint"
+          onClick={onOpenTerminal}
+          variants={itemVariants}
+        >
+          <kbd>⌘K</kbd>
+          <span>Open the Command Deck</span>
+          <Cpu size={12} aria-hidden="true" />
+        </motion.button>
+
         <motion.div className="hero-metrics" variants={itemVariants} ref={metricsRef}>
           {HERO_SIGNALS.metrics.map((metric, idx) => (
             <React.Fragment key={metric.label}>

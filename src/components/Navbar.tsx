@@ -103,6 +103,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           <div className="nav-actions">
+            <a
+              href="#signal"
+              className="nav-live-status nav-live-status--live"
+              aria-label="Live signal — see the readings"
+            >
+              <span className="nav-live-dot" aria-hidden="true" />
+              <span className="nav-live-label">LIVE</span>
+            </a>
+
             <ThemeToggle isNight={isNight} onToggle={onToggleTheme} />
 
             <button

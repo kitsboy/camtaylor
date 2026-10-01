@@ -1,8 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Quote } from 'lucide-react';
+import { Quote, Building2, Activity, MapPin } from 'lucide-react';
 import { TESTIMONIALS } from '../data/testimonials';
+import { VENTURES } from '../data/ventures';
 import { ScrollFade } from './ScrollFade';
+
+// A verifiable proof strip, computed from the live ventures data so it can never
+// drift from what the Ventures section actually shows. "Proof before promise" —
+// the numbers are real, not vibes.
+const liveCount = VENTURES.filter((v) => v.status === 'live').length;
+const totalCount = VENTURES.length;
+const markets = new Set(VENTURES.map((v) => v.tag)).size;
 
 export const Testimonials: React.FC = () => {
   return (
@@ -11,6 +19,24 @@ export const Testimonials: React.FC = () => {
       <div className="section-header">
         <h2 className="section-title text-gradient">SUMMIT JOURNAL</h2>
         <p className="section-subtitle">Notes from founders and partners on the route.</p>
+      </div>
+
+      <div className="proof-strip" aria-label="Proof by the numbers">
+        <div className="proof-stat">
+          <Building2 size={16} aria-hidden="true" />
+          <strong>{totalCount}</strong>
+          <span>ventures built</span>
+        </div>
+        <div className="proof-stat">
+          <Activity size={16} aria-hidden="true" />
+          <strong>{liveCount}</strong>
+          <span>live today</span>
+        </div>
+        <div className="proof-stat">
+          <MapPin size={16} aria-hidden="true" />
+          <strong>{markets}</strong>
+          <span>markets</span>
+        </div>
       </div>
 
       <div className="testimonials-scroll-wrap">
