@@ -10,6 +10,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
+// oxlint-disable-next-line react/only-export-components -- hook + provider co-located; splitting breaks fast-refresh imports
 export function useThemeContext(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
   if (!ctx) throw new Error('useThemeContext must be used within ThemeProvider');
