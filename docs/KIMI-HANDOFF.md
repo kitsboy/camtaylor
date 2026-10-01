@@ -2323,3 +2323,25 @@ do not force-push `main` without Cam's approval. Leave the tree clean at session
 - If your deployment is on THOR rather than Cloudflare Pages, say so plainly in your note — the difference matters, because the repo's `public/_headers`, `_redirects` and `sw.js` only take effect on Cloudflare Pages.
 
 ---
+
+## Session — 2026-10-01 (HERMES: mobile overflow + dependency hardening)
+
+**Machine:** HERMES (Cam-directed)
+**Project:** camtaylor
+**Branch:** sync/live-origin (aligned to live origin/main, HEAD 96d71d5)
+
+**Done:**
+- [x] **Fixed 390px overflow on subpages** — `.legal-footer` was a non-wrapping flex row (5 links, gap 16px) that overflowed to 402px on `/route/giveabit` and `/privacy` at 390px. Added `flex-wrap: wrap` + `justify-content: center` + `gap: 12px 16px` to `.legal-footer-links` and `gap: 12px` to `.legal-footer`. Verified: scrollWidth 402 → 390, no offenders.
+- [x] **Dependency hardening** — `npm audit fix`: react-router 7.18.1→7.18.4 (RSC CSRF bypass GHSA-qwww-vcr4-c8h2), postcss 8.5.16→8.5.28 (source-map path traversal), nanoid→3.3.19. **0 vulnerabilities** (was 4 high).
+- [x] **gitignore** `scripts/.content-hashes.json` (machine-local baseline, per handoff intent — was not actually ignored).
+- [x] Build clean · **100 passed / 1 skipped** Playwright (was 99/1/1) · lint 0 errors.
+
+**Decisions:**
+- Brand is intentionally **"Sherpa"** (`SITE.title = 'Sherpa'`, 19 refs) — NOT a leftover. The 3 "Deal Architect" strings are a venture role, a service name, and the homepage title composed from `SITE.title`. No persona change made.
+- Worked on `sync/live-origin` (byte-identical to live origin/main) and pushed there; did NOT touch `main` (which is force-pushed/rewritten by another agent and 83 commits divergent). Merge to production via PR.
+
+**Git State:**
+- Branch: sync/live-origin — pushed `a0c65f9` (3 files: index.css, package-lock.json, .gitignore).
+- Working tree: clean.
+
+---
