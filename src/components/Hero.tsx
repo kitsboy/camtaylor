@@ -116,15 +116,25 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
         </motion.p>
 
         <motion.div className="hero-actions" variants={itemVariants}>
+          <a
+            href={SITE.calendlyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary"
+          >
+            <span>Book a route check</span>
+            <ArrowRight size={15} />
+          </a>
+
           <button
             onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
-            className="btn-primary"
+            className="btn-secondary"
           >
             <span>See the Route</span>
             <ArrowRight size={15} />
           </button>
 
-          <button onClick={onOpenTerminal} className="btn-secondary">
+          <button onClick={onOpenTerminal} className="btn-secondary btn-ghost">
             <Cpu size={14} />
             <span>Command Deck</span>
           </button>
