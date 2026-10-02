@@ -1,0 +1,79 @@
+{
+  "schema": "gab.product-metrics.v1",
+  "productId": "camtaylor",
+  "name": "Cam Taylor",
+  "updatedAt": "2026-10-02T00:00:00.000Z",
+  "window": {
+    "label": "all",
+    "from": "2025-01-01T00:00:00Z",
+    "to": "2026-10-02T00:00:00Z"
+  },
+  "health": {
+    "status": "green",
+    "message": "Static Vite SPA on Cloudflare Pages (project camtaylor, git integration on main). KPIs are curated counts from the site's own data modules (src/data/*.ts), regenerated on deploy. No live uptime probe on this static origin, so uptimePct24h/latencyMs are omitted rather than reported as null.",
+    "dependencies": [
+      {
+        "id": "site",
+        "status": "green",
+        "detail": "Cloudflare Pages git integration on main — commit+push auto-deploys"
+      },
+      {
+        "id": "contact-form",
+        "status": "green",
+        "detail": "Formspree xpqgopvd (family form -> hello@giveabit.io), button enabled, preview off"
+      },
+      {
+        "id": "umami",
+        "status": "amber",
+        "detail": "Tracking script wired; live pageviews depend on reverse proxy"
+      }
+    ]
+  },
+  "kpis": [
+    {
+      "key": "wisdom_entries",
+      "label": "Wisdom entries",
+      "value": 10,
+      "unit": "entries",
+      "format": "number",
+      "priority": 1,
+      "hint": "Sovereign healthcare wisdom database entries (src/data/wisdom.ts)."
+    },
+    {
+      "key": "services",
+      "label": "Services",
+      "value": 10,
+      "unit": "services",
+      "format": "number",
+      "priority": 2,
+      "hint": "Services offered (src/data/services.ts)."
+    },
+    {
+      "key": "ventures",
+      "label": "Ventures",
+      "value": 18,
+      "unit": "ventures",
+      "format": "number",
+      "priority": 2,
+      "hint": "Ventures tracked (src/data/ventures.ts)."
+    },
+    {
+      "key": "testimonials",
+      "label": "Testimonials",
+      "value": 4,
+      "unit": "testimonials",
+      "format": "number",
+      "priority": 3,
+      "hint": "Testimonials (src/data/testimonials.ts)."
+    },
+    {
+      "key": "waypoints",
+      "label": "Waypoints",
+      "value": 13,
+      "unit": "waypoints",
+      "format": "number",
+      "priority": 3,
+      "hint": "Journey waypoints (src/data/waypoints.ts)."
+    }
+  ]
+}
