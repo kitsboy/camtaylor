@@ -2457,3 +2457,25 @@ do not force-push `main` without Cam's approval. Leave the tree clean at session
 - Working tree: clean.
 
 ---
+
+## Session — 2026-10-01 (HERMES: 4 UI upgrades — dashboard, deep-dive, reading, missions)
+
+**Machine:** HERMES (Cam-directed)
+**Project:** camtaylor
+**Branch:** main
+
+**Done:**
+- [x] **#1 Live route dashboard** — added a real-time dashboard strip to the live-signal section (block height, mempool, fast fee, block age), driven by the same WebSocket/API data as the panels.
+- [x] **#2 Venture case-study deep-dive** — added a "Route so far" milestones timeline to every venture case file (`/route/:id`), with a new `milestones` field in `ventures.ts` (7 ventures) and timeline CSS.
+- [x] **#3 Dispatch reading indicator** — extended the dispatch progress bar with a live "% read" label that fills as you scroll.
+- [x] **#4 Command Deck missions** — added one-tap "Missions" pills (/book, see-a-venture, philosophy, summit) that run command sequences.
+
+**Decisions:**
+- Milestones are honest, dated, non-financial — consistent with the "amounts stay with participants" rule.
+- Dashboard reuses the existing live hook — no new data source.
+
+**Git State:**
+- Branch: main — pushed.
+- Working tree: clean.
+
+---

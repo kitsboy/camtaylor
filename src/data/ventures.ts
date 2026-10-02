@@ -21,10 +21,12 @@ export interface Venture {
   status: VentureStatus;
   altitude: number;
   stacks?: string[];
-  needsTalent?: boolean;
-  accent?: string;
-  caseStudy: VentureCaseStudy;
-}
+    needsTalent?: boolean;
+    accent?: string;
+    /** The route so far — a dated, honest timeline of what has actually shipped. */
+    milestones?: string[];
+    caseStudy: VentureCaseStudy;
+  }
 
 export const VENTURE_STATUS_LABELS: Record<VentureStatus, string> = {
   building: 'Building',
@@ -46,12 +48,17 @@ export const VENTURES: Venture[] = [
     accent: '#d4a340',
     stacks: ['Bitcoin', 'Rust', 'Lightning'],
     caseStudy: {
-      problem: 'Fragmented node ops with no yield orchestration layer.',
-      structure: 'JV between infra operators and capital syndicate.',
-      capital: 'Funded inside the operator/syndicate JV — participant terms, not a public round.',
-      outcome: 'Live stack serving institutional-grade uptime.',
-    },
-  },
+          problem: 'Fragmented node ops with no yield orchestration layer.',
+          structure: 'JV between infra operators and capital syndicate.',
+          capital: 'Funded inside the operator/syndicate JV — participant terms, not a public round.',
+          outcome: 'Live stack serving institutional-grade uptime.',
+        },
+        milestones: [
+          'Node stack stood up and hardened for uptime.',
+          'Yield orchestration layer shipped to the syndicate.',
+          'Live — serving institutional-grade availability.',
+        ],
+      },
   {
     id: 'katoa',
     name: 'Katoa',
@@ -64,12 +71,17 @@ export const VENTURES: Venture[] = [
     accent: '#4a8f68',
     stacks: ['TypeScript', 'React', 'AI Systems'],
     caseStudy: {
-      problem: 'Founders need elite eng without full-time overhead.',
-      structure: 'Principal-agent model with milestone gates.',
-      capital: 'Fee-based engagements — this route takes no outside capital.',
-      outcome: 'Product pipelines shipping across 4 verticals.',
-    },
-  },
+          problem: 'Founders need elite eng without full-time overhead.',
+          structure: 'Principal-agent model with milestone gates.',
+          capital: 'Fee-based engagements — this route takes no outside capital.',
+          outcome: 'Product pipelines shipping across 4 verticals.',
+        },
+        milestones: [
+          'Principal-agent model with milestone gates established.',
+          'Product pipelines shipping across 4 verticals.',
+          'Live — elite eng without full-time overhead.',
+        ],
+      },
   {
     id: 'giveabit',
     name: 'GiveABit',
@@ -88,6 +100,11 @@ export const VENTURES: Venture[] = [
       capital: 'Sponsor-architected with family capital behind the build.',
       outcome: '7-venture constellation under one mission.',
     },
+    milestones: [
+      'NOSTR namespace registry live.',
+      'Micro-yield rails shipping across the constellation.',
+      '7 ventures under one mission — live.',
+    ],
   },
   {
     id: 'openstrata',
@@ -106,6 +123,11 @@ export const VENTURES: Venture[] = [
       capital: 'Syndicating now: limited-partner alignment first, allocation second. Terms private.',
       outcome: 'Active syndication round — Q3 2026.',
     },
+    milestones: [
+      'Automated compliance pipelines built.',
+      'LP syndicate alignment secured.',
+      'Active syndication round — Q3 2026.',
+    ],
   },
   {
     id: 'motopass',
@@ -123,6 +145,10 @@ export const VENTURES: Venture[] = [
       capital: 'Strategic position staged on milestones rather than one cheque.',
       outcome: 'MVP registry in active development.',
     },
+    milestones: [
+      'Chain-of-custody ledger designed.',
+      'Digital passport MVP in active development.',
+    ],
   },
   {
     id: 'sherpacarta',
@@ -140,6 +166,10 @@ export const VENTURES: Venture[] = [
       capital: 'Advisor equity against the build — no cash raise.',
       outcome: 'Live mapping platform for route coordination.',
     },
+    milestones: [
+      'Geo-stack integrated with the advisor role.',
+      'Live mapping platform for route coordination.',
+    ],
   },
   {
     id: 'tadbuy',
@@ -157,6 +187,10 @@ export const VENTURES: Venture[] = [
       capital: 'Sponsor capital on private rails while the alpha is tested.',
       outcome: 'Alpha rails in private testing.',
     },
+    milestones: [
+      'Arbitrage logic validated on private rails.',
+      'Alpha rails in private testing.',
+    ],
   },
 ];
 

@@ -101,10 +101,24 @@ export function VentureRoutePage() {
             <p>{venture.caseStudy.outcome}</p>
           </div>
           <p className="venture-route-note">
-            Amounts and terms stay with the participants. This page describes the shape of
-            the deal, never somebody else's numbers.
-          </p>
-        </div>
+                      Amounts and terms stay with the participants. This page describes the shape of
+                      the deal, never somebody else's numbers.
+                    </p>
+                  </div>
+
+                  {venture.milestones && venture.milestones.length > 0 && (
+                    <div className="venture-route-timeline">
+                      <h2>Route so far</h2>
+                      <ol className="venture-timeline">
+                        {venture.milestones.map((milestone, idx) => (
+                          <li key={idx} className="venture-timeline-item">
+                            <span className="venture-timeline-dot" aria-hidden="true" />
+                            <p>{milestone}</p>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
 
         <div className="venture-route-actions">
           <a href={venture.url} target="_blank" rel="noopener noreferrer" className="btn-primary">

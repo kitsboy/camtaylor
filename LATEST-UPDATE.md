@@ -1,10 +1,10 @@
 # camtaylor — Last Updated 2026-10-01
 
-- **4 UI improvements shipped:**
-  - Command Deck discoverable (hero ⌘K chip + quick-action pills on open)
-  - Proof section strengthened (verifiable "by the numbers" strip from VENTURES data)
-  - Live route-status pulse in navbar (LIVE/CONNECTING/OFFLINE dot, same hook as hero)
-  - Dispatch reading-progress bar (fills as you scroll)
-- Earlier: 4 UI features (real-time live panels, calendar-aware /book, dispatch→PDF, offline-first PWA); Calendly primary hero CTA; check:links in verify gate; Umami analytics ON.
+- **4 UI upgrades shipped:**
+  - Live route dashboard (block height, mempool, fast fee, block age — real-time)
+  - Venture case-study deep-dive ("Route so far" milestones timeline on every /route/:id)
+  - Dispatch "% read" indicator (fills as you scroll)
+  - Command Deck Missions (one-tap sequences: book, see-a-venture, philosophy, summit)
+- Earlier: 4 UI improvements (deck discoverable, proof strip, navbar live dot, dispatch progress); 4 UI features (live panels, calendar /book, dispatch→PDF, offline PWA); Calendly hero CTA; check:links in verify; Umami analytics ON.
 
 Commit: see `git log -1`
