@@ -1250,6 +1250,7 @@ img, video {
   transition: var(--transition-fast);
 }
 .terminal-pill:hover { background: var(--green); color: #fff; }
+.terminal-pill--live { min-height: 44px; min-width: 44px; padding: 10px 12px; }
 
 .terminal-quick-actions {
   display: flex;

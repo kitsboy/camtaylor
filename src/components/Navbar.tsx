@@ -6,6 +6,7 @@ import { useScrollSpy } from '../hooks/useScrollSpy';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { ThemeToggle } from './ThemeToggle';
+import { useSignalChip, type SignalChip } from '../hooks/useSignalChip';
 
 interface NavbarProps {
   onToggleTerminal: () => void;
@@ -19,6 +20,13 @@ const SECTION_IDS = NAV_ITEMS.map((item) => item.id);
 /** Position on the route, 1–12, in ascent order. */
 const ROUTE_INDEX = new Map(WAYPOINTS.map((waypoint, index) => [waypoint.id, index + 1]));
 
+const CHIP_LABEL: Record<SignalChip, string> = {
+  live: 'LIVE',
+  stale: 'LAST GOOD',
+  connecting: 'CONNECTING',
+  offline: 'OFFLINE',
+};
+
 export const Navbar: React.FC<NavbarProps> = ({
   onToggleTerminal,
   isTerminalOpen,
@@ -31,6 +39,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const menuRef = useRef<HTMLDivElement>(null);
   const menuBtnRef = useRef<HTMLButtonElement>(null);
   const touchStartY = useRef(0);
+  const signalChip = useSignalChip();
+  const signalLabel = CHIP_LABEL[signalChip];
 
   useBodyScrollLock(menuOpen);
   useFocusTrap(menuRef, menuOpen);
@@ -105,11 +115,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="nav-actions">
             <a
               href="#signal"
-              className="nav-live-status nav-live-status--live"
-              aria-label="Live signal — see the readings"
+              className={`nav-live-status nav-live-status--${signalChip}`}
+              aria-label={`Signal ${signalLabel}. Open the readings.`}
             >
               <span className="nav-live-dot" aria-hidden="true" />
-              <span className="nav-live-label">LIVE</span>
+              <span className="nav-live-label">{signalLabel}</span>
             </a>
 
             <ThemeToggle isNight={isNight} onToggle={onToggleTheme} />

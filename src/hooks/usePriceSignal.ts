@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { LIVE_SIGNAL_SOURCE } from '../data/liveSignal';
 import { readJson } from '../utils/readJson';
 import { PRICE_READING_MAX_AGE, recallReading, rememberReading } from '../utils/readingsCache';
+import { publishPrice } from '../utils/signalBoard';
 
 export interface PriceSample {
   at: number;
@@ -32,6 +33,7 @@ export function usePriceSignal() {
   const [samples, setSamples] = useState<PriceSample[]>([]);
   const [cadRate, setCadRate] = useState<number | null>(null);
   const [isStale, setIsStale] = useState(false);
+  const [updatedAt, setUpdatedAt] = useState<number | null>(null);
   const mounted = useRef(true);
 
   useEffect(() => {
@@ -69,13 +71,16 @@ export function usePriceSignal() {
       setSamples(next);
       setStatus(next.length > 1 ? 'live' : 'offline');
       setIsStale(false);
-      rememberReading<PriceSample[]>('price', next);
+      const now = Date.now();
+      setUpdatedAt(now);
+      rememberReading<PriceSample[]>('price', next, now);
       return;
     }
 
     const cached = recallReading<PriceSample[]>('price', PRICE_READING_MAX_AGE);
     if (cached && cached.value.length > 1) {
       setSamples(cached.value);
+      setUpdatedAt(cached.at);
       setStatus('live');
       setIsStale(true);
       return;
@@ -84,11 +89,23 @@ export function usePriceSignal() {
     setSamples([]);
     setStatus('offline');
     setIsStale(false);
+    setUpdatedAt(null);
   }, []);
 
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
-  return { status, samples, cadRate, isStale, refresh };
+  useEffect(() => {
+    const latest = samples.length ? samples[samples.length - 1] : null;
+    publishPrice({
+      status,
+      isStale,
+      updatedAt,
+      closeUsd: latest?.close ?? null,
+      satsPerUsd: latest && latest.close > 0 ? 100_000_000 / latest.close : null,
+    });
+  }, [status, isStale, updatedAt, samples]);
+
+  return { status, samples, cadRate, isStale, updatedAt, refresh };
 }

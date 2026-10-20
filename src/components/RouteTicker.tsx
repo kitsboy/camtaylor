@@ -2,6 +2,7 @@ import React from 'react';
 import { Clock, Mountain } from 'lucide-react';
 import { ROUTE_CONDITIONS } from '../data/liveSignal';
 import { usePacificClock } from '../hooks/usePacificClock';
+import { usePageVisible } from '../hooks/usePageVisible';
 
 /**
  * Route conditions band: a low-key marquee of standing conditions plus the
@@ -9,6 +10,7 @@ import { usePacificClock } from '../hooks/usePacificClock';
  */
 export const RouteTicker: React.FC = () => {
   const { shortTime, zone } = usePacificClock(15_000);
+  const visible = usePageVisible();
 
   const track = (
     <div className="route-ticker-track">
@@ -22,7 +24,7 @@ export const RouteTicker: React.FC = () => {
   );
 
   return (
-    <aside className="route-ticker" aria-label="Route conditions">
+    <aside className={`route-ticker${visible ? '' : ' is-paused'}`} aria-label="Route conditions">
       <div className="route-ticker-cap">
         <Mountain size={13} aria-hidden="true" />
         <span className="route-ticker-cap-label">ROUTE CONDITIONS</span>

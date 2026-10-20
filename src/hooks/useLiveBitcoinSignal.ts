@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { LIVE_SIGNAL_SOURCE } from '../data/liveSignal';
 import { readJson } from '../utils/readJson';
 import { BLOCK_READING_MAX_AGE, recallReading, rememberReading } from '../utils/readingsCache';
+import { publishChain } from '../utils/signalBoard';
 
 export interface LiveBlock {
   height: number;
@@ -192,6 +193,19 @@ export function useLiveBitcoinSignal() {
       }
     };
   }, [refresh]);
+
+  useEffect(() => {
+    const tip = blocks.length ? blocks[blocks.length - 1] : null;
+    publishChain({
+      status,
+      isStale,
+      updatedAt,
+      tipHeight: tip?.height ?? null,
+      mempoolCount: mempool?.count ?? null,
+      mempoolVsize: mempool?.vsize ?? null,
+      fastestFee: fees?.fastest ?? null,
+    });
+  }, [status, isStale, updatedAt, blocks, fees, mempool]);
 
   return { status, blocks, fees, mempool, updatedAt, isStale, refresh };
 }

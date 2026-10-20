@@ -9,14 +9,18 @@ import {
   formatHelp,
   formatManifesto,
   formatNostr,
+  formatPriceReading,
   formatRoute,
   formatServices,
+  formatSignal,
+  formatFee,
   formatStatus,
   formatVentures,
   SHERPA_ASCII,
 } from '../data/commandDeck';
 import { VENTURES } from '../data/ventures';
 import { SITE } from '../data/site';
+import { readChain, readPrice } from '../utils/signalBoard';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 
@@ -39,6 +43,7 @@ const BOOT_LOGS: LogEntry[] = [
   { id: nextLogId(), type: 'system', text: 'CAM TAYLOR // SHERPA COMMAND DECK v2.1.0' },
   { id: nextLogId(), type: 'system', text: 'Initializing secure node connection to camtaylor.ca...' },
   { id: nextLogId(), type: 'system', text: 'Connection established. Type "/help" to view available protocols.' },
+  { id: nextLogId(), type: 'system', text: 'Live readings: /signal, /fee, /price. Only what this browser has actually read.' },
   { id: nextLogId(), type: 'system', text: 'Tip: press "/" (or ⌘K) to summon this deck from anywhere.' },
 ];
 
@@ -68,8 +73,8 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose, onNav
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
   }, [isOpen, onClose]);
 
   useEffect(() => {
@@ -109,6 +114,15 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose, onNav
             break;
           case 'status':
             newHistory.push({ id: nextLogId(), type: 'output', text: formatStatus() });
+            break;
+          case 'signal':
+            newHistory.push({ id: nextLogId(), type: 'output', text: formatSignal(readChain()) });
+            break;
+          case 'fee':
+            newHistory.push({ id: nextLogId(), type: 'output', text: formatFee(readChain()) });
+            break;
+          case 'price':
+            newHistory.push({ id: nextLogId(), type: 'output', text: formatPriceReading(readPrice()) });
             break;
           case 'services':
             newHistory.push({ id: nextLogId(), type: 'output', text: 'AREAS OF EXPERTISE:\n' + formatServices() });
@@ -304,8 +318,8 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose, onNav
           </div>
 
           <div className="terminal-pills">
-            {['/status', '/route', '/nostr', '/book', '/field-guide', '/wisdom', '/help'].map((cmd) => (
-              <button key={cmd} type="button" onClick={() => runCommand(cmd)} className="terminal-pill">
+            {['/status', '/signal', '/fee', '/price', '/route', '/book', '/help'].map((cmd) => (
+              <button key={cmd} type="button" onClick={() => runCommand(cmd)} className="terminal-pill terminal-pill--live">
                 {cmd}
               </button>
             ))}

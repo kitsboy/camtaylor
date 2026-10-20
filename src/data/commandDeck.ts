@@ -3,11 +3,15 @@ import { SERVICES } from './services';
 import { SITE } from './site';
 import { VENTURES } from './ventures';
 import { NOSTR_IDENTITIES, NOSTR_JSON_URL } from './nostr';
+import type { ChainSnapshot, PriceSnapshot } from '../utils/signalBoard';
 
 export const COMMANDS = [
   'help',
   'about',
   'status',
+  'signal',
+  'fee',
+  'price',
   'services',
   'ventures',
   'route',
@@ -38,6 +42,9 @@ export function formatHelp(): string {
     'Available Commands:',
     '  /about     - Learn about Cam Taylor',
     '  /status    - Availability & response SLA',
+    '  /signal    - Chain reading this browser has actually received',
+    '  /fee       - Fast fee from that same reading',
+    '  /price     - Latest BTC-USD close and sats per dollar',
     '  /services  - Areas of expertise',
     '  /ventures  - Portfolio and active operations',
     '  /route     - Deep-dive a venture (/route giveabit)',
@@ -76,6 +83,73 @@ export function formatStatus(): string {
     `Response SLA: ${SITE.responseTime}`,
     `Current route: ${SITE.currentRoutes[0]}`,
     'Queue: Open',
+  ].join('\n');
+}
+
+const counts = new Intl.NumberFormat('en-CA', { maximumFractionDigits: 0 });
+const money = new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
+function readStamp(at: number | null, stale: boolean): string {
+  if (at == null) return stale ? 'LAST GOOD, time not recorded' : 'time not recorded';
+  const clock = new Date(at).toLocaleTimeString('en-CA', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'America/Vancouver',
+  });
+  return stale ? `LAST GOOD as of ${clock} PT, not current` : `as of ${clock} PT`;
+}
+
+function unread(label: string): string {
+  return [
+    `${label}:`,
+    'Not read yet from this browser.',
+    'Source: mempool.space. No number until a read lands.',
+  ].join('\n');
+}
+
+export function formatSignal(chain: ChainSnapshot): string {
+  if (chain.tipHeight == null && chain.status !== 'live') {
+    return chain.status === 'offline'
+      ? 'SIGNAL:\nOFFLINE. This browser could not reach mempool.space. No reading to show.'
+      : unread('SIGNAL');
+  }
+  return [
+    `SIGNAL (${readStamp(chain.updatedAt, chain.isStale)}):`,
+    'Source: mempool.space',
+    `Tip height: ${chain.tipHeight != null ? counts.format(chain.tipHeight) : '—'}`,
+    `Mempool txs: ${chain.mempoolCount != null ? counts.format(chain.mempoolCount) : '—'}`,
+    `Pending vB: ${chain.mempoolVsize != null ? counts.format(chain.mempoolVsize) : '—'}`,
+    'Readings, not advice.',
+  ].join('\n');
+}
+
+export function formatFee(chain: ChainSnapshot): string {
+  if (chain.fastestFee == null) {
+    return chain.status === 'offline'
+      ? 'FEE:\nOFFLINE. Fast fee could not be read from mempool.space.'
+      : unread('FEE');
+  }
+  return [
+    `FEE (${readStamp(chain.updatedAt, chain.isStale)}):`,
+    'Source: mempool.space recommended fastest fee',
+    `Fast fee: ${chain.fastestFee} sats/vB`,
+    'A reading, not advice.',
+  ].join('\n');
+}
+
+export function formatPriceReading(price: PriceSnapshot): string {
+  if (price.closeUsd == null || price.satsPerUsd == null) {
+    return price.status === 'offline'
+      ? 'PRICE:\nOFFLINE. Hourly BTC-USD closes could not be read from the Coinbase Exchange public API.'
+      : unread('PRICE').replace('mempool.space', 'Coinbase Exchange');
+  }
+  return [
+    `PRICE (${readStamp(price.updatedAt, price.isStale)}):`,
+    'Source: Coinbase Exchange public API, BTC-USD hourly close',
+    `Latest close: ${money.format(price.closeUsd)}`,
+    `Sats per $1: ${counts.format(price.satsPerUsd)} (100,000,000 divided by that close, nearest sat)`,
+    'One spot reading, not advice.',
   ].join('\n');
 }
 

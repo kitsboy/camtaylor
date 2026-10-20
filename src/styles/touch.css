@@ -167,6 +167,7 @@
   .route-ticker-rail { animation: none !important; }
 
   .glow-orb,
+  .hero-backdrop-aurora,
   .hero-backdrop-motion,
   .hero-backdrop-shimmer,
   .pulse { animation: none !important; }
