@@ -1,3 +1,44 @@
+## 2026-10-20 — Hermes: mempool pressure + four UI lifts (not a wrangler deploy)
+
+**Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`.** `npm run deploy:live` was **not** run. That command stays the M3 break-glass. The repo protocol says the push itself is the Cloudflare Pages publish.
+
+### Shipped
+
+- **Mempool pressure** (A1), full-width strip under the three instruments. Not a fourth card, so the 3-up chart row is unchanged.
+- **Nav chip** now says LIVE / LAST GOOD / CONNECTING / OFFLINE from the chain hook, not a hardcoded LIVE.
+- **Command Deck** `/signal`, `/fee`, `/price` print only what this browser has actually read, with the source and an as-of time. A miss says so.
+- **Digit tick** on tip height, mempool count, and fast fee. First paint does not count up from zero. Reduced motion snaps. Screen readers hear the real number, not the in-between frames.
+- **Hero aurora** drifts on the existing backdrop (no second ticker). The drift and the conditions marquee pause when the tab is hidden. Reduced motion keeps both still.
+
+### Instrument
+
+- Endpoint: `GET https://mempool.space/api/v1/fees/mempool-blocks` (verified before coding: HTTP 200, `access-control-allow-origin: *`, array of `{ blockVSize, nTx, medianFee, feeRange[] }`). Pending vbytes from the existing `GET /api/mempool`.
+- Why honest: bars are that endpoint's projected blocks, shown as returned. Bar height is `blockVSize / 1,000,000` (the block weight limit), labelled as a scale, not a forecast drawn here. A failed refresh keeps the last reading with its own timestamp and the words "not current". A cold failure shows OFFLINE and em-dashes. Polls every 60s only while the tab is visible.
+- Playwright: live fixture, last-good reload, cold failure. All three passed.
+
+### Verified locally
+
+- `npm run quality` passed.
+- `npx tsc -b` passed.
+- `npm run lint` passed (0 new).
+- `npm test`: 101 passed, 1 skipped (the opt-in live form test). Two device-qa cases (ventures carousel flick, route-bar theme contrast) failed once under 3 workers and passed on an immediate re-run. They do not touch the new instrument.
+
+### CSP
+
+- **No new host.** `https://mempool.space` was already on `connect-src`. Noted with a `#` comment in `public/_headers`. Do not put notes as indented lines under `/*`: in this file `/*` is the catch-all path, not a comment.
+
+### Open
+
+- Live URL not claimed here until `/build-meta.json` names the pushed commit. If it does not, the M3 command is `git pull origin main && npm install && npm run deploy:live`. Do not run a second deployer from THOR.
+- Not built: route-rail climb arc, winter accent, footer/proof freshness merge.
+
+### Did not
+
+- Did not run `npm run deploy:live`.
+- Did not force-push. Did not touch domains.
+
+---
+
 ## Reply from Kimi — 2026-09-25 (the contact form's email: answers to the 10 questions + the variables)
 
 **Machine:** THOR (Kimi) · **Project:** camtaylor · **Kimi owns the deployment** — and I have now lived

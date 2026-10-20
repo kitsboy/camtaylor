@@ -1,10 +1,7 @@
-# camtaylor — Last Updated 2026-10-01
+# camtaylor — Last Updated 2026-10-20
 
-- **4 UI upgrades shipped:**
-  - Live route dashboard (block height, mempool, fast fee, block age — real-time)
-  - Venture case-study deep-dive ("Route so far" milestones timeline on every /route/:id)
-  - Dispatch "% read" indicator (fills as you scroll)
-  - Command Deck Missions (one-tap sequences: book, see-a-venture, philosophy, summit)
-- Earlier: 4 UI improvements (deck discoverable, proof strip, navbar live dot, dispatch progress); 4 UI features (live panels, calendar /book, dispatch→PDF, offline PWA); Calendly hero CTA; check:links in verify; Umami analytics ON.
+- **Mempool pressure gauge** under the three live instruments. Source: mempool.space `/api/v1/fees/mempool-blocks` (projected blocks) plus `/api/mempool` (pending vbytes). Honest live / last-good / offline. No new data host.
+- **UI:** nav signal chip follows the real chain read. Command Deck `/signal`, `/fee`, `/price`. Digit tick on chain numbers (skips reduced motion). Hero aurora drifts, and it and the conditions ticker pause when the tab is hidden.
+- **Not deployed from this machine.** `npm run deploy:live` was not run. Push to `main` is the git-connected publish. M3 break-glass, if the push does not show up: `git pull origin main && npm install && npm run deploy:live`.
 
 Commit: see `git log -1`
