@@ -29,7 +29,7 @@
 
 ### Open
 
-- Live URL not claimed here until `/build-meta.json` names the pushed commit. If it does not, the M3 command is `git pull origin main && npm install && npm run deploy:live`. Do not run a second deployer from THOR.
+- Live verified 2026-10-20: `https://camtaylor.ca/build-meta.json`, `www`, and `camtaylor.pages.dev` all name `e6a56da`. The published bundle contains "Mempool pressure". `npm run deploy:live` was still not run. The push was the publish.
 - Not built: route-rail climb arc, winter accent, footer/proof freshness merge.
 
 ### Did not
