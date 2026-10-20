@@ -11,8 +11,11 @@ import {
 import { useLiveBitcoinSignal } from '../hooks/useLiveBitcoinSignal';
 import { useLightningSignal } from '../hooks/useLightningSignal';
 import { usePriceSignal } from '../hooks/usePriceSignal';
+import { useMempoolPressure } from '../hooks/useMempoolPressure';
 import { usePacificClock } from '../hooks/usePacificClock';
 import { SignalChart } from './SignalChart';
+import { MempoolPressure } from './MempoolPressure';
+import { TickReading } from './TickReading';
 import { SectionFold } from './SectionFold';
 import { buildChartSeries } from '../utils/signalChart';
 
@@ -45,6 +48,7 @@ export const LiveSignal: React.FC = () => {
   const { status, blocks, fees, mempool, updatedAt, isStale, refresh } = useLiveBitcoinSignal();
   const lightning = useLightningSignal();
   const price = usePriceSignal();
+  const pressure = useMempoolPressure();
   const [quote, setQuote] = useState<PriceQuote>('USD');
   const { time, now } = usePacificClock();
 
@@ -106,11 +110,11 @@ export const LiveSignal: React.FC = () => {
             <p className="live-subtitle">{LIVE_SIGNAL_COPY.subtitle}</p>
           </div>
           <div
-            className={`live-state live-state--${isStale || lightning.isStale || price.isStale ? 'stale' : status}`}
+            className={`live-state live-state--${isStale || lightning.isStale || price.isStale || pressure.isStale ? 'stale' : status}`}
             aria-live="polite"
           >
             <span className="live-state-dot" aria-hidden="true" />
-            {isStale || lightning.isStale || price.isStale
+            {isStale || lightning.isStale || price.isStale || pressure.isStale
               ? 'LAST GOOD'
               : status === 'live'
                 ? 'LIVE'
@@ -127,13 +131,14 @@ export const LiveSignal: React.FC = () => {
           reading the browser had in hand a minute earlier. The reading is kept, with the
           time it was actually received, and this says which panels are showing it.
         */}
-        {isStale || lightning.isStale || price.isStale ? (
+        {isStale || lightning.isStale || price.isStale || pressure.isStale ? (
           <p className="live-stale" role="status">
             <RefreshCw size={13} aria-hidden="true" />
             {[
               isStale ? 'the chain reading' : null,
               lightning.isStale ? 'Lightning capacity' : null,
               price.isStale ? 'the price series' : null,
+              pressure.isStale ? 'mempool pressure' : null,
             ]
               .filter(Boolean)
               .join(', ')}
@@ -190,18 +195,22 @@ export const LiveSignal: React.FC = () => {
             <div className="live-mini-stats" role="group" aria-label="Chain readings">
               <div className="live-mini-stat live-stat">
                 <span className="live-stat-label">Tip height</span>
-                <strong>{tip ? counts.format(tip.height) : '—'}</strong>
+                <strong>
+                  <TickReading value={tip?.height ?? null} format={(n) => counts.format(n)} />
+                </strong>
                 <small>latest mined block</small>
               </div>
               <div className="live-mini-stat live-stat">
                 <span className="live-stat-label">Mempool</span>
-                <strong>{mempool ? counts.format(mempool.count) : '—'}</strong>
+                <strong>
+                  <TickReading value={mempool?.count ?? null} format={(n) => counts.format(n)} />
+                </strong>
                 <small>transactions waiting</small>
               </div>
               <div className="live-mini-stat live-stat">
                 <span className="live-stat-label">Fast fee</span>
                 <strong>
-                  {fees ? fees.fastest : '—'}
+                  <TickReading value={fees?.fastest ?? null} format={(n) => String(n)} />
                   <i>{fees ? 'sats/vB' : ''}</i>
                 </strong>
                 <small>next-block estimate</small>
@@ -353,6 +362,13 @@ export const LiveSignal: React.FC = () => {
           </SectionFold>
         </div>
 
+        <MempoolPressure
+          status={pressure.status}
+          reading={pressure.reading}
+          updatedAt={pressure.updatedAt}
+          isStale={pressure.isStale}
+        />
+
         {feeTiers.length > 0 && (
           <div className="live-fees" aria-label="Recommended fee tiers in sats per vB">
             {feeTiers.map((tier) => (
@@ -382,6 +398,7 @@ export const LiveSignal: React.FC = () => {
                 void refresh();
                 void lightning.refresh();
                 void price.refresh();
+                void pressure.refresh();
               }}
               disabled={status === 'connecting'}
             >

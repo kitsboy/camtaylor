@@ -559,6 +559,9 @@ test('only one call to action is lit at a time', async ({ page }) => {
  * notice it growing either; this is the ceiling, deliberately loose, so the question is
  * "was this worth a screen?" rather than a target to shave.
  *
+ * 15,800: the mempool pressure strip sits under the three instruments. Measured 15,522
+ * with that strip in place. Still not a new screen.
+ *
  * Where the height actually is, measured by section at 1440: the expedition log 1,669px,
  * ventures 1,522, contact 1,228, services 1,217, the live signal 1,086. It is spread across
  * every section rather than sitting in one place — the same shape the phone page had — and
@@ -573,8 +576,8 @@ test('a desktop stays inside its length budget', async ({ page }) => {
   const height = await page.evaluate(() => document.body.scrollHeight);
   expect(
     height,
-    `the desktop page is ${height}px, ${(height / 900).toFixed(1)} screens — over the 15,400px budget`,
-  ).toBeLessThan(15_400);
+    `the desktop page is ${height}px, ${(height / 900).toFixed(1)} screens — over the 15,800px budget`,
+  ).toBeLessThan(15_800);
 });
 
 test('a phone folds the long section tails, and unfolding strands nothing', async ({ page }) => {

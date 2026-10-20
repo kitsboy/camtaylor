@@ -42,5 +42,7 @@ export function recallReading<T>(key: string, maxAgeMs: number): CachedReading<T
 
 /** Blocks are found every ten minutes; an hour keeps a reading useful without ageing it. */
 export const BLOCK_READING_MAX_AGE = 60 * 60 * 1000;
+/** Pressure moves with every block. Fifteen minutes is the longest a last-good gauge may stand in. */
+export const PRESSURE_READING_MAX_AGE = 15 * 60 * 1000;
 export const PRICE_READING_MAX_AGE = 6 * 60 * 60 * 1000;
 export const LIGHTNING_READING_MAX_AGE = 3 * 24 * 60 * 60 * 1000;

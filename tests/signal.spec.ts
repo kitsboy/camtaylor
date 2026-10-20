@@ -17,6 +17,10 @@ const BLOCKS = Array.from({ length: 15 }, (_, index) => ({
 }));
 const FEES = { fastestFee: 12, halfHourFee: 9, hourFee: 7, economyFee: 4 };
 const MEMPOOL = { count: 60_000, vsize: 50_000_000 };
+const PRESSURE_BLOCKS = [
+  { blockVSize: 900_000, nTx: 2_100, totalFees: 40_000, medianFee: 4.2, feeRange: [1.1, 2, 3, 4.2, 5, 8, 12] },
+  { blockVSize: 700_000, nTx: 1_600, totalFees: 20_000, medianFee: 2.4, feeRange: [1, 1.4, 1.8, 2.4, 3, 4, 7] },
+];
 const LIGHTNING = Array.from({ length: 6 }, (_, index) => ({
   added: 1_750_000_000 + index * 86_400,
   channel_count: 40_000 + index,
@@ -38,6 +42,7 @@ const ROUTES: Array<[string, string]> = [
   ['**/api/v1/blocks', JSON.stringify(BLOCKS)],
   ['**/api/v1/fees/recommended', JSON.stringify(FEES)],
   ['**/api/mempool', JSON.stringify(MEMPOOL)],
+  ['**/api/v1/fees/mempool-blocks', JSON.stringify(PRESSURE_BLOCKS)],
   ['**/api/v1/lightning/statistics/3m', JSON.stringify(LIGHTNING)],
   ['**/candles**', JSON.stringify(CANDLES)],
   ['**/api/v1/prices', JSON.stringify({ USD: 61_500, CAD: 84_000 })],
@@ -90,4 +95,45 @@ test('a cold failure invents nothing and says so', async ({ page }) => {
   await expect(page.locator('.live-stale')).toHaveCount(0);
   await expect(page.locator('.live-offline')).toBeVisible();
   await expect(page.locator('.live-mini-stat', { hasText: 'Tip height' })).toContainText('—');
+});
+
+test('mempool pressure shows the projected blocks it was given', async ({ page }) => {
+  await serveReadings(page);
+  await page.goto('/#signal');
+
+  const panel = page.locator('#signal .pressure');
+  await expect(panel).toBeVisible();
+  await expect(panel.locator('.pressure-state')).toContainText('LIVE');
+  await expect(panel.locator('.pressure-note')).toContainText('mempool.space');
+  await expect(panel.locator('.pressure-note')).toContainText('not advice');
+  await expect(panel.locator('.pressure-tick')).toHaveCount(2);
+  await expect(panel).toContainText('2,100');
+  await expect(panel).toContainText('50,000,000');
+  await expect(panel.locator('.pressure-asof')).toContainText('as of');
+  await expect(panel.locator('.pressure-asof')).not.toContainText('not current');
+});
+
+test('mempool pressure labels a failed refresh as last good, not current', async ({ page }) => {
+  await serveReadings(page);
+  await page.goto('/#signal');
+  await expect(page.locator('.pressure-state')).toContainText('LIVE');
+
+  await failReadings(page);
+  await page.reload();
+
+  await expect(page.locator('.pressure-state')).toContainText('LAST GOOD');
+  await expect(page.locator('.pressure-asof')).toContainText('not current');
+  await expect(page.locator('.pressure')).toContainText('2,100');
+});
+
+test('mempool pressure invents nothing on a cold failure', async ({ page }) => {
+  await failReadings(page);
+  await page.goto('/#signal');
+
+  const panel = page.locator('#signal .pressure');
+  await expect(panel.locator('.pressure-state')).toContainText('OFFLINE');
+  await expect(panel.locator('.pressure-empty')).toBeVisible();
+  await expect(panel.locator('.pressure-tick')).toHaveCount(0);
+  await expect(panel.getByText('2,100')).toHaveCount(0);
+  await expect(panel.locator('.pressure-stats')).toContainText('—');
 });

@@ -12,6 +12,9 @@ export const LIVE_SIGNAL_SOURCE = {
   blocks: 'https://mempool.space/api/v1/blocks',
   fees: 'https://mempool.space/api/v1/fees/recommended',
   mempool: 'https://mempool.space/api/mempool',
+  // Projected next blocks. Same host as the chain readings. Shape verified:
+  // array of { blockVSize, nTx, medianFee, feeRange[] }, CORS *.
+  mempoolBlocks: 'https://mempool.space/api/v1/fees/mempool-blocks',
   lightningSeries: 'https://mempool.space/api/v1/lightning/statistics/3m',
   priceCandles: 'https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=3600',
   priceRates: 'https://mempool.space/api/v1/prices',
@@ -43,6 +46,13 @@ export const LIGHTNING_COPY = {
   note: 'Daily mempool.space Lightning snapshots. Public, announced network only — private and unannounced channels cannot be counted here.',
   empty: 'Lightning snapshots are not available from this browser right now.',
   connecting: 'Reading Lightning snapshots…',
+} as const;
+
+export const PRESSURE_COPY = {
+  title: 'Mempool pressure',
+  connecting: 'Reading projected blocks…',
+  empty: 'Mempool pressure could not be read from this browser.',
+  note: 'Projected next blocks from mempool.space /api/v1/fees/mempool-blocks. Pending vbytes from mempool.space /api/mempool. Shown as returned. Bar height is block vsize divided by 1,000,000 vB, the block weight limit. Not a forecast drawn here. Readings, not advice.',
 } as const;
 
 export const LIVE_SIGNAL_COPY = {
