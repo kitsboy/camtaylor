@@ -1962,6 +1962,10 @@ body {
   .hero-intelligence-strip { order: 7; }
   .hero-video-wrap { order: 8; }
   .hero-metrics { order: 9; }
+  /* The live block pulse is a hero footer chip: on the phone stack it sits
+     AFTER the CTA (default order 0 would float it to the top and push the
+     primary button 23px past the 375×667 fold). */
+  .hero-live-row { order: 10; }
 
   .hero-route-status { padding: 8px 10px; }
 

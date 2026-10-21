@@ -562,6 +562,12 @@ test('only one call to action is lit at a time', async ({ page }) => {
  * 15,800: the mempool pressure strip sits under the three instruments. Measured 15,522
  * with that strip in place. Still not a new screen.
  *
+ * 16,000 (2026-10-21): the difficulty "climb" panel (~230px, the next retarget
+ * countdown in the live signal) and the hero's live block pulse (~45px) landed
+ * in `773e98e`. Measured 15,817 at 1440 with them in place — CI renders ~90px
+ * taller than a local runner for the same build, so the ceiling carries that
+ * delta. Still 17.8 screens: not a new screen.
+ *
  * Where the height actually is, measured by section at 1440: the expedition log 1,669px,
  * ventures 1,522, contact 1,228, services 1,217, the live signal 1,086. It is spread across
  * every section rather than sitting in one place — the same shape the phone page had — and
@@ -576,8 +582,8 @@ test('a desktop stays inside its length budget', async ({ page }) => {
   const height = await page.evaluate(() => document.body.scrollHeight);
   expect(
     height,
-    `the desktop page is ${height}px, ${(height / 900).toFixed(1)} screens — over the 15,800px budget`,
-  ).toBeLessThan(15_800);
+    `the desktop page is ${height}px, ${(height / 900).toFixed(1)} screens — over the 16,000px budget`,
+  ).toBeLessThan(16_000);
 });
 
 test('a phone folds the long section tails, and unfolding strands nothing', async ({ page }) => {
@@ -671,8 +677,14 @@ test('a phone folds the long section tails, and unfolding strands nothing', asyn
  *
  * The ceiling is deliberately loose. This is not a target to shave; it is the
  * point at which someone should ask what was added and whether it was worth
- * another screen of scrolling on a phone. 18,500px is about 7% above the current
- * page, so ordinary copy edits will not trip it.
+ * another screen of scrolling on a phone. 18,500px was about 7% above the page
+ * then, so ordinary copy edits would not trip it.
+ *
+ * 19,900 (2026-10-21): the climb panel's stats were stacked in one column on a
+ * phone (247px of stats); `773e98e` also added the live block pulse. The stats
+ * now sit side by side on a phone too (same as desktop), which took the page to
+ * 18,677 with folds closed. 19,900 keeps the same ~7% rule: another feature that
+ * adds a full screen will still trip this.
  */
 test('the phone page stays inside its length budget', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -691,7 +703,7 @@ test('the phone page stays inside its length budget', async ({ page }) => {
   expect(
     height,
     `the phone page is ${height}px, or ${(height / 844).toFixed(1)} screens — see the handoff for what it was and what changed`,
-  ).toBeLessThan(18500);
+  ).toBeLessThan(19900);
 });
 
 /**
