@@ -25,7 +25,16 @@ The 773e98e batch (nav de-squish, difficulty climb, live block pulse, rail glow)
 ### Did not
 
 - Did not run `npm run deploy:live`. Did not force-push. Did not touch domains.
-- Did not change `aab5d7e`'s design choices (climb note hidden on mobile, tighter padding), copy, data sources, or the honesty clauses.
+- Did not change `aab5d7e`'s design choices
+### Deploy note (15:30 PT)
+
+`0e5779f` was pushed while the Pages build for `aab5d7e` was still in flight,
+and the Pages<->GitHub integration skipped it (no Pages check-run landed on the
+commit; the verify-live-deploy workflow polled the live build-meta for its full
+15 minutes and saw `aab5d7e` throughout). CI for `0e5779f` itself is green
+(build + test). This docs-only touch push re-triggers the integration so the
+tip of main — which contains the repair — gets built and published.
+ (climb note hidden on mobile, tighter padding), copy, data sources, or the honesty clauses.
 
 ---
 
