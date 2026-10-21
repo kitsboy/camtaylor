@@ -1,3 +1,22 @@
+## 2026-10-21 — Hermes: fresh UI batch — nav de-squish, difficulty climb, live block pulse, rail glow (pushed = deployed, verified live)
+
+**Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`.** The push IS the deploy (git-connected Cloudflare Pages, single-deployer rule). Live build-meta now names `773e98e` — verified serving the new bundle. `npm run deploy:live` stays the M3 break-glass.
+
+### Shipped
+- **Nav de-squish:** inline links cut to the 5 core (About, Proof, Signal, Expertise, Connect) — agents/family/kit moved to the existing route sheet + footer, which still carry all 12. Fixes the cramped masthead.
+- **Difficulty "climb" countdown (new realtime):** `DifficultyClimb.tsx` + `useDifficultySignal.ts` — live progress bar + change / blocks-left / est-time to the next difficulty adjustment from mempool.space `/api/v1/difficulty-adjustment` (verified CORS `*`). Honest offline/stale, reduced-motion, 30s poll paused when tab hidden.
+- **Live block pulse (new realtime):** `LiveBlockPulse.tsx` reads the shared signal board (never a second source) — "Latest block <height> · Ns ago" pill in the hero, live-dot pulse. Honest "Reading chain…/Last read" states.
+- **Rail campfire:** active route-rail marker gets a soft double-glow halo (pure CSS, reduced-motion honored).
+- **+2 Playwright tests** (difficulty climb, hero pulse). Full suite: **99 passed / 1 skipped / 0 failed**; quality + lint + build all green.
+
+### CSP
+No new host — difficulty-adjustment is on mempool.space, already allowed in `connect-src`.
+
+### Verify state
+Live camtaylor.ca serves the new bundle (build-meta `773e98e`); deploy-verify workflow reported success.
+
+---
+
 ## 2026-10-20 — Hermes: mempool pressure + four UI lifts (not a wrangler deploy)
 
 **Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`.** `npm run deploy:live` was **not** run. That command stays the M3 break-glass. The repo protocol says the push itself is the Cloudflare Pages publish.
