@@ -5,6 +5,7 @@ import { ArrowRight, Cpu, Activity, Orbit, ShieldCheck, MapPin } from 'lucide-re
 import { SITE, HERO_SIGNALS } from '../data/site';
 import { HeroVideo } from './HeroVideo';
 import { RouteStatusRotator } from './RouteStatusRotator';
+import { LiveBlockPulse } from './LiveBlockPulse';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface HeroProps {
@@ -167,6 +168,10 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
               </div>
             </React.Fragment>
           ))}
+        </motion.div>
+
+        <motion.div className="hero-live-row" variants={itemVariants}>
+          <LiveBlockPulse />
         </motion.div>
       </motion.div>
     </section>

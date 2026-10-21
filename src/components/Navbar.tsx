@@ -99,7 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </a>
 
           <div className="nav-links">
-            {NAV_ITEMS.filter(({ id }) => ['about', 'agents', 'family', 'proof', 'signal', 'services', 'kit', 'contact'].includes(id)).map(({ id, label }) => (
+            {NAV_ITEMS.filter(({ id }) => ['about', 'proof', 'signal', 'services', 'contact'].includes(id)).map(({ id, label }) => (
               <button
                 key={id}
                 type="button"

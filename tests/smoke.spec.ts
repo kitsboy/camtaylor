@@ -232,6 +232,35 @@ test('lightning capacity panel plots snapshots or says so honestly', async ({ pa
   await expect(page.locator('#signal .live-chart')).toHaveCount(1);
 });
 
+test('difficulty climb renders the next-pitch countdown honestly', async ({ page }) => {
+  await page.goto('/');
+  const climb = page.locator('#signal .climb-panel');
+  await expect(climb).toBeVisible();
+  await expect(climb).toContainText('The next pitch');
+  await expect(climb).toContainText(/change|blocks left|est\. time|mempool\.space/i);
+
+  await expect
+    .poll(async () => (await climb.textContent())?.includes('reading…'), {
+      timeout: 15000,
+      message: 'the difficulty panel never left its connecting state',
+    })
+    .toBe(false);
+
+  // Honest: the panel always shows a source note and a refresh control.
+  await expect(climb.locator('.climb-note')).toContainText('mempool.space');
+  await expect(climb.locator('.climb-refresh')).toBeVisible();
+});
+
+test('hero shows a live latest-block pulse from the shared signal board', async ({ page }) => {
+  await page.goto('/');
+  const pulse = page.locator('#hero .block-pulse');
+  await expect(pulse).toBeVisible();
+  // Reads the same board the panels publish — so it either reports a block
+  // height (live read) or the honest "Reading chain…" placeholder, never a
+  // fabricated number.
+  await expect.poll(async () => (await pulse.textContent()) ?? '').toMatch(/Latest block|Last read|Reading chain/);
+});
+
 test('live signal charts share one frame and one reading row', async ({ page }) => {
   await page.goto('/');
   const signal = page.locator('#signal');

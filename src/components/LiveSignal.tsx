@@ -15,6 +15,7 @@ import { useMempoolPressure } from '../hooks/useMempoolPressure';
 import { usePacificClock } from '../hooks/usePacificClock';
 import { SignalChart } from './SignalChart';
 import { MempoolPressure } from './MempoolPressure';
+import { DifficultyClimb } from './DifficultyClimb';
 import { TickReading } from './TickReading';
 import { SectionFold } from './SectionFold';
 import { buildChartSeries } from '../utils/signalChart';
@@ -368,6 +369,8 @@ export const LiveSignal: React.FC = () => {
           updatedAt={pressure.updatedAt}
           isStale={pressure.isStale}
         />
+
+        <DifficultyClimb />
 
         {feeTiers.length > 0 && (
           <div className="live-fees" aria-label="Recommended fee tiers in sats per vB">
