@@ -1,5 +1,6 @@
 import { Mountain, TrendingUp, TrendingDown } from 'lucide-react';
 import { useDifficultySignal } from '../hooks/useDifficultySignal';
+import { useLiveCountdown } from '../hooks/useLiveCountdown';
 
 const whole = new Intl.NumberFormat('en-CA', { maximumFractionDigits: 0 });
 const pct = new Intl.NumberFormat('en-CA', { minimumFractionDigits: 1, maximumFractionDigits: 1, signDisplay: 'always' });
@@ -11,7 +12,8 @@ function formatRemaining(seconds: number | null): string {
   const mins = Math.floor((seconds % 3600) / 60);
   if (days > 0) return `${days}d ${hours}h`;
   if (hours > 0) return `${hours}h ${mins}m`;
-  return `${mins}m`;
+  if (mins > 0) return `${mins}m`;
+  return `${Math.max(0, Math.round(seconds))}s`;
 }
 
 /**
@@ -31,6 +33,13 @@ export function DifficultyClimb() {
     nextRetargetHeight,
     refresh,
   } = useDifficultySignal();
+
+  const now = useLiveCountdown();
+  // A live-ticking estimate: take the API's remaining time, anchored to the
+  // moment the reading landed, and subtract elapsed wall-clock while the tab
+  // is visible. Honest — derived from the real read, never invented.
+  const remainingLive =
+    remainingTime != null && updatedAt != null ? Math.max(0, remainingTime - (now - updatedAt) / 1000) : remainingTime;
 
   const progress = progressPercent != null ? Math.min(100, Math.max(0, progressPercent)) : null;
   const change = difficultyChange != null ? difficultyChange : null;
@@ -72,8 +81,8 @@ export function DifficultyClimb() {
         </div>
         <div className="climb-stat">
           <span className="climb-stat-label">Est. time</span>
-          <strong>{formatRemaining(remainingTime)}</strong>
-          <small>at current pace</small>
+          <strong>{formatRemaining(remainingLive)}</strong>
+          <small>to retarget · live</small>
         </div>
       </div>
 

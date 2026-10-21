@@ -197,20 +197,21 @@ test('reduced motion stops every ambient loop', async ({ page }) => {
 
 /**
  * The default ambient set is a budget, not an accident: one loop per region.
- * These three were the loudest repeats and carry no information.
+ * These three were the loudest repeats and carry no information. The hero's
+ * decorative bars are gone entirely — replaced by the real last-climb ticker —
+ * so the remaining decorative loops (orb, shine) must stay parked.
  */
 test('the decorative loops stay parked by default', async ({ page }) => {
   await page.goto('/');
 
   const parked = await page.evaluate(() => {
-    const bars = document.querySelector('.intelligence-bars span');
     const orb = document.querySelector('.glow-orb-cyan');
     const shine = document.querySelector('.hero-video-shine');
     const name = (el: Element | null) => (el ? getComputedStyle(el).animationName : 'absent');
-    return { bars: name(bars), orb: name(orb), shine: name(shine) };
+    return { orb: name(orb), shine: name(shine) };
   });
 
-  expect(parked).toEqual({ bars: 'none', orb: 'none', shine: 'none' });
+  expect(parked).toEqual({ orb: 'none', shine: 'none' });
 });
 
 /**

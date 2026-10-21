@@ -1,3 +1,17 @@
+## 2026-10-21 — Hermes: last-climb ticker, live ascent countdown, PWA polish (pushed = deployed)
+
+**Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`.** The push IS the deploy (git-connected Cloudflare Pages, single-deployer rule).
+
+### Shipped
+- **Last-climb ticker (hero):** replaced the fabricated decorative bars with a real live ticker reading the shared signal board — Tip / Fast fee / Mempool + a READING/LAST-GOOD state. Honest-by-design: missing fields show "—", never a guess. Zero page-height delta (same slot).
+- **Live ascent countdown (difficulty climb):** the "Est. time" stat now ticks down live, anchored to the real reading's timestamp (subtracts elapsed wall-clock while the tab is visible). Honest — derived from the actual read, never invented.
+- **PWA polish:** manifest now leads with the orange flame icon (was Cam's photo), adds `id`, and sets ink theme/background colors for both themes.
+
+### Tests
++3 Playwright tests (ticker honest state, bars gone, live countdown). Full suite green at CI conditions (1 worker + form env).
+
+---
+
 ## 2026-10-21 — Hermes: CI repair pass — hero CTA fold fix + length budgets re-baselined (lands on the aab5d7e batch)
 
 **Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`.** The push IS the deploy (git-connected Cloudflare Pages, single-deployer rule). `npm run deploy:live` stays the M3 break-glass.

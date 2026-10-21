@@ -7,6 +7,7 @@ import { HeroVideo } from './HeroVideo';
 import { RouteStatusRotator } from './RouteStatusRotator';
 import { LiveBlockPulse } from './LiveBlockPulse';
 import { HeroLiveReadings } from './HeroLiveReadings';
+import { LastClimbTicker } from './LastClimbTicker';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface HeroProps {
@@ -104,11 +105,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
           <HeroVideo />
         </div>          <motion.div className="hero-intelligence-strip" variants={itemVariants} aria-label="Route intelligence">
             <div className="intelligence-label"><Activity size={13} /> {HERO_SIGNALS.intelligenceLabel}</div>
-            <div className="intelligence-bars" aria-hidden="true">
-              {[42, 68, 54, 82, 71, 94, 78, 100, 88, 96, 84, 100].map((height, index) => (
-                <span key={index} style={{ height: `${height}%` }} />
-              ))}
-            </div>
+            <LastClimbTicker />
             <div className="intelligence-value"><Orbit size={13} /> {HERO_SIGNALS.intelligenceValue}</div>
           </motion.div>
 

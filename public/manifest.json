@@ -2,10 +2,11 @@
   "name": "Cam Taylor | Sherpa",
   "short_name": "Sherpa",
   "description": "Deal architecture, capital syndication, and venture operations.",
+  "id": "/",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ddd6cb",
-  "theme_color": "#ddd6cb",
+  "background_color": "#0E1B2A",
+  "theme_color": "#0E1B2A",
   "icons": [
     {
       "src": "/favicon.svg",
@@ -16,13 +17,23 @@
     {
       "src": "/cam-profile.jpg",
       "sizes": "192x192",
-      "type": "image/jpeg",
-      "purpose": "any"
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/cam-profile.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
     },
     {
       "src": "/cam-profile.jpg",
       "sizes": "512x512",
       "type": "image/jpeg",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "maskable"
     }
   ]
