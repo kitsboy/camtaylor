@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { VENTURES, VENTURE_STATUS_LABELS, type Venture, type VentureStatus } from '../data/ventures';
 import { ScrollFade } from './ScrollFade';
+import { VentureLiveDot } from './VentureLiveDot';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 
@@ -236,6 +237,7 @@ export const Ventures: React.FC = () => {
                     <span className={`venture-status venture-status--${vent.status}`}>
                       {VENTURE_STATUS_LABELS[vent.status]}
                     </span>
+                    <VentureLiveDot url={vent.url} />
                     <span className="venture-tag">{vent.tag}</span>
                     {vent.needsTalent && (
                       <span className="venture-talent-badge">Hiring</span>

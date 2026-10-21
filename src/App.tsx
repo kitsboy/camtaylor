@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { HomePage } from './pages/HomePage';
+import { OfflineBanner } from './components/OfflineBanner';
 import { IS_PRIVATE_PREVIEW } from './data/site';
 
 const PrivacyPage = lazy(() =>
@@ -47,6 +48,7 @@ function App() {
               PRIVATE PREVIEW · Not public · Form delivery and analytics disabled
             </div>
           )}
+          <OfflineBanner />
           <Suspense fallback={<PageFallback />}>
             <Routes>
               <Route path="/" element={<HomePage />} />

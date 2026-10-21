@@ -75,15 +75,32 @@ export function formatAbout(): string {
   ].join('\n');
 }
 
-export function formatStatus(): string {
-  return [
+export function formatStatus(chain?: ChainSnapshot, price?: PriceSnapshot): string {
+  const lines = [
     'OPERATIONAL STATUS:',
     'Availability: Accepting new expeditions (2 slots)',
     `Timezone: ${SITE.timezone}`,
     `Response SLA: ${SITE.responseTime}`,
     `Current route: ${SITE.currentRoutes[0]}`,
     'Queue: Open',
-  ].join('\n');
+  ];
+  // Live mission briefing — only when a real reading has landed. Never a
+  // fabricated number: each line is gated on the snapshot actually holding it.
+  if (chain && chain.tipHeight != null) {
+    lines.push('');
+    lines.push('LIVE CHAIN:');
+    lines.push(`  Tip height: ${counts.format(chain.tipHeight)}`);
+    if (chain.mempoolCount != null) lines.push(`  Mempool: ${counts.format(chain.mempoolCount)} txs waiting`);
+    if (chain.fastestFee != null) lines.push(`  Fast fee: ${chain.fastestFee} sats/vB`);
+    if (chain.isStale) lines.push('  (last good — not current)');
+  }
+  if (price && price.closeUsd != null) {
+    lines.push('');
+    lines.push('LIVE PRICE:');
+    lines.push(`  BTC: ${money.format(price.closeUsd)}`);
+    if (price.satsPerUsd != null) lines.push(`  Sats per $1: ${counts.format(price.satsPerUsd)}`);
+  }
+  return lines.join('\n');
 }
 
 const counts = new Intl.NumberFormat('en-CA', { maximumFractionDigits: 0 });

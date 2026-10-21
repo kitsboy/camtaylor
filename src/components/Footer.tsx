@@ -4,6 +4,14 @@ import { Link } from 'react-router-dom';
 import { IS_PRIVATE_PREVIEW, SITE } from '../data/site';
 import { FAMILY_OFFERINGS } from '../data/family';
 import { EcosystemRibbon } from './EcosystemRibbon';
+import { useSignalChip, type SignalChip } from '../hooks/useSignalChip';
+
+const CHIP_LABEL: Record<SignalChip, string> = {
+  live: 'LIVE',
+  stale: 'LAST GOOD',
+  connecting: 'CONNECTING',
+  offline: 'OFFLINE',
+};
 
 interface FooterProps {
   onToggleTerminal: () => void;
@@ -32,6 +40,7 @@ export const Footer: React.FC<FooterProps> = ({ onToggleTerminal }) => {
   const [sitemapOpen, setSitemapOpen] = React.useState(false);
   const [quoteIndex, setQuoteIndex] = React.useState(0);
   const [scrollProgress, setScrollProgress] = React.useState(0);
+  const signalChip = useSignalChip();
   const footerQuotes = ['Hard yet humble, wise yet we can dance.', 'We\'d rather show you old truth than new lies.'];
   React.useEffect(() => {
     const updateProgress = () => {
@@ -78,9 +87,9 @@ export const Footer: React.FC<FooterProps> = ({ onToggleTerminal }) => {
         </div>
 
         <div className="footer-signal-row">
-          <div className="footer-signal">
+          <div className={`footer-signal footer-signal--${signalChip}`}>
             <span className="footer-signal-dot" />{' '}
-            {IS_PRIVATE_PREVIEW ? 'PRIVATE PREVIEW / LOCAL BUILD' : 'PUBLIC / LIVE'}
+            {IS_PRIVATE_PREVIEW ? 'PRIVATE PREVIEW / LOCAL BUILD' : `PUBLIC / ${CHIP_LABEL[signalChip]}`}
           </div>
           <div className="footer-signal-line" />
           <div className="footer-signal"><ShieldCheck size={13} /> PROOF OVER PROMISE</div>

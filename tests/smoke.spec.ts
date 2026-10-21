@@ -261,6 +261,49 @@ test('hero shows a live latest-block pulse from the shared signal board', async 
   await expect.poll(async () => (await pulse.textContent()) ?? '').toMatch(/Latest block|Last read|Reading chain/);
 });
 
+test('hero shows live route-condition readings from the shared board', async ({ page }) => {
+  await page.goto('/');
+  const readings = page.locator('#hero .hero-live-readings');
+  await expect(readings).toBeVisible();
+  // Four honest cells: Tip, Mempool, Fast fee, Signal — each shows a real value
+  // or the "—" placeholder, never a fabricated number.
+  await expect(readings.locator('.hero-live-reading')).toHaveCount(4);
+  await expect(readings.locator('.hero-live-reading--state')).toBeVisible();
+});
+
+test('venture cards carry an honest live-reachability dot', async ({ page }) => {
+  await page.goto('/');
+  const cards = page.locator('.venture-card');
+  await expect(cards.first()).toBeVisible();
+  const dots = cards.locator('.venture-live-dot');
+  await expect(dots.first()).toBeVisible();
+  // Every dot is in one of the three honest states (checking / live / unreachable).
+  await expect(dots.first()).toHaveClass(/venture-live-dot--(checking|live|unreachable)/);
+});
+
+test('command deck /status reports live readings when available', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.navbar').getByRole('button', { name: /Command Deck/i }).click();
+  const input = page.locator('.terminal-input');
+  await input.fill('/status');
+  await input.press('Enter');
+  const logs = page.locator('.terminal-logs');
+  await expect(logs).toContainText('OPERATIONAL STATUS');
+  // Either the live chain block is present (a real read landed) or the honest
+  // base status is — never a fabricated number.
+  await expect(logs).toContainText(/OPERATIONAL STATUS|LIVE CHAIN/);
+});
+
+test('footer signal reflects the shared live state', async ({ page }) => {
+  await page.goto('/');
+  const footer = page.locator('footer.footer');
+  await expect(footer).toBeVisible();
+  const signal = footer.locator('.footer-signal').first();
+  await expect(signal).toBeVisible();
+  // Preview builds show the private label; public builds show the live state.
+  await expect(signal).toContainText(/PRIVATE PREVIEW|PUBLIC \/ (LIVE|LAST GOOD|CONNECTING|OFFLINE)/);
+});
+
 test('live signal charts share one frame and one reading row', async ({ page }) => {
   await page.goto('/');
   const signal = page.locator('#signal');

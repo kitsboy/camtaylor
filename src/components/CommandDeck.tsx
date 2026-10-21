@@ -113,7 +113,7 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose, onNav
             newHistory.push({ id: nextLogId(), type: 'output', text: formatAbout() });
             break;
           case 'status':
-            newHistory.push({ id: nextLogId(), type: 'output', text: formatStatus() });
+            newHistory.push({ id: nextLogId(), type: 'output', text: formatStatus(readChain(), readPrice()) });
             break;
           case 'signal':
             newHistory.push({ id: nextLogId(), type: 'output', text: formatSignal(readChain()) });

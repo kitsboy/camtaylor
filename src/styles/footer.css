@@ -40,6 +40,12 @@
 .footer-signal { display: inline-flex; align-items: center; gap: 6px; color: rgba(255,255,255,.54); font: 700 var(--fs-2xs)/1 var(--font-heading); letter-spacing: .1em; white-space: nowrap; }
 .footer-signal:first-child { color: #d7ff55; }
 .footer-signal-dot { width: 6px; height: 6px; border-radius: 50%; background: #d7ff55; box-shadow: 0 0 9px #d7ff55; }
+.footer-signal--stale { color: #e9d15a; }
+.footer-signal--stale .footer-signal-dot { background: #e9d15a; box-shadow: 0 0 9px #e9d15a; }
+.footer-signal--connecting { color: #9db1aa; }
+.footer-signal--connecting .footer-signal-dot { background: #9db1aa; box-shadow: none; }
+.footer-signal--offline { color: #ff5a36; }
+.footer-signal--offline .footer-signal-dot { background: #ff5a36; box-shadow: 0 0 9px #ff5a36; }
 .footer-signal-line { height: 1px; flex: 1; background: linear-gradient(90deg, rgba(100,230,226,.45), rgba(155,124,255,.45)); }
 .footer-main-grid { display: grid; grid-template-columns: 1.35fr .8fr .9fr 1.45fr; gap: 36px; padding: 48px 0 54px; }
 .footer-brand-block h3 { color: #fff; font: 700 var(--fs-h3)/1 var(--font-heading); }

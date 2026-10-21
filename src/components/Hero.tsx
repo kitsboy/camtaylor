@@ -6,6 +6,7 @@ import { SITE, HERO_SIGNALS } from '../data/site';
 import { HeroVideo } from './HeroVideo';
 import { RouteStatusRotator } from './RouteStatusRotator';
 import { LiveBlockPulse } from './LiveBlockPulse';
+import { HeroLiveReadings } from './HeroLiveReadings';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface HeroProps {
@@ -172,6 +173,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
 
         <motion.div className="hero-live-row" variants={itemVariants}>
           <LiveBlockPulse />
+          <HeroLiveReadings />
         </motion.div>
       </motion.div>
     </section>
