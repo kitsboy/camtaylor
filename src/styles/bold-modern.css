@@ -2888,6 +2888,12 @@ textarea:focus-visible, summary:focus-visible, [role="button"]:focus-visible, [t
 /* Fee strip "≈ sats to send" estimate — added 2026-11-10 */
 .live-block-fees-send { margin: 8px 0 0; color: rgba(255,255,255,.92); font: 700 var(--fs-caption)/1.35 var(--font-body); }
 .live-block-fees-send small { color: rgba(255,255,255,.6); font-weight: 500; font-size: var(--fs-micro); margin-left: 6px; letter-spacing: .02em; }
+.live-share { min-height: 44px; display: inline-flex; align-items: center; gap: 7px; padding: 0 13px; border: 1px solid rgba(215,255,85,.28); border-radius: 999px; background: rgba(215,255,85,.06); color: rgba(244,239,228,.92); font: 700 var(--fs-2xs)/1 var(--font-heading); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; transition: border-color .18s, background .18s, color .18s; }
+.live-share:hover, .live-share:focus-visible { border-color: rgba(215,255,85,.7); background: rgba(215,255,85,.14); }
+.live-share--shared { border-color: rgba(7,205,196,.8); background: rgba(7,205,196,.14); color: #dff5f3; }
+@media (max-width: 760px) { .live-share span { display: none; } .live-share { min-width: 44px; justify-content: center; padding: 0 12px; } }
 
 .hero-ascent-value { color: var(--ink); font-size: clamp(1rem, 1.9vw, 1.22rem); font-weight: 800; letter-spacing: -.012em; line-height: 1.15; font-variant-numeric: tabular-nums; }
 [data-theme="night"] .hero-ascent-value { color: #eef7f2; }
+.hero-ascent--summit .hero-ascent-value { color: var(--coral); }
+[data-theme="night"] .hero-ascent--summit .hero-ascent-value { color: #ff6a4a; }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, Coins, ExternalLink, Loader2, RefreshCw, Zap } from 'lucide-react';
+import { Activity, Coins, ExternalLink, Loader2, RefreshCw, Zap, Share2, Check } from 'lucide-react';
 import {
   LIGHTNING_COPY,
   LIVE_SIGNAL_COPY,
@@ -51,7 +51,24 @@ export const LiveSignal: React.FC = () => {
   const price = usePriceSignal();
   const pressure = useMempoolPressure();
   const [quote, setQuote] = useState<PriceQuote>('USD');
+  const [shared, setShared] = useState(false);
   const { time, now } = usePacificClock();
+
+  const shareBoard = () => {
+    const url = typeof window !== 'undefined' && window.location ? `${window.location.origin}${window.location.pathname}#signal` : 'https://camtaylor.ca/#signal';
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(
+        () => {
+          setShared(true);
+          setTimeout(() => setShared(false), 2000);
+        },
+        () => undefined,
+      );
+    } else {
+      setShared(true);
+      setTimeout(() => setShared(false), 2000);
+    }
+  };
 
   const cadRate = price.cadRate;
   // Falls back to USD whenever the live CAD rate is missing, so a label can
@@ -133,9 +150,18 @@ export const LiveSignal: React.FC = () => {
                 : status === 'connecting'
                   ? 'CONNECTING'
                   : 'OFFLINE'}
-            <small>{time} PT</small>
+              <small>{time} PT</small>
+            </div>
+            <button
+              type="button"
+              className={`live-share${shared ? ' live-share--shared' : ''}`}
+              onClick={shareBoard}
+              aria-live="polite"
+            >
+              {shared ? <Check size={13} aria-hidden="true" /> : <Share2 size={13} aria-hidden="true" />}
+              <span>{shared ? 'Copied' : 'Share the board'}</span>
+            </button>
           </div>
-        </div>
 
         {/*
           A dropped read used to blank the panel and print "offline", which blames the

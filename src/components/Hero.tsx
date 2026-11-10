@@ -168,10 +168,13 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
               </div>
             </React.Fragment>
           ))}
-          <div className="metric-item hero-ascent" title="Your position on the route">
-            <span className="metric-label">Ascent</span>
+          <div
+            className={`metric-item hero-ascent${ascent.position === ascent.total ? ' hero-ascent--summit' : ''}`}
+            title={ascent.position === ascent.total ? 'You are at the summit' : 'Your position on the route'}
+          >
+            <span className="metric-label">{ascent.position === ascent.total ? 'At the top' : 'Ascent'}</span>
             <span className="hero-ascent-value">
-              {ascent.waypoint.camp} · {ascent.position}/{ascent.total}
+              {ascent.position === ascent.total ? 'Summit' : ascent.waypoint.camp} · {ascent.position}/{ascent.total}
             </span>
           </div>
         </motion.div>

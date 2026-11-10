@@ -1,3 +1,12 @@
+## 2026-11-10 — Hermes: ⌘K route commands + live-board share + summit chip (pushed = deployed)
+
+**Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`** — the push IS the deploy (single-deployer).
+
+- **⌘K route commands** — the command deck now accepts `/now` and `/archive` (jump to those pages) and `/signal` jumps to the live board instead of just printing a stale reading. Command list + help text updated in `commandDeck.ts`; `CommandDeck.tsx` gained `case 'now'` / `case 'archive'` (`onClose()` + `navigate`) and `case 'signal'` now calls `onNavigate?.('signal')`.
+- **“Share the board” copy-link button** — in the live signal header, a pill that copies `…/#signal` to the clipboard and flips to “Copied” for 2 s (`Check`/`Share2` icons, `aria-live="polite"`). Falls back silently without clipboard support. New `.live-share` / `.live-share--shared` CSS (44 px min-height touch target; text hides ≤760px leaving a square icon button).
+- **Summit state on the hero ascent chip** — when the reading line is at the final waypoint the chip reads `Summit · 12/12` with a coral accent (`hero-ascent--summit`), instead of repeating the last camp name.
+- Kept: `small{time} PT` clock in the live-state chip (restored — a mid-batch edit had dropped it, and the fix doubled a ternary branch; the double branch was caught by `tsc` as TS2367 and fixed before build).
+
 ## 2026-11-10 — Hermes: indie ascent (top-5) + 3 UI polishes (pushed = deployed)
 
 **Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`** — the push IS the deploy (single-deployer).

@@ -117,6 +117,15 @@ export const CommandDeck: React.FC<CommandDeckProps> = ({ isOpen, onClose, onNav
             break;
           case 'signal':
             newHistory.push({ id: nextLogId(), type: 'output', text: formatSignal(readChain()) });
+            onNavigate?.('signal');
+            break;
+          case 'now':
+            onClose();
+            navigate('/now');
+            break;
+          case 'archive':
+            onClose();
+            navigate('/archive');
             break;
           case 'fee':
             newHistory.push({ id: nextLogId(), type: 'output', text: formatFee(readChain()) });
