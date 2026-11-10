@@ -1,4 +1,5 @@
-import { useState, lazy, Suspense, useCallback } from 'react';
+import { useState, lazy, Suspense, useCallback, useEffect } from 'react';
+import { NAV_ITEMS } from '../data/site';
 import { BackgroundCanvas } from '../components/BackgroundCanvas';
 import { HeroBackdrop } from '../components/HeroBackdrop';
 import { Navbar } from '../components/Navbar';
@@ -53,6 +54,30 @@ export function HomePage() {
   useGoldenHour();
   useHashScroll();
   useCardSpotlight();
+
+  // The long page reads as one ascent; name the tab with the camp you are
+  // standing at, so a shared deep-link keeps context when the reader comes back.
+  useEffect(() => {
+    const ids = NAV_ITEMS.map((item) => item.id);
+    const els = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+    const labels = new Map<string, string>(NAV_ITEMS.map((item) => [item.id, item.label]));
+    if (!('IntersectionObserver' in window) || !els.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const label = labels.get((entry.target as HTMLElement).id);
+            if (label) document.title = `${label} | ${SITE.name} — ${SITE.title}`;
+          }
+        }
+      },
+      { rootMargin: '-45% 0px -50% 0px', threshold: 0 },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
 
   const openTerminal = useCallback(() => setIsTerminalOpen(true), []);
   const toggleTerminal = useCallback(() => setIsTerminalOpen((v) => !v), []);

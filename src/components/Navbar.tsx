@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { Terminal, Menu, X, Bot, ArrowUpRight } from 'lucide-react';
 import { IS_PRIVATE_PREVIEW, NAV_ITEMS, ROUTE_LEGS } from '../data/site';
 import { WAYPOINTS, formatAltitude, getWaypoint } from '../data/waypoints';
@@ -110,6 +111,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {label}
               </button>
             ))}
+            <Link to="/now" className="nav-link nav-link--now">
+              Now
+            </Link>
           </div>
 
           <div className="nav-actions">
@@ -229,6 +233,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               </ol>
             </section>
           ))}
+          <Link to="/now" className="nav-mobile-now" onClick={() => setMenuOpen(false)}>
+            Now
+            <span>route reading</span>
+          </Link>
 
           <div className="nav-mobile-footer">
             <ThemeToggle isNight={isNight} onToggle={onToggleTheme} />

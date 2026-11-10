@@ -56,7 +56,7 @@ function NostrCard({ identity, index }: { identity: (typeof NOSTR_IDENTITIES)[0]
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
     >
-      <img src={identity.avatar} alt={identity.name} className="nostr-avatar" width={64} height={64} />
+      <img src={identity.avatar} alt={identity.name} className="nostr-avatar" width={64} height={64} loading="lazy" decoding="async" />
 
       <div className="nostr-card-body">
         <div className="nostr-card-header">

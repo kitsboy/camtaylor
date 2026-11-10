@@ -2830,3 +2830,28 @@ textarea:focus-visible, summary:focus-visible, [role="button"]:focus-visible, [t
 ::selection { color: var(--ink); background: var(--acid, #d7ff55); }
 
 * { scrollbar-color: rgba(7, 205, 196, .55) rgba(10, 22, 30, .6); }
+
+
+/* ── Now page (route reading) ──────────────────────────────────────────────── */
+.now-content { max-width: 720px; }
+.now-kicker { margin: 0 0 8px; color: var(--coral); font: 800 var(--fs-2xs)/1 var(--font-heading); letter-spacing: .16em; text-transform: uppercase; }
+.now-h { margin: 28px 0 10px; font: 800 1.05rem/1.2 var(--font-heading); color: var(--text-strong); }
+.now-list, .now-ventures, .now-reach { list-style: none; margin: 0 0 8px; padding: 0; }
+.now-list li, .now-reach li { display: flex; align-items: center; gap: 8px; padding: 6px 0; color: var(--text-strong); }
+.now-dot { flex: 0 0 auto; color: var(--acid); }
+.now-reach a { color: var(--acid); font-weight: 700; }
+.now-reach-note { color: var(--text-muted); font-size: var(--fs-micro); letter-spacing: .03em; }
+.now-ventures { display: grid; gap: 10px; margin-top: 6px; }
+.now-venture { display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; background: var(--card-bg, #fff); border: 1px solid var(--line-bright); border-radius: 12px; }
+.now-venture-head { display: flex; align-items: center; gap: 8px; }
+.now-venture-name { font: 800 var(--fs-sm)/1.2 var(--font-heading); color: var(--text-strong); }
+.now-venture-status { padding: 2px 7px; border-radius: 999px; font: 800 var(--fs-micro)/1 var(--font-heading); letter-spacing: .06em; text-transform: uppercase; }
+.now-venture-status--live { color: #081317; background: var(--acid); }
+.now-venture-status--syndicating { color: #081317; background: var(--cyan); }
+.now-venture-status--building { color: #fff; background: var(--violet); }
+.now-venture-url { margin-left: auto; color: var(--cyan); display: inline-flex; }
+.now-venture-role { color: var(--text-muted); font: 600 var(--fs-2xs)/1.2 var(--font-heading); letter-spacing: .04em; }
+.now-venture-desc { color: var(--text-strong); font-size: var(--fs-caption); line-height: 1.5; }
+.now-footnote { margin-top: 22px; color: var(--text-muted); font-size: var(--fs-caption); }
+.nav-mobile-now { display: flex; align-items: baseline; gap: 6px; margin: 4px 0 8px; padding: 8px 10px; color: var(--acid); font: 800 var(--fs-2xs)/1 var(--font-heading); letter-spacing: .1em; text-transform: uppercase; border: 1px solid rgba(215,255,85,.28); border-radius: 9px; background: rgba(215,255,85,.05); }
+.nav-mobile-now span { color: var(--text-muted); font: 500 var(--fs-micro)/1 var(--font-body); letter-spacing: .02em; text-transform: none; }

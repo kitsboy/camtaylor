@@ -106,6 +106,10 @@ export const LiveSignal: React.FC = () => {
     .map((block) => block.medianFee)
     .filter((fee) => fee > 0)
     .slice(-14);
+  // A median fee is usually a whole sats per vB, but a quiet mempool returns a
+  // fraction — a raw float reads as broken (`0.12648… sats/vB`). One decimal.
+  const formatFee = (fee: number) =>
+    new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(fee);
   const blockFeeChart = buildChartSeries(blockFeeSeries, CHART_W, 72);
 
   return (
@@ -374,7 +378,7 @@ export const LiveSignal: React.FC = () => {
           <div className="live-block-fees" aria-label="Median fee per recent block">
             <div className="live-block-fees-head">
               <span>Fee {status === 'live' ? `per block · ${blockFeeSeries.length} blocks` : 'per block'}</span>
-              <strong>{blockFeeSeries.length ? `${blockFeeSeries[blockFeeSeries.length - 1]} sats/vB` : '—'}</strong>
+              <strong>{blockFeeSeries.length ? `${formatFee(blockFeeSeries[blockFeeSeries.length - 1])} sats/vB` : '—'}</strong>
             </div>
             <SignalChart
               values={blockFeeSeries}

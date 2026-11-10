@@ -14,6 +14,9 @@ const TermsPage = lazy(() =>
 const FieldGuidePage = lazy(() =>
   import('./pages/FieldGuidePage').then((m) => ({ default: m.FieldGuidePage })),
 );
+const NowPage = lazy(() =>
+  import('./pages/NowPage').then((m) => ({ default: m.NowPage })),
+);
 const YearReviewPage = lazy(() =>
   import('./pages/YearReviewPage').then((m) => ({ default: m.YearReviewPage })),
 );
@@ -55,6 +58,7 @@ function App() {
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/field-guide" element={<FieldGuidePage />} />
+              <Route path="/now" element={<NowPage />} />
               <Route path="/wisdom" element={<WisdomPage />} />
               <Route path="/2026" element={<YearReviewPage />} />
               <Route path="/route/:ventureId" element={<VentureRoutePage />} />

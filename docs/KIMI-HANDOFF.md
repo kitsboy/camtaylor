@@ -1,3 +1,19 @@
+## 2026-11-10 — Hermes: Now page, fee rounding, JSON-LD WebSite, camp-title scroll-spy, lazy images (pushed = deployed)
+
+**Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`** — the push IS the deploy (single-deployer).
+
+- **#1 Fee rounding** — the fee-per-block strip formats the median fee to one decimal (`0.1 sats/vB` not `0.12648…`); quiet-mempool floats no longer read as broken.
+- **#2 `/now` page** — new route reading station: current focus (mirrors `SITE.currentRoutes`, can't drift) + active ventures (from `VENTURES`, stealth filtered) + reach the desk. Discoverable from the desktop nav ("Now") and the mobile menu; `data/now.ts` + `pages/NowPage.tsx` (usePageMeta + SiteLayout conventions).
+- **#3 JSON-LD** — added a `WebSite` node alongside the existing `Person` in `index.html`.
+- **#5 Camp-title scroll-spy** — on the long homepage the tab title now names the camp you're standing at (IntersectionObserver over the section ids).
+- **#7 Media weight** — lazy+async on the NOSTR avatars (About photo already lazy).
+- **#4 (OG) + #6 (form)** — verified already complete (per-page OG images exist; contact already falls back to a mailto of the whole composed inquiry to the monitored inbox).
+
+### Tests
+`tsc` + `oxlint` + `quality` + full Playwright suite green (107 passed, 0 failed). Two fixes during dev: Navbar brace from the mobile Now link, and a stray brace in the CSS append — both caught and cleaned.
+
+---
+
 ## 2026-11-10 — Hermes: field reports, fee-per-block, PT anchors, copy-route, summit flag, CWV gate, form-endpoint guard, llms hygiene + polish (pushed = deployed)
 
 **Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`.** The push IS the deploy (git-connected Cloudflare Pages, single-deployer rule).
