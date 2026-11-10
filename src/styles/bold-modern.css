@@ -2,7 +2,7 @@
 .section-kicker { margin-bottom: 8px; color: #23675d; font: 700 var(--fs-2xs)/1 var(--font-heading); letter-spacing: .2em; text-transform: uppercase; }
 /* The kicker sits on the dark ink shells too, where the deep teal is unreadable. */
 .agents-shell .section-kicker, .proof-shell .section-kicker { color: #6fbfb2; }
-.family-section, .agents-section, .proof-section { padding: clamp(56px, 9vw, 104px) 0; position: relative; }
+.family-section, .agents-section, .proof-section { padding: clamp(56px, 9vw, 84px) 0; position: relative; }
 .family-header { margin-bottom: 32px; }
 .family-filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin: 0 auto 8px; }
 .family-count { margin-bottom: 16px; color: var(--text-muted); text-align: center; font: 700 var(--fs-2xs)/1 var(--font-heading); letter-spacing: .1em; text-transform: uppercase; }
@@ -689,7 +689,7 @@ body {
 .family-tooltip { z-index: 2; }
 
 /* ── Trail kit / affiliate cards ─────────────────────────────────────── */
-.kit-section { position: relative; padding: clamp(56px, 9vw, 104px) 0; }
+.kit-section { position: relative; padding: clamp(56px, 9vw, 84px) 0; }
 .kit-header { margin-bottom: 18px; }
 .kit-count { margin-bottom: 22px; color: var(--text-muted); text-align: center; font: 700 var(--fs-2xs)/1 var(--font-heading); letter-spacing: .1em; text-transform: uppercase; }
 .kit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(248px, 1fr)); gap: 14px; align-items: stretch; }
@@ -1045,7 +1045,7 @@ body {
 }
 
 /* ── Live signal (Bitcoin route readings) ────────────────────────────── */
-.live-section { position: relative; padding: clamp(56px, 9vw, 104px) 0; }
+.live-section { position: relative; padding: clamp(56px, 9vw, 84px) 0; }
 
 .live-shell {
   position: relative;
@@ -1160,6 +1160,11 @@ body {
 }
 
 .live-mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, .12); }
+.live-block-fees { max-width: 1060px; margin: 12px auto 0; padding: 8px 14px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.13); border-radius: 12px; }
+.live-block-fees-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.live-block-fees-head span { color: rgba(255, 255, 255, .6); font: 700 var(--fs-2xs)/1 var(--font-heading); letter-spacing: .1em; text-transform: uppercase; }
+.live-block-fees-head strong { color: var(--coral); font: 800 .95rem/1 var(--font-heading); font-variant-numeric: tabular-nums; }
+.live-block-fees-chart { display: block; width: 100%; height: 28px; }
 .live-mini-stat { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding-left: 10px; border-left: 1px solid rgba(255, 255, 255, .16); }
 .live-mini-stat strong { color: #fff; font: 700 clamp(.92rem, 1.6vw, 1.15rem)/1.1 var(--font-heading); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .live-mini-stat strong i { margin-left: 5px; color: rgba(255, 255, 255, .55); font: 700 var(--fs-2xs)/1 var(--font-heading); font-style: normal; }
@@ -2129,9 +2134,21 @@ body {
    The log is the part of the site that keeps moving, so it reads as a
    dated timeline rather than a card grid. Entries come from real markdown
    in `src/content/dispatches`; the RSS feed is built from the same files. */
-.expedition-section { position: relative; padding: clamp(56px, 9vw, 104px) 0; }
+.expedition-section { position: relative; padding: clamp(56px, 9vw, 84px) 0; }
 
 .log-filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin: 0 auto 30px; }
+.log-reports { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 1060px; margin: 0 auto 4px; }
+.log-reports-heading { grid-column: 1 / -1; display: flex; align-items: center; gap: 7px; margin-bottom: 2px; color: var(--text-strong); font: 800 var(--fs-2xs)/1 var(--font-heading); letter-spacing: .14em; }
+.log-reports-heading span { color: var(--text-strong); font: 500 var(--fs-micro)/1 var(--font-body); letter-spacing: .02em; text-transform: none; }
+.log-report { display: grid; grid-template-columns: auto 1fr; gap: 8px; padding: 7px; background: var(--card-bg, #fff); border: 1px solid var(--line-bright); border-radius: 12px; box-shadow: 0 2px 8px rgba(16, 23, 19, .06); }
+.log-report-alt { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 46px; padding: 3px 2px; background: var(--ink, #0E1B2A); border-radius: 10px; color: var(--ink, #0E1B2A); font: 800 var(--fs-micro)/1 var(--font-heading); text-align: center; }
+.log-report-alt--summit { color: var(--acid); }
+.log-report-alt--mid { color: var(--cyan); }
+.log-report-alt--base, .log-report-alt--descent { color: var(--coral); }
+.log-report-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.log-report-body strong { font: 800 var(--fs-xs)/1.3 var(--font-heading); color: #14201b; line-height: 1.25; }
+.log-report-body span { color: #3d4a44; font-size: var(--fs-2xs); line-height: 1.4; }
+.log-report-body small { color: #4b5a52; font: 600 var(--fs-micro)/1 var(--font-body); text-transform: uppercase; letter-spacing: .06em; }
 
 .log-filter-btn {
   padding: 7px 12px;
@@ -2409,6 +2426,31 @@ body {
   border-radius: 999px;
   background: linear-gradient(180deg, var(--acid), var(--cyan));
   box-shadow: 0 0 10px rgba(215, 255, 85, .5);
+}
+
+/* The summit flag sits on the rail's summit waypoint and only "plants" once the
+   route actually reaches it — the same scroll position the spine renders. */
+.route-rail-summit {
+  position: absolute;
+  left: 15px;
+  top: 20px;
+  width: 12px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  transform: rotate(-8deg);
+  opacity: .35;
+  filter: grayscale(1);
+  transition: opacity .4s, filter .4s, transform .4s;
+  pointer-events: none;
+}
+.route-rail-summit--reached { opacity: 1; filter: none; transform: rotate(-8deg) translateY(2px); }
+.route-rail-summit-flag {
+  width: 10px;
+  height: 16px;
+  background: linear-gradient(135deg, var(--cyan), var(--acid));
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+  box-shadow: 0 0 8px rgba(215, 255, 85, .6);
 }
 
 .route-rail-label strong { display: block; font: 800 var(--fs-2xs)/1 var(--font-heading); letter-spacing: .08em; }
@@ -2772,4 +2814,19 @@ body {
   .live-section {
     padding: var(--section-pad-mobile) 0;
   }
+  .log-reports { grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
+  .log-report { padding: 10px; }
 }
+/* ── Keyboard + selection polish ─────────────────────────────────────────────
+   One visible focus ring for every control, whatever its own stylesheet does
+   (WCAG 2.4.7). Outlines, not borders, so nothing here changes layout or the
+   length budgets. */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
+textarea:focus-visible, summary:focus-visible, [role="button"]:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+::selection { color: var(--ink); background: var(--acid, #d7ff55); }
+
+* { scrollbar-color: rgba(7, 205, 196, .55) rgba(10, 22, 30, .6); }

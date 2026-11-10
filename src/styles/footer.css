@@ -39,6 +39,7 @@
 .footer-signal-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-top: 1px solid rgba(255,255,255,.12); border-bottom: 1px solid rgba(255,255,255,.12); }
 .footer-signal { display: inline-flex; align-items: center; gap: 6px; color: rgba(255,255,255,.54); font: 700 var(--fs-2xs)/1 var(--font-heading); letter-spacing: .1em; white-space: nowrap; }
 .footer-signal:first-child { color: #d7ff55; }
+.footer-signal--stamp { color: rgba(255,255,255,.66); font-weight: 400; letter-spacing: .04em; text-transform: none; }
 .footer-signal-dot { width: 6px; height: 6px; border-radius: 50%; background: #d7ff55; box-shadow: 0 0 9px #d7ff55; }
 .footer-signal--stale { color: #e9d15a; }
 .footer-signal--stale .footer-signal-dot { background: #e9d15a; box-shadow: 0 0 9px #e9d15a; }
@@ -55,6 +56,10 @@
 .footer-email-cta span { display: inline-flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .footer-email-cta button { display: grid; place-items: center; flex: 0 0 26px; width: 26px; height: 26px; padding: 0; color: #64e6e2; background: transparent; border: 1px solid rgba(100,230,226,.3); border-radius: 5px; cursor: pointer; }
 .footer-email-cta button:hover, .footer-email-cta button:focus-visible { color: #081317; background: #64e6e2; }
+.footer-copy-route { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; margin-top: 10px; padding: 8px 12px; border: 1px solid rgba(255,255,255,.18); border-radius: 8px; background: rgba(255,255,255,.04); color: #d7ff55; font: 700 var(--fs-2xs)/1 var(--font-heading); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: border-color .18s, background .18s, color .18s, transform .12s; }
+
+.footer-copy-route--copied { border-color: #d7ff55; background: rgba(215,255,85,.12); color: #d7ff55; }
+.footer-copy-route:hover { border-color: #d7ff55; background: rgba(215,255,85,.08); }
 .footer-social--large { gap: 9px; margin-top: 14px; }
 .footer-social--large a { width: 38px; height: 38px; display: grid; place-items: center; color: rgba(255,255,255,.54); background: #10262c; border: 1px solid rgba(255,255,255,.12); border-radius: 9px; transition: color .2s, background .2s, border-color .2s, transform .2s; }
 .footer-social--large a:hover, .footer-social--large a:focus-visible { color: #081317; background: #d7ff55; border-color: #d7ff55; transform: translateY(-4px); }

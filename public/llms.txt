@@ -1,7 +1,7 @@
 # Cam Taylor — Sherpa
 > Personal site for deal architecture, capital syndication, and venture operations.
 
-Last updated: 2026-07-15
+Last updated: 2026-11-10
 
 ## Identity
 - Name: Cam Taylor (Cameron Taylor)
@@ -51,6 +51,7 @@ Response time: typically within 48h PT.
 - /terms — Terms of Use
 
 ## Deploy
-Local-first. Planned host: Cloudflare Pages. Not deployed yet.
+Live on Cloudflare Pages — https://camtaylor.ca (main branch; the push IS the deploy).
+RSS: /feed.xml · Machine-readable index: /llms.txt
 
 Part of the Give A Bit family — https://giveabit.io

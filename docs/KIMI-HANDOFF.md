@@ -1,3 +1,27 @@
+## 2026-11-10 — Hermes: field reports, fee-per-block, PT anchors, copy-route, summit flag, CWV gate, form-endpoint guard, llms hygiene + polish (pushed = deployed)
+
+**Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`.** The push IS the deploy (git-connected Cloudflare Pages, single-deployer rule).
+
+### Shipped (user-selected batch 1,4,5,6,7,8,9,10 + polish)
+1. **Field reports (#1)** — expedition log opens with a 3-col "FIELD REPORTS" strip built from the real `EXPEDITION_LOG` archive (altitude badge from `ALTITUDE_LABELS`, outcome line + terrain/date). 1-col on phone.
+2. **Fee-per-block chart (#4)** — ``last 14 blocks`` series from `medianFee` (fee > 0) the existing mempool read already returns; coral `SignalChart` in `.live-block-fees`. No new endpoint, no fabricated data; label states "· 14 blocks".
+3. **Pacific "as of" anchors (#5)** — new shared `useBoardFreshness` hook reads chain `updatedAt` from the signal board, formats to PT; footer shows "last read HH:MM:SS PT". Footer is not a second source of numbers.
+4. **Copy route summary (#6)** — footer button writes a clipboard-only route summary (capability, active ventures + URLs, email/response time) `FAMILY_OFFERINGS`+`SITE`. Zero infra.
+5. **Summit pennant (#7)** — route-rail flag is `aria-hidden`, grayscale until `activeIndex` reaches the last camp; shares the rail's single scroll truth.
+6. **Core Web Vitals (#8)** — hero LCP already eager+`fetchpriority=high`+`aspect-ratio` locked; analytics/Sentry runtime-gated. Global `:focus-visible` ring + `::selection`/scrollbar themed (also part of the polish pass).
+7. **Form-endpoint guard (#9)** — `npm run quality` in a public build now fails closed if the placeholder Formspree ID (`xykqodnk`) or no ID is set, so real launches can't silently drop leads. Real ID stays a one-line Cam step.
+8. **RSS/llms hygiene (#10)** — `feed.xml`/`sitemap.xml` are auto-generated from dispatches at build (can't drift); stale `llms.txt` date + deploy section fixed.
+
+**Polish (self-chosen):** (a) global `:focus-visible` ring on every control (WCAG 2.4.7), (b) footer copy-route gains a real "copied" state (acid border/glow `--copied` class), (c) themed `::selection` + scrollbar.
+
+### Budget
+Measured desktop **16,005 → trimmed my new blocks (reports margin/gap/padding, fee chart 44→36, fee margins) → green <16,000**. Phone **19,042 < 19,900**.
+
+### Tests
+`npm run build` + `oxlint` + `quality` all green. Full Playwright suite (isolated config, 1 worker, form env) green — desktop + phone length budgets pass.
+
+---
+
 ## 2026-10-21 — Hermes: last-climb ticker, live ascent countdown, PWA polish (pushed = deployed)
 
 **Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`.** The push IS the deploy (git-connected Cloudflare Pages, single-deployer rule).

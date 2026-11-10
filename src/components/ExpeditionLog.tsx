@@ -1,12 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Flag, Mountain, Rss } from 'lucide-react';
+import { ArrowRight, Flag, Mountain, Rss, FileText, TrendingUp, AlertTriangle } from 'lucide-react';
 import {
   DISPATCHES,
   formatDispatchDate,
   formatDispatchMonth,
 } from '../utils/dispatches';
+import { EXPEDITION_LOG, ALTITUDE_LABELS } from '../data/expeditionLog';
 import { SectionFold } from './SectionFold';
 
 const TERRAINS = [...new Set(DISPATCHES.map((entry) => entry.terrain))];
@@ -37,6 +38,25 @@ export const ExpeditionLog: React.FC = () => {
           Real routes, real terrain, written when they happened.
         </p>
       </div>
+
+      {EXPEDITION_LOG.length > 0 && (
+        <div className="log-reports" role="list" aria-label="Field reports">
+          <h3 className="log-reports-heading"><FileText size={12} /> FIELD REPORTS <span>outcome-focused, from the route archive</span></h3>
+          {EXPEDITION_LOG.slice(0, 3).map((entry) => (
+            <article className="log-report" role="listitem" key={entry.id}>
+              <span className={`log-report-alt log-report-alt--${entry.altitude}`}>
+                {entry.altitude === 'summit' ? <TrendingUp size={12} /> : <AlertTriangle size={12} />}
+                {ALTITUDE_LABELS[entry.altitude]}
+              </span>
+              <div className="log-report-body">
+                <strong>{entry.title}</strong>
+                <span>{entry.outcome}</span>
+                <small>{entry.terrain} · {entry.date}</small>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
 
       {TERRAINS.length > 1 && (
         <div className="log-filters" role="group" aria-label="Filter dispatches by terrain">

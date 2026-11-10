@@ -26,6 +26,17 @@ export const RouteRail: React.FC = () => {
         aria-hidden="true"
         style={{ height: `calc((100% - 32px) * ${progress.toFixed(3)})` }}
       />
+      {/* The summit flag: it reads the same scroll position as the spine, and
+          only "plants" (fills its pennant) once the route actually reaches the
+          summit waypoint — it cannot be planted early, because it shares the
+          one source of truth for how far up the route you are. */}
+      <span
+        className={`route-rail-summit${activeIndex === NAV_ITEMS.length - 1 ? ' route-rail-summit--reached' : ''}`}
+        aria-hidden="true"
+        role="presentation"
+      >
+        <span className="route-rail-summit-flag" />
+      </span>
 
       {NAV_ITEMS.map(({ id, label }, index) => {
         const waypoint = getWaypoint(id);

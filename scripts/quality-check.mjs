@@ -292,6 +292,24 @@ if (!analyticsHosts.length) {
   }
 }
 
+// ── The contact form must never ship a corpse ───────────────────────────────────
+// `xykqodnk` is the template's placeholder: a form posting to it accepts a
+// visitor's message and delivers it nowhere — the reading stays green because
+// the POST itself succeeded. A *public* build (preview disabled) must not go out
+// pointing at it. A missing `VITE_FORMSPREE_FORM_ID` on the deployer's side was
+// exactly how the placeholder leaked into production once; the replied check below
+// closes that: in public mode the placeholder or an unset ID is a hard failure, so
+// the only way to publish a working form is to name a real endpoint.
+const isPreview = process.env.VITE_PRIVATE_PREVIEW !== 'false';
+const formId = process.env.VITE_FORMSPREE_FORM_ID ?? 'xykqodnk';
+if (!isPreview) {
+  if (!process.env.VITE_FORMSPREE_FORM_ID) {
+    failures.push('BUILD FAILS: this is a public build but VITE_FORMSPREE_FORM_ID is unset — the contact form would post to the placeholder and drop every lead. Set the live ID (or run a private preview).');
+  } else if (formId === 'xykqodnk') {
+    failures.push('BUILD FAILS: VITE_FORMSPREE_FORM_ID is still the template placeholder — the contact form would drop every lead. Set the live Formspree ID before publishing.');
+  }
+}
+
 if (failures.length) {
   console.error(failures.map((failure) => `✗ ${failure}`).join('\n'));
   process.exit(1);

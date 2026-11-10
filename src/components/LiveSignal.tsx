@@ -100,6 +100,13 @@ export const LiveSignal: React.FC = () => {
       ]
     : [];
   const feeMax = feeTiers.reduce((high, tier) => Math.max(high, tier.value), 0) || 1;
+  // Median fee paid per recent block — a real series from the same read that
+  // plots the block chart, so fee pressure shows as a line, not just a bar.
+  const blockFeeSeries = blocks
+    .map((block) => block.medianFee)
+    .filter((fee) => fee > 0)
+    .slice(-14);
+  const blockFeeChart = buildChartSeries(blockFeeSeries, CHART_W, 72);
 
   return (
     <section className="live-section" id="signal">
@@ -362,6 +369,22 @@ export const LiveSignal: React.FC = () => {
           </div>
           </SectionFold>
         </div>
+
+        {blockFeeChart && (
+          <div className="live-block-fees" aria-label="Median fee per recent block">
+            <div className="live-block-fees-head">
+              <span>Fee {status === 'live' ? `per block · ${blockFeeSeries.length} blocks` : 'per block'}</span>
+              <strong>{blockFeeSeries.length ? `${blockFeeSeries[blockFeeSeries.length - 1]} sats/vB` : '—'}</strong>
+            </div>
+            <SignalChart
+              values={blockFeeSeries}
+              label={`Median fee paid per recent Bitcoin block (sats/vB)`}
+              gradientId="block-fee-chart-fill"
+              accent="#ff3d0f"
+              svgClassName="live-block-fees-chart"
+            />
+          </div>
+        )}
 
         <MempoolPressure
           status={pressure.status}

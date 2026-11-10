@@ -1,10 +1,11 @@
 import React from 'react';
-import { ArrowUp, ArrowUpRight, Bot, Compass, Gauge, Mail, ShieldCheck, Terminal, Copy, Check, ExternalLink, Heart, KeyRound, Sparkles, ChevronDown } from 'lucide-react';
+import { ArrowUp, ArrowUpRight, Bot, Compass, Gauge, Mail, ShieldCheck, Terminal, Copy, Check, ExternalLink, Heart, KeyRound, Sparkles, ChevronDown, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { IS_PRIVATE_PREVIEW, SITE } from '../data/site';
 import { FAMILY_OFFERINGS } from '../data/family';
 import { EcosystemRibbon } from './EcosystemRibbon';
 import { useSignalChip, type SignalChip } from '../hooks/useSignalChip';
+import { useBoardFreshness } from '../hooks/useBoardFreshness';
 
 const CHIP_LABEL: Record<SignalChip, string> = {
   live: 'LIVE',
@@ -41,6 +42,7 @@ export const Footer: React.FC<FooterProps> = ({ onToggleTerminal }) => {
   const [quoteIndex, setQuoteIndex] = React.useState(0);
   const [scrollProgress, setScrollProgress] = React.useState(0);
   const signalChip = useSignalChip();
+  const { lastReadPt } = useBoardFreshness();
   const footerQuotes = ['Hard yet humble, wise yet we can dance.', 'We\'d rather show you old truth than new lies.'];
   React.useEffect(() => {
     const updateProgress = () => {
@@ -61,6 +63,22 @@ export const Footer: React.FC<FooterProps> = ({ onToggleTerminal }) => {
     await navigator.clipboard?.writeText(SITE.familyEmail);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
+  };
+
+  const [routeCopied, setRouteCopied] = React.useState(false);
+  const copyRoute = async () => {
+    const lines = [
+      `Cam Taylor — Sherpa`,
+      `Deal architecture, capital syndication, venture operations. British Columbia, Pacific Time.`,
+      ``,
+      `Active ventures:`,
+      ...FAMILY_OFFERINGS.map((offering) => `  − ${offering.name} (${offering.label}) — ${offering.url}`),
+      ``,
+      `Reach the desk: ${SITE.familyEmail} · ${SITE.responseTime}. Route details at ${SITE.url}`,
+    ];
+    await navigator.clipboard?.writeText(lines.join('\n'));
+    setRouteCopied(true);
+    window.setTimeout(() => setRouteCopied(false), 1800);
   };
 
   return (
@@ -93,6 +111,7 @@ export const Footer: React.FC<FooterProps> = ({ onToggleTerminal }) => {
           </div>
           <div className="footer-signal-line" />
           <div className="footer-signal"><ShieldCheck size={13} /> PROOF OVER PROMISE</div>
+          <div className="footer-signal footer-signal--stamp"><Clock size={13} /> last read {lastReadPt} PT</div>
         </div>
 
         <div className="footer-main-grid">
@@ -105,6 +124,10 @@ export const Footer: React.FC<FooterProps> = ({ onToggleTerminal }) => {
                 {copied ? <Check size={13} /> : <Copy size={13} />}
               </button>
             </div>
+            <button type="button" className={`footer-copy-route${routeCopied ? ' footer-copy-route--copied' : ''}`} onClick={copyRoute} aria-label={routeCopied ? 'Route copied' : 'Copy the full route summary'}>
+              {routeCopied ? <Check size={13} /> : <Compass size={13} />}
+              {routeCopied ? 'Route copied' : 'Copy route summary'}
+            </button>
             <div className="footer-social footer-social--large" aria-label="Social links">
               <a href={SITE.social.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub"><GitHubIcon /></a>
               <a href={SITE.social.x} target="_blank" rel="noopener noreferrer" aria-label="X" title="X"><XIcon /></a>
