@@ -20,7 +20,7 @@ const markets = new Set(VENTURES.map((v) => v.tag)).size;
  */
 export const Testimonials: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const shown = open ? TESTIMONIALS : TESTIMONIALS.slice(0, 1);
+  const shown = open ? TESTIMONIALS : [];
 
   return (
     <section className="testimonials-section" id="testimonials">
@@ -79,7 +79,7 @@ export const Testimonials: React.FC = () => {
           aria-expanded={open}
         >
           <ChevronDown size={14} aria-hidden="true" />
-          {open ? 'A quieter route' : `${TESTIMONIALS.length - shown.length} more notes · tap to read`}
+          {open ? 'A quieter route' : `Read the notes · ${TESTIMONIALS.length} voices`}
         </button>
       </div>
     </section>
