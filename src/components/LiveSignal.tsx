@@ -387,6 +387,12 @@ export const LiveSignal: React.FC = () => {
               accent="#ff3d0f"
               svgClassName="live-block-fees-chart"
             />
+            {blockFeeSeries.length > 0 && (
+              <p className="live-block-fees-send">
+                ≈ {satsFormat.format(blockFeeSeries[blockFeeSeries.length - 1] * 140)} sats to send BTC
+                <small>economy fee × ~140 vB standard taproot · mempool.space</small>
+              </p>
+            )}
           </div>
         )}
 

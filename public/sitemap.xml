@@ -12,6 +12,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://camtaylor.ca/now</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://camtaylor.ca/archive</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://camtaylor.ca/2026</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

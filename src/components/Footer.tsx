@@ -192,6 +192,8 @@ export const Footer: React.FC<FooterProps> = ({ onToggleTerminal }) => {
           <div className="footer-links">
             <Link to="/privacy" className="footer-legal-link">Privacy</Link>
             <Link to="/terms" className="footer-legal-link">Terms</Link>
+            <Link to="/now" className="footer-legal-link">Now</Link>
+            <Link to="/archive" className="footer-legal-link">Archive</Link>
             <button onClick={onToggleTerminal} className="footer-terminal-link"><Terminal size={12} /> <span>Command Deck</span></button>
             <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="back-to-top back-to-top--progress" aria-label="Back to top" style={{ '--scroll-progress': `${scrollProgress}%` } as React.CSSProperties}><ArrowUp size={14} /></button>
           </div>

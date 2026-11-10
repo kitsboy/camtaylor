@@ -94,6 +94,8 @@ const newestDispatch = dispatches[0]?.date ?? null;
 const staticUrls = [
   { loc: `${ORIGIN}/`, priority: '1.0', changefreq: 'weekly', lastmod: newestDispatch },
   { loc: `${ORIGIN}/field-guide`, priority: '0.8', changefreq: 'monthly' },
+  { loc: `${ORIGIN}/now`, priority: '0.7', changefreq: 'weekly' },
+  { loc: `${ORIGIN}/archive`, priority: '0.8', changefreq: 'weekly' },
   { loc: `${ORIGIN}/2026`, priority: '0.7', changefreq: 'monthly' },
   { loc: `${ORIGIN}/privacy`, priority: '0.3', changefreq: 'yearly' },
   { loc: `${ORIGIN}/terms`, priority: '0.3', changefreq: 'yearly' },

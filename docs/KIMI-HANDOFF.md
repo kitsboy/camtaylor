@@ -1,3 +1,22 @@
+## 2026-11-10 — Hermes: indie ascent (top-5) + 3 UI polishes (pushed = deployed)
+
+**Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`** — the push IS the deploy (single-deployer).
+
+- **#1 Hero “Ascent” position chip** — one more metric in the hero band shows where you are on the route (`Base Camp · 1/8` → `Summit · 8/8`), driven by the same scroll position as the nav (new `useActiveWaypoint`, intersection-based). Structural framing, not a measured reading — on brand with waypoints.ts.
+- **#2 Year-on-year “tide-mark”** — added to `/2026`: a two-column Before-this-review / Now compare, authored as directional conditions-that-changed, explicitly not measured growth (the prior-year numbers were never logged). `YEAR_TIDE_MARK` in `yearReview.ts`.
+- **#3 `/archive` index** — new page: every dispatch grouped by month with date/camp/read-time/tags, RSS note. Linked from the footer (alongside `/now`) and from the homepage log feed ("full index"). `/archive` + `/now` are in the sitemap.
+- **#4 PDF/print — verified already done** — the dispatch page has a “Save as PDF” (window.print) and a thorough `@media print` stylesheet (white bg / black text, hides navbar/sticky-cta/canvas) across three stylesheets. No change needed.
+- **#5 “≈ sats to send BTC” estimate** — in the live fee strip, a derived label: economy median fee × ~140 vB standard taproot → total sats, labelled mempool.space. Guarded against an empty series.
+
+**Polish (3 UI/UX, folded into the above):**
+- **A — Hero “pick a leg” cue** — a desktop-only pill in the live row (“↓ pick a camp — the log is one ascent”); hidden ≤980px so the phone hero fold is untouched.
+- **B — Ascent meter (doubles as #1)** — crisp metric chip, updates as you scroll past a camp.
+- **C — Fee-strip send estimate (doubles as #5)** — tight caption under the fee chart.
+
+**Tests:** `tsc` + `oxlint` + `quality` + budget gates (desktop 16,000 / phone) + full Playwright suite green. All new surfaces read on both themes.
+
+---
+
 ## 2026-11-10 — Hermes: Now page, fee rounding, JSON-LD WebSite, camp-title scroll-spy, lazy images (pushed = deployed)
 
 **Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`** — the push IS the deploy (single-deployer).

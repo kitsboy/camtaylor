@@ -8,6 +8,7 @@ import { RouteStatusRotator } from './RouteStatusRotator';
 import { LiveBlockPulse } from './LiveBlockPulse';
 import { HeroLiveReadings } from './HeroLiveReadings';
 import { LastClimbTicker } from './LastClimbTicker';
+import { useActiveWaypoint } from '../hooks/useActiveWaypoint';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface HeroProps {
@@ -18,6 +19,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
   const sectionRef = useRef<HTMLElement>(null);
   const metricsRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
+  const ascent = useActiveWaypoint();
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -166,11 +168,20 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
               </div>
             </React.Fragment>
           ))}
+          <div className="metric-item hero-ascent" title="Your position on the route">
+            <span className="metric-label">Ascent</span>
+            <span className="hero-ascent-value">
+              {ascent.waypoint.camp} · {ascent.position}/{ascent.total}
+            </span>
+          </div>
         </motion.div>
 
         <motion.div className="hero-live-row" variants={itemVariants}>
           <LiveBlockPulse />
           <HeroLiveReadings />
+          <span className="hero-scroll-cue" aria-hidden="true">
+            <span className="hero-scroll-cue-glyph" /> pick a camp — the log is one ascent
+          </span>
         </motion.div>
       </motion.div>
     </section>

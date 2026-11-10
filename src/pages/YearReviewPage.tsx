@@ -8,6 +8,7 @@ import {
   YEAR_REVIEW_LESSONS,
   YEAR_REVIEW_QUARTERS,
   YEAR_REVIEW_LAST_UPDATED,
+  YEAR_TIDE_MARK,
 } from '../data/yearReview';
 
 export function YearReviewPage() {
@@ -34,6 +35,30 @@ export function YearReviewPage() {
             <li key={h}>{h}</li>
           ))}
         </ul>
+
+        <h2>{YEAR_TIDE_MARK.label}</h2>
+        <p className="legal-updated">
+          Directional framing, not measured growth — the “last year” column records the
+          conditions that changed, since the numbers prior to this review were never logged.
+        </p>
+        <div className="tide-mark">
+          <div className="tide-column tide-column--before">
+            <h3>Before this review</h3>
+            <ul>
+              {YEAR_TIDE_MARK.before.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="tide-column">
+            <h3>Now</h3>
+            <ul>
+              {YEAR_TIDE_MARK.now.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
 
         <h2>Current quarter ({currentQuarter.toUpperCase()})</h2>
         <ul>
