@@ -10,6 +10,8 @@ Picked items (1, 3, 4) from the offer: **Ventures → static grid**, **Summit Jo
 
 Gate green (tsc+lint+build+quality). Confirmatory full suite on this tree **107 passed / 1 skipped / 0 failed** (the route-bar + command-deck flakes seen mid-batch both pass in isolation and are unrelated to this change).
 
+**Length (apples-to-apples, same viewport + load, old `b4f82f8` vs new `52d14c6`):** desktop **15,899 → 15,773** (−126px), phone **19,179 → 19,038** (−141px) — both deeper under budget (16,000 / 19,900). An earlier incarnation of the journal (show 1 card + toggle) was actually *taller* than the old 3-in-a-row it replaced (+66px), so it was changed to collapse to zero cards by default (proof strip + read-toggle always open), which is what produces the real cut.
+
 ## 2026-11-10 — Hermes: ⌘K route commands + live-board share + summit chip (pushed = deployed)
 
 **Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`** — the push IS the deploy (single-deployer).
