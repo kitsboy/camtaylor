@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Globe,
   ArrowUpRight,
@@ -10,15 +10,10 @@ import {
   ShieldAlert,
   ShoppingBag,
   Map,
-  X,
-  Users,
   TrendingUp,
 } from 'lucide-react';
-import { VENTURES, VENTURE_STATUS_LABELS, type Venture, type VentureStatus } from '../data/ventures';
-import { ScrollFade } from './ScrollFade';
+import { VENTURES, VENTURE_STATUS_LABELS, type VentureStatus } from '../data/ventures';
 import { VentureLiveDot } from './VentureLiveDot';
-import { useFocusTrap } from '../hooks/useFocusTrap';
-import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 
 const ICONS = [Award, Code, Globe, Zap, ShieldAlert, Map, ShoppingBag] as const;
 
@@ -34,8 +29,6 @@ function AltitudeMeter({ value }: { value: number }) {
   return (
     <div className="altitude-meter" title={`Altitude: ${value}%`}>
       <div className="altitude-meter-track">
-        {/* Mounts, rather than waiting on an intersection: inside the
-            horizontal carousel an intersection may never arrive. */}
         <motion.div
           className="altitude-meter-fill"
           initial={{ width: 0 }}
@@ -48,130 +41,18 @@ function AltitudeMeter({ value }: { value: number }) {
   );
 }
 
-function VentureModal({
-  venture,
-  onClose,
-  returnFocus,
-}: {
-  venture: Venture;
-  onClose: () => void;
-  returnFocus?: () => void;
-}) {
-  const modalRef = useRef<HTMLDivElement>(null);
-  useFocusTrap(modalRef, true);
-  useBodyScrollLock(true);
-
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [onClose]);
-
-  useEffect(() => () => returnFocus?.(), [returnFocus]);
-
-  return (
-    <motion.div
-      className="venture-modal-overlay"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-    >
-      <motion.div
-        ref={modalRef}
-        className="venture-modal glass-depth-3"
-        initial={{ opacity: 0, y: 24, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 16, scale: 0.98 }}
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-label={`${venture.name} case study`}
-      >
-        <button type="button" className="venture-modal-close" onClick={onClose} aria-label="Close">
-          <X size={16} />
-        </button>
-        <p className="venture-modal-eyebrow">{venture.tag}</p>
-        <h3 className="venture-modal-title">{venture.name}</h3>
-        <p className="venture-modal-role">{venture.role}</p>
-
-        <div className="venture-modal-slides">
-          <div className="venture-slide">
-            <span className="venture-slide-num">01</span>
-            <h4>Problem</h4>
-            <p>{venture.caseStudy.problem}</p>
-          </div>
-          <div className="venture-slide">
-            <span className="venture-slide-num">02</span>
-            <h4>Structure</h4>
-            <p>{venture.caseStudy.structure}</p>
-          </div>
-          <div className="venture-slide">
-            <span className="venture-slide-num">03</span>
-            <h4>Outcome</h4>
-            <p>{venture.caseStudy.outcome}</p>
-          </div>
-        </div>
-
-        <div className="venture-modal-actions">
-          <a href={venture.url} target="_blank" rel="noopener noreferrer" className="btn-primary">
-            Visit platform <ArrowUpRight size={14} />
-          </a>
-          <Link to={`/route/${venture.id}`} className="btn-secondary" onClick={onClose}>
-            Full route page
-          </Link>
-          {venture.needsTalent && (
-            <a href="#contact" className="btn-secondary" onClick={onClose}>
-              <Users size={14} /> Join expedition
-            </a>
-          )}
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
+/**
+ * Ventures used to be a horizontal carousel with an inline case-study modal.
+ * The full case file now lives on its own route page (`/route/:id`), so the
+ * homepage keeps a compact, static grid whose cards open that page — same
+ * information, one less layer of JavaScript, and a shorter section. A static
+ * grid is never parked off a horizontal viewport, so the reveal cascade can
+ * never strand a card the way the old carousel did.
+ */
 export const Ventures: React.FC = () => {
-  const [activeVenture, setActiveVenture] = useState<Venture | null>(null);
   const [filter, setFilter] = useState<'all' | VentureStatus>('all');
-  const [activeDot, setActiveDot] = useState(0);
-  const sliderRef = useRef<HTMLDivElement>(null);
-  const lastTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   const filtered = filter === 'all' ? VENTURES : VENTURES.filter((v) => v.status === filter);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const ventureId = params.get('venture');
-    if (ventureId) {
-      const v = VENTURES.find((x) => x.id === ventureId);
-      if (v) setActiveVenture(v);
-    }
-  }, []);
-
-  const updateDots = useCallback(() => {
-    const el = sliderRef.current;
-    if (!el) return;
-    const cardWidth = el.querySelector('.venture-card')?.clientWidth ?? 300;
-    const gap = 16;
-    const index = Math.round(el.scrollLeft / (cardWidth + gap));
-    setActiveDot(Math.min(index, filtered.length - 1));
-  }, [filtered.length]);
-
-  useEffect(() => {
-    const el = sliderRef.current;
-    if (!el) return;
-    el.addEventListener('scroll', updateDots, { passive: true });
-    return () => el.removeEventListener('scroll', updateDots);
-  }, [updateDots]);
-
-  const scrollToCard = (index: number) => {
-    const el = sliderRef.current;
-    const card = el?.querySelectorAll('.venture-card')[index] as HTMLElement | undefined;
-    card?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-  };
 
   return (
     <section className="ventures-section" id="ventures">
@@ -179,7 +60,8 @@ export const Ventures: React.FC = () => {
       <div className="section-header">
         <h2 className="section-title text-gradient">ACTIVE VENTURES</h2>
         <p className="section-subtitle">
-          Companies, protocols, and platforms engineered or backed.
+          Companies, protocols, and platforms engineered or backed. Each card opens its route file — the case
+          study, live reachability, and provenance.
         </p>
       </div>
 
@@ -198,20 +80,12 @@ export const Ventures: React.FC = () => {
       </div>
 
       <div className="ventures-scroll-wrap">
-        <ScrollFade />
-        {/* The cascade is driven by the SECTION entering the viewport, not by
-            each card. A card parked outside a horizontal carousel never fires
-            its own `whileInView`, so a fast flick used to leave five of seven
-            cards stranded at opacity 0 — permanently invisible. The section is
-            always in the vertical viewport when someone is looking at the
-            carousel, so every card is guaranteed to reveal. */}
         <motion.div
           className="ventures-slider"
-          ref={sliderRef}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-20px' }}
-          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }}
         >
           {filtered.map((vent) => {
             const Icon = ICONS[VENTURES.indexOf(vent)] ?? Globe;
@@ -225,7 +99,7 @@ export const Ventures: React.FC = () => {
                   hidden: { opacity: 0, scale: 0.95 },
                   visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } },
                 }}
-                whileHover={{ y: -6 }}
+                whileHover={{ y: -4 }}
               >
                 <div className="venture-route-trace" aria-hidden="true" />
 
@@ -260,18 +134,10 @@ export const Ventures: React.FC = () => {
                 )}
 
                 <div className="venture-card-actions">
-                  <button
-                    type="button"
-                    className="venture-case-btn"
-                    ref={(el) => { if (el) lastTriggerRef.current = el; }}
-                    onClick={(e) => {
-                      lastTriggerRef.current = e.currentTarget;
-                      setActiveVenture(vent);
-                    }}
-                  >
+                  <Link to={`/route/${vent.id}`} className="venture-case-btn">
                     <TrendingUp size={13} />
-                    Case study
-                  </button>
+                    Route file
+                  </Link>
                   <a
                     href={vent.url}
                     target="_blank"
@@ -287,29 +153,6 @@ export const Ventures: React.FC = () => {
           })}
         </motion.div>
       </div>
-
-      <div className="venture-dots" aria-label="Venture carousel pagination">
-        {filtered.map((v, i) => (
-          <button
-            key={v.id}
-            type="button"
-            className={`venture-dot ${activeDot === i ? 'venture-dot--active' : ''}`}
-            onClick={() => scrollToCard(i)}
-            aria-label={`Go to ${v.name}`}
-            aria-current={activeDot === i ? 'true' : undefined}
-          />
-        ))}
-      </div>
-
-      <AnimatePresence>
-        {activeVenture && (
-          <VentureModal
-            venture={activeVenture}
-            onClose={() => setActiveVenture(null)}
-            returnFocus={() => lastTriggerRef.current?.focus()}
-          />
-        )}
-      </AnimatePresence>
     </section>
   );
 };

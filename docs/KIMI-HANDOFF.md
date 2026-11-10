@@ -1,3 +1,15 @@
+## 2026-11-10 — Hermes: homepage consolidation — Ventures→grid, Summit Journal→toggle (pushed = deployed)
+
+**Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`** — the push IS the deploy.
+
+Picked items (1, 3, 4) from the offer: **Ventures → static grid**, **Summit Journal → read-toggle**, **Signal kept live**. Log and desktop padding left untouched.
+
+- **Ventures (`src/components/Ventures.tsx`)** — the horizontal carousel + inline case-study modal are gone. The full case file already lived on `/route/:id` (smoke asserts it there independently), so the homepage now shows the same cards in a static grid; each card's primary action is **Route file** → deep link to that venture's route page. `.venture-card`, filters, live dot, altitude meter, name/role/desc/stacks all preserved. Removed `.venture-modal`, `.venture-dots`, carousel motion. A static grid is never parked off-horizontal, so the old "stranded blank card" case (f0fed9d) cannot recur by construction.
+- **Summit Journal (`src/components/Testimonials.tsx`)** — the proof strip (live venture counts) always renders; the three quotes fold behind a `.journal-toggle` button (`aria-expanded`, 44px target). Not a `<details class="section-fold">`, so the "desktop does not fold anything" invariant (device-qa) holds. No feature loss.
+- **Signal** — unchanged, stays live/open.
+
+Gate green (tsc+lint+build+quality). Confirmatory full suite on this tree **107 passed / 1 skipped / 0 failed** (the route-bar + command-deck flakes seen mid-batch both pass in isolation and are unrelated to this change).
+
 ## 2026-11-10 — Hermes: ⌘K route commands + live-board share + summit chip (pushed = deployed)
 
 **Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`** — the push IS the deploy (single-deployer).

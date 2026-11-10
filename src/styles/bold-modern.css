@@ -2897,3 +2897,10 @@ textarea:focus-visible, summary:focus-visible, [role="button"]:focus-visible, [t
 [data-theme="night"] .hero-ascent-value { color: #eef7f2; }
 .hero-ascent--summit .hero-ascent-value { color: var(--coral); }
 [data-theme="night"] .hero-ascent--summit .hero-ascent-value { color: #ff6a4a; }
+
+/* Summit journal read-toggle — the proof strip stays open, the quotes fold. */
+.journal-toggle { min-height: 44px; display: inline-flex; align-items: center; gap: 7px; margin-top: 22px; padding: 0 15px; border: 1px solid var(--glass-border); border-radius: 999px; background: transparent; color: var(--text-secondary); font: 700 var(--fs-2xs)/1 var(--font-heading); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; transition: border-color .18s, color .18s, background .18s; }
+.journal-toggle:hover, .journal-toggle:focus-visible { border-color: var(--green); color: var(--green); }
+.journal-toggle--open .lucide-chevron-down { transform: rotate(180deg); }
+.journal-toggle svg { transition: transform .2s ease; }
+.testimonials-grid--open .testimonial-card { margin-top: 18px; }
