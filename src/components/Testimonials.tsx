@@ -13,14 +13,15 @@ const totalCount = VENTURES.length;
 const markets = new Set(VENTURES.map((v) => v.tag)).size;
 
 /**
- * The three quotes fold behind one honest control. The proof strip (the number
- * the reader actually lands on) always stays open; the quotes themselves are
- * secondary colour, so a reader who wants them taps and gets the same three — no
- * content lost, just not all rendered at full height on first paint.
+ * One note is always visible and the other two open on tap. The proof strip
+ * (the number the reader actually lands on) stays open above that note; the
+ * rest of the journal stays behind the same control. Nothing is deleted — it
+ * is just not all rendered at full height on first paint.
  */
 export const Testimonials: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const shown = open ? TESTIMONIALS : [];
+  const featured = TESTIMONIALS[0];
+  const shown = open ? TESTIMONIALS.slice(1) : [];
 
   return (
     <section className="testimonials-section" id="testimonials">
@@ -47,6 +48,18 @@ export const Testimonials: React.FC = () => {
           <span>markets</span>
         </div>
       </div>
+
+      <blockquote className="journal-featured testimonial-card glass-depth-1">
+        <Quote className="testimonial-quote-icon" size={20} />
+        <p className="testimonial-text">&ldquo;{featured.quote}&rdquo;</p>
+        <footer className="testimonial-footer">
+          <cite className="testimonial-author">{featured.author}</cite>
+          <span className="testimonial-role">
+            {featured.role}
+            {featured.venture ? ` · ${featured.venture}` : ''}
+          </span>
+        </footer>
+      </blockquote>
 
       <div className="testimonials-scroll-wrap">
         <ScrollFade />
@@ -79,7 +92,7 @@ export const Testimonials: React.FC = () => {
           aria-expanded={open}
         >
           <ChevronDown size={14} aria-hidden="true" />
-          {open ? 'A quieter route' : `Read the notes · ${TESTIMONIALS.length} voices`}
+          {open ? 'A quieter route' : `Read the notes · ${TESTIMONIALS.length - 1} more`}
         </button>
       </div>
     </section>
