@@ -478,11 +478,11 @@ test('the route sheet menu carries all twelve camps in three legs', async ({ pag
 });
 
 /**
- * The pill and the bar's Connect item are the same door: both say "start a
- * conversation" and both are the loudest thing on their strip of screen. Both
- * are worth having — the pill is the wide invitation, Connect is the permanent
- * thumb-reach — but both lit at once is the site shouting twice about one
- * thing. Exactly one carries the accent at any moment.
+ * The pill and the bar's Connect item share one strip of screen. The pill
+ * says "Book a route check". Connect still scrolls to the form. Both are
+ * worth having — the pill is the wide invitation once the hero book button
+ * has left, Connect is the permanent thumb-reach — but both lit at once is
+ * the site shouting twice. Exactly one accent at a time.
  *
  * `StickyCta` publishes which is showing on `<html data-cta>`.
  */
@@ -499,6 +499,19 @@ test('only one call to action is lit at a time', async ({ page }) => {
       lane: document.documentElement.dataset.cta ?? '(none)',
       scrollY: Math.round(window.scrollY),
     }));
+
+  // At the top the hero book button is in view, so the pill stays off and the
+  // bar holds the call. Poll: `data-cta` is published in an effect.
+  await expect
+    .poll(async () => (await read()).pillShowing, {
+      message: 'the pill should stay hidden while the hero book button is in view',
+    })
+    .toBe(false);
+  await expect
+    .poll(async () => (await read()).lane, {
+      message: 'the bar should hold the call while the hero button is in view',
+    })
+    .toBe('bar');
 
   // Scrolling down sends the pill away; the bar carries the call.
   // Poll for the settled state instead of a fixed wait — the scroll handler and the
