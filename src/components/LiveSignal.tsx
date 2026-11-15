@@ -19,7 +19,6 @@ import { DifficultyClimb } from './DifficultyClimb';
 import { TickReading } from './TickReading';
 import { SectionFold } from './SectionFold';
 import { LiveBlockPulse } from './LiveBlockPulse';
-import { LastClimbTicker } from './LastClimbTicker';
 import { HeroLiveReadings } from './HeroLiveReadings';
 import { buildChartSeries } from '../utils/signalChart';
 
@@ -141,18 +140,19 @@ export const LiveSignal: React.FC = () => {
             <h2 className="section-title">{LIVE_SIGNAL_COPY.title}</h2>
             <p className="live-subtitle">{LIVE_SIGNAL_COPY.subtitle}</p>
           </div>
-          <div
-            className={`live-state live-state--${isStale || lightning.isStale || price.isStale || pressure.isStale ? 'stale' : status}`}
-            aria-live="polite"
-          >
-            <span className="live-state-dot" aria-hidden="true" />
-            {isStale || lightning.isStale || price.isStale || pressure.isStale
-              ? 'LAST GOOD'
-              : status === 'live'
-                ? 'LIVE'
-                : status === 'connecting'
-                  ? 'CONNECTING'
-                  : 'OFFLINE'}
+          <div className="live-head-actions">
+            <div
+              className={`live-state live-state--${isStale || lightning.isStale || price.isStale || pressure.isStale ? 'stale' : status}`}
+              aria-live="polite"
+            >
+              <span className="live-state-dot" aria-hidden="true" />
+              {isStale || lightning.isStale || price.isStale || pressure.isStale
+                ? 'LAST GOOD'
+                : status === 'live'
+                  ? 'LIVE'
+                  : status === 'connecting'
+                    ? 'CONNECTING'
+                    : 'OFFLINE'}
               <small>{time} PT</small>
             </div>
             <button
@@ -165,12 +165,12 @@ export const LiveSignal: React.FC = () => {
               <span>{shared ? 'Copied' : 'Share the board'}</span>
             </button>
           </div>
+        </div>
 
-          <div className="signal-conditions" aria-label="Route conditions">
-            <LiveBlockPulse />
-            <LastClimbTicker />
-            <HeroLiveReadings />
-          </div>
+        <div className="signal-conditions" aria-label="Route conditions">
+          <LiveBlockPulse />
+          <HeroLiveReadings />
+        </div>
 
         {/*
           A dropped read used to blank the panel and print "offline", which blames the

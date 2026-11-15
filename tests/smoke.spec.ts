@@ -273,13 +273,8 @@ test('signal camp shows live route-condition readings from the shared board', as
 
 test('signal camp last-climb ticker reads the shared board, never decorative bars', async ({ page }) => {
   await page.goto('/');
-  const ticker = page.locator('#signal .intelligence-ticker');
-  await expect(ticker).toBeVisible();
-  // Three honest cells (Tip, Fast fee, Mempool) + a state cell. Each shows a
-  // real value or "—", never a fabricated number.
-  await expect(ticker.locator('.intelligence-ticker-item')).toHaveCount(4);
-  await expect(ticker.locator('.intelligence-ticker-item--state')).toBeVisible();
-  // The old fabricated decorative bars are gone.
+  await expect(page.locator('#signal .intelligence-ticker')).toHaveCount(0);
+  await expect(page.locator('#hero .intelligence-ticker')).toHaveCount(0);
   await expect(page.locator('.intelligence-bars')).toHaveCount(0);
 });
 
