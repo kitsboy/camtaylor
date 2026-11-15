@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const ROUTE_CHECKED_KEY = 'ct-route-checked';
+const HERO_BG = '/hero-bg.jpg';
 
 function waitForFonts(): Promise<void> {
   return (document.fonts?.ready ?? Promise.resolve()).then(() => {});
@@ -14,11 +17,34 @@ function waitForImage(src: string): Promise<void> {
   });
 }
 
+function readRouteChecked(): boolean {
+  try {
+    return sessionStorage.getItem(ROUTE_CHECKED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function markRouteChecked(): void {
+  try {
+    sessionStorage.setItem(ROUTE_CHECKED_KEY, '1');
+  } catch {
+    /* private mode, or storage blocked — this view still hides, the next one cannot skip */
+  }
+}
+
+function heroImageCached(): boolean {
+  const img = new Image();
+  img.src = HERO_BG;
+  return img.complete;
+}
+
 export const LoadingScreen: React.FC = () => {
-  const [visible, setVisible] = useState(true);
+  // Hidden until the layout effect says this view must wait, so a skip never paints.
+  const [visible, setVisible] = useState(false);
   const [prefersReduced, setPrefersReduced] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReduced(mq.matches);
 
@@ -27,11 +53,32 @@ export const LoadingScreen: React.FC = () => {
       return;
     }
 
-    Promise.all([waitForFonts(), waitForImage('/hero-bg.jpg')])
-      .then(() => setVisible(false))
-      .catch(() => setVisible(false));
+    if (readRouteChecked()) {
+      setVisible(false);
+      return;
+    }
 
-    const fallback = setTimeout(() => setVisible(false), 1800);
+    if (document.fonts?.status === 'loaded' && heroImageCached()) {
+      markRouteChecked();
+      setVisible(false);
+      return;
+    }
+
+    setVisible(true);
+
+    let settled = false;
+    const hide = () => {
+      if (settled) return;
+      settled = true;
+      markRouteChecked();
+      setVisible(false);
+    };
+
+    Promise.all([waitForFonts(), waitForImage(HERO_BG)])
+      .then(hide)
+      .catch(hide);
+
+    const fallback = setTimeout(hide, 1800);
     return () => clearTimeout(fallback);
   }, []);
 
