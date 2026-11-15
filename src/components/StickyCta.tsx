@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { SITE } from '../data/site';
 import { useScrollDirection } from '../hooks/useScrollDirection';
 
 export const StickyCta: React.FC = () => {
@@ -30,11 +31,10 @@ export const StickyCta: React.FC = () => {
   const hidden = contactVisible || footerVisible || direction === 'down';
 
   /**
-   * This pill and the route bar's Connect item are the same door. Both are right
-   * on their own; both lit at once is the page shouting the same thing twice.
-   * Publishing which one is on screen lets the stylesheet keep exactly one of
-   * them lit — the same mechanism `data-theme` and `data-reduced-motion` use to
-   * carry state that several components need.
+   * The pill opens Calendly. The phone quick-nav Connect item still scrolls to
+   * the form. Publishing which one is on screen lets the stylesheet keep exactly
+   * one of them lit — the same mechanism `data-theme` and `data-reduced-motion`
+   * use to carry state that several components need.
    */
   useEffect(() => {
     document.documentElement.dataset.cta = hidden ? 'bar' : 'pill';
@@ -43,16 +43,17 @@ export const StickyCta: React.FC = () => {
     };
   }, [hidden]);
 
-  const scrollToContact = () => {
-    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
     <div className={`sticky-cta ${hidden ? 'sticky-cta--hidden' : ''}`}>
-      <button type="button" onClick={scrollToContact} className="sticky-cta-btn">
-        <span>Start a conversation</span>
+      <a
+        href={SITE.calendlyUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="sticky-cta-btn"
+      >
+        <span>Book a route check</span>
         <ArrowRight size={16} />
-      </button>
+      </a>
     </div>
   );
 };

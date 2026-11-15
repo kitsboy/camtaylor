@@ -1788,6 +1788,7 @@ img, video {
   border: none;
   border-radius: var(--radius);
   color: #fff;
+  text-decoration: none;
   font-family: var(--font-heading);
   font-weight: 700;
   font-size: var(--fs-body);
