@@ -1008,8 +1008,7 @@ a,
   .scroll-rope,
   .hero-backdrop-wrap,
   .background-canvas,
-  .terminal-overlay,
-  .custom-cursor {
+  .terminal-overlay {
     display: none !important;
   }
 

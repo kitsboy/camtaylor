@@ -24,7 +24,6 @@ import { Footer } from '../components/Footer';
 import { StickyCta } from '../components/StickyCta';
 import { ScrollProgress } from '../components/ScrollProgress';
 import { LoadingScreen } from '../components/LoadingScreen';
-import { CustomCursor } from '../components/CustomCursor';
 import { MobileQuickNav } from '../components/MobileQuickNav';
 import { BackToTop } from '../components/BackToTop';
 import { useKonamiCode } from '../hooks/useKonamiCode';
@@ -96,7 +95,6 @@ export function HomePage() {
     <>
       <LoadingScreen />
       <ScrollProgress />
-      <CustomCursor />
 
       <a href="#hero" className="skip-link">
         Skip to content
