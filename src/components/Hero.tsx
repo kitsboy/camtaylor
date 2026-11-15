@@ -1,5 +1,4 @@
 import React, { useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Cpu, Activity, Orbit, ShieldCheck, MapPin } from 'lucide-react';
 import { SITE, HERO_SIGNALS } from '../data/site';
@@ -128,21 +127,12 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
           </a>
 
           <button
-            onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => document.getElementById('route-sheet')?.scrollIntoView({ behavior: 'smooth' })}
             className="btn-secondary"
           >
             <span>See the Route</span>
             <ArrowRight size={15} />
           </button>
-
-          <button onClick={onOpenTerminal} className="btn-secondary btn-ghost">
-            <Cpu size={14} />
-            <span>Command Deck</span>
-          </button>
-
-          <Link to="/field-guide" className="btn-secondary btn-ghost">
-            Field Guide
-          </Link>
         </motion.div>
 
         <motion.button

@@ -31,6 +31,7 @@ export const RouteSheet: React.FC = () => {
 
   return (
     <motion.nav
+      id="route-sheet"
       className="route-sheet"
       aria-label="Route sheet"
       initial={reduced ? false : 'hidden'}
