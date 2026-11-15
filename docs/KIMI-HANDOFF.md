@@ -1,3 +1,19 @@
+## 2026-11-15 — Grok: five homepage UI passes (pushed = deployed)
+
+**Machine:** M3 (Grok) · **Project:** camtaylor · **Pushed to `main`** — the push IS the deploy.
+
+Local `main` had diverged: unpushed docs commit `ac6981d` (25 Sep) plus a broken contact-strip WIP. Neither was replayed. The commit is on branch `backup/ac6981d-sept-docs`. The WIP is `stash@{0}` (`sept contact wip — not on origin contact`). Do not pop that stash onto current `Contact.tsx`.
+
+Shipped, each its own commit:
+
+- `0b63918` — Summit Journal shows the OpenStrata note on first paint. The other two open from “Read the notes · 2 more”. Proof strip unchanged.
+- `7606ff1` — The phone scroll-up pill says “Book a route check” and opens the same Calendly URL as the hero. The phone Connect bar still scrolls to the form. The pill is phone-only (`max-width: 768px`).
+- `038856e` — Hero actions are Book a route check and See the Route. See the Route scrolls to `#route-sheet`. Command Deck stays on the ⌘K chip. Field Guide stays in the footer.
+- `6f6f06b` — The route-check veil skips when `sessionStorage['ct-route-checked']` is set, or when fonts and `/hero-bg.jpg` are already cached. A cold visit still shows it. Reduced motion still skips.
+- `a2a0124` — Latest block, last-climb ticker, and route-condition cells moved from the hero into `#signal .signal-conditions`. They still read the shared board. Smoke tests point at `#signal`.
+
+Checked: `tsc`, oxlint, `npm run quality`. Playwright preview: desktop and phone length budgets, hero fold at 375/390/414, no horizontal overflow at 320 and 390, and the three signal-reading smokes. Browser: desktop 1440 and phone 390 — featured quote present, route sheet receives See the Route, phone pill href is the Calendly link, signal strip shows a live block height and does not overflow.
+
 ## 2026-11-10 — Hermes: homepage consolidation — Ventures→grid, Summit Journal→toggle (pushed = deployed)
 
 **Machine:** THOR (Hermes) · **Project:** camtaylor · **Pushed to `main`** — the push IS the deploy.
