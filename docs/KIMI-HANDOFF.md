@@ -1,3 +1,15 @@
+## 2026-11-15 — Grok: signal row, phone pill, native cursor, live form ping
+
+**Machine:** M3 (Grok) · **Project:** camtaylor · **Pushed to `main`**.
+
+- `c9e5c58` — Signal shows one reading row (latest-block pulse + Tip / Mempool / Fast fee / Signal). The duplicate last-climb ticker is gone. “Share the board” sits beside the LIVE chip.
+- `be60b59` — The phone pill stays hidden while the hero “Book a route check” button is on screen. It returns on scroll-up after that button leaves. Connect still scrolls to the form.
+- `560dc8c` — Desktop uses the native pointer. The custom cursor and `cursor: none` are gone.
+
+**Live form.** `LIVE_FORM_TEST=1` ran once against https://camtaylor.ca. The success panel appeared and names `hello@giveabit.io`. One marked message: name `CT live-form test`, from `live-form-test@giveabit.io`, body starts with `CT-TEST-`. No reply needed.
+
+Checked: tsc, oxlint, quality, signal smokes, the one-CTA phone test, length budgets, hero fold at 375/390/414, overflow at 390. Browser at 1440 and 390.
+
 ## 2026-11-15 — Grok: five homepage UI passes (pushed = deployed)
 
 **Machine:** M3 (Grok) · **Project:** camtaylor · **Pushed to `main`** — the push IS the deploy.
