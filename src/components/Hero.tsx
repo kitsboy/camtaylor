@@ -4,9 +4,6 @@ import { ArrowRight, Cpu, Activity, Orbit, ShieldCheck, MapPin } from 'lucide-re
 import { SITE, HERO_SIGNALS } from '../data/site';
 import { HeroVideo } from './HeroVideo';
 import { RouteStatusRotator } from './RouteStatusRotator';
-import { LiveBlockPulse } from './LiveBlockPulse';
-import { HeroLiveReadings } from './HeroLiveReadings';
-import { LastClimbTicker } from './LastClimbTicker';
 import { useActiveWaypoint } from '../hooks/useActiveWaypoint';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -106,7 +103,6 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
           <HeroVideo />
         </div>          <motion.div className="hero-intelligence-strip" variants={itemVariants} aria-label="Route intelligence">
             <div className="intelligence-label"><Activity size={13} /> {HERO_SIGNALS.intelligenceLabel}</div>
-            <LastClimbTicker />
             <div className="intelligence-value"><Orbit size={13} /> {HERO_SIGNALS.intelligenceValue}</div>
           </motion.div>
 
@@ -170,8 +166,6 @@ export const Hero: React.FC<HeroProps> = ({ onOpenTerminal }) => {
         </motion.div>
 
         <motion.div className="hero-live-row" variants={itemVariants}>
-          <LiveBlockPulse />
-          <HeroLiveReadings />
           <span className="hero-scroll-cue" aria-hidden="true">
             <span className="hero-scroll-cue-glyph" /> pick a camp — the log is one ascent
           </span>

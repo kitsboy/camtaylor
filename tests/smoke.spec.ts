@@ -251,9 +251,9 @@ test('difficulty climb renders the next-pitch countdown honestly', async ({ page
   await expect(climb.locator('.climb-refresh')).toBeVisible();
 });
 
-test('hero shows a live latest-block pulse from the shared signal board', async ({ page }) => {
+test('signal camp shows a live latest-block pulse from the shared signal board', async ({ page }) => {
   await page.goto('/');
-  const pulse = page.locator('#hero .block-pulse');
+  const pulse = page.locator('#signal .block-pulse');
   await expect(pulse).toBeVisible();
   // Reads the same board the panels publish — so it either reports a block
   // height (live read) or the honest "Reading chain…" placeholder, never a
@@ -261,9 +261,9 @@ test('hero shows a live latest-block pulse from the shared signal board', async 
   await expect.poll(async () => (await pulse.textContent()) ?? '').toMatch(/Latest block|Last read|Reading chain/);
 });
 
-test('hero shows live route-condition readings from the shared board', async ({ page }) => {
+test('signal camp shows live route-condition readings from the shared board', async ({ page }) => {
   await page.goto('/');
-  const readings = page.locator('#hero .hero-live-readings');
+  const readings = page.locator('#signal .hero-live-readings');
   await expect(readings).toBeVisible();
   // Four honest cells: Tip, Mempool, Fast fee, Signal — each shows a real value
   // or the "—" placeholder, never a fabricated number.
@@ -271,16 +271,16 @@ test('hero shows live route-condition readings from the shared board', async ({ 
   await expect(readings.locator('.hero-live-reading--state')).toBeVisible();
 });
 
-test('hero last-climb ticker reads the shared board, never decorative bars', async ({ page }) => {
+test('signal camp last-climb ticker reads the shared board, never decorative bars', async ({ page }) => {
   await page.goto('/');
-  const ticker = page.locator('#hero .intelligence-ticker');
+  const ticker = page.locator('#signal .intelligence-ticker');
   await expect(ticker).toBeVisible();
   // Three honest cells (Tip, Fast fee, Mempool) + a state cell. Each shows a
   // real value or "—", never a fabricated number.
   await expect(ticker.locator('.intelligence-ticker-item')).toHaveCount(4);
   await expect(ticker.locator('.intelligence-ticker-item--state')).toBeVisible();
   // The old fabricated decorative bars are gone.
-  await expect(page.locator('#hero .intelligence-bars')).toHaveCount(0);
+  await expect(page.locator('.intelligence-bars')).toHaveCount(0);
 });
 
 test('difficulty climb counts down live from the real reading', async ({ page }) => {

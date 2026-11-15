@@ -18,6 +18,9 @@ import { MempoolPressure } from './MempoolPressure';
 import { DifficultyClimb } from './DifficultyClimb';
 import { TickReading } from './TickReading';
 import { SectionFold } from './SectionFold';
+import { LiveBlockPulse } from './LiveBlockPulse';
+import { LastClimbTicker } from './LastClimbTicker';
+import { HeroLiveReadings } from './HeroLiveReadings';
 import { buildChartSeries } from '../utils/signalChart';
 
 const CHART_W = 640;
@@ -161,6 +164,12 @@ export const LiveSignal: React.FC = () => {
               {shared ? <Check size={13} aria-hidden="true" /> : <Share2 size={13} aria-hidden="true" />}
               <span>{shared ? 'Copied' : 'Share the board'}</span>
             </button>
+          </div>
+
+          <div className="signal-conditions" aria-label="Route conditions">
+            <LiveBlockPulse />
+            <LastClimbTicker />
+            <HeroLiveReadings />
           </div>
 
         {/*
